@@ -13,7 +13,7 @@ function MainPage() {
 
   return (
     <div>
-      <nav class="navBars">
+      <nav className="navBars">
         <a href="./main">Home</a>
         <a href="./manage">관리</a>
         <a href="./analysis">분석</a>
