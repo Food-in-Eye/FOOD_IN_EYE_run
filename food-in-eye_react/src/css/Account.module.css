@@ -21,15 +21,3 @@ form {
 .align {
   align-items: left;
 }
-
-.btnLogin {
-  color: black;
-  background-color: whitesmoke;
-  border: 2px solid black;
-  margin-top: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 53px;
-  padding-right: 53px;
-  border-radius: 10px;
-}

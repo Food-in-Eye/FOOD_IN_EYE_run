@@ -1,0 +1,12 @@
+.style {
+  color: black;
+  background-color: whitesmoke;
+  border: 2px solid black;
+  align-self: center;
+  margin-top: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 30px;
+  padding-right: 30px;
+  border-radius: 10px;
+}
