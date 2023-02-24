@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import styles from "../css/login.module.css";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -8,14 +9,22 @@ function LoginPage() {
   };
 
   return (
-    <div>
-      <h3>로그인</h3>
+    <div className={styles.container}>
       <form>
-        <input type="text" name="id" placeholder="아이디" />
-        <input type="password" name="password" placeholder="비밀번호" />
-        <button onClick={onLogin}>로그인</button>
+        <h2>로그인</h2>
+        <div className={styles.align}>
+          <p>ID</p>
+          <input type="text" name="id" placeholder="아이디" />
+          <p>Password</p>
+          <input type="password" name="password" placeholder="비밀번호" />
+          <br />
+          <button className={styles.btnLogin} onClick={onLogin}>
+            로그인
+          </button>
+        </div>
+        <br />
+        <Link to={`/register`}>회원가입</Link>
       </form>
-      <Link to={`/register`}>회원가입</Link>
     </div>
   );
 }
