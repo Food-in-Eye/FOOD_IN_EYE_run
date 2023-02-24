@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import styles from "../css/login.module.css";
+import styles from "../css/Account.module.css";
+import Button from "../css/Button.module.css";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function LoginPage() {
           <p>Password</p>
           <input type="password" name="password" placeholder="비밀번호" />
           <br />
-          <button className={styles.btnLogin} onClick={onLogin}>
+          <button className={Button.style} onClick={onLogin}>
             로그인
           </button>
         </div>
