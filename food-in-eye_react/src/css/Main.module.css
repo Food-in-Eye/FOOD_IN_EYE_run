@@ -1,0 +1,136 @@
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.util {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+}
+
+.util li {
+  float: left;
+}
+
+.util li a {
+  display: block;
+  font: 12px/1 "arial";
+  color: #999;
+  padding: 0px 10px;
+}
+
+.header {
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.header h2 {
+  position: absolute;
+  top: 30px;
+  left: 5px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.inner {
+  margin: 0px auto;
+}
+
+.profile {
+  position: absolute;
+  right: 10px;
+  bottom: 15px;
+  width: 100px;
+  display: flex;
+  justify-content: space-between;
+  background-color: transparent;
+}
+
+.profile img {
+  width: 30px;
+  height: auto;
+  padding: 0;
+  border-radius: 100%;
+  border: 1px solid black;
+}
+
+.profile h3 {
+  margin-top: 5px;
+  font: bold 20px/1 "arial";
+}
+
+.gnb {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.gnb li {
+  float: left;
+  flex-direction: row;
+}
+
+.gnb li a {
+  display: block;
+  font: bold 15px/1 "arial";
+  color: #555;
+  padding: 20px 40px;
+  transition: all 0.5s;
+}
+
+.gnb li a:hover {
+  background: #555;
+  color: #fff;
+}
+
+.sale {
+  box-sizing: border-box;
+  background-color: #2f365f;
+  width: 300px;
+  height: auto;
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-evenly;
+}
+
+.sales {
+  font: bold, 15px/1 "arial";
+  color: #fff;
+  flex-flow: row wrap;
+  left: 10px;
+  top: 30px;
+}
+
+.container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  padding: 30px;
+}
+
+.sales,
+.order,
+.managePage {
+  flex-basis: calc(33.3% - 50px);
+}
