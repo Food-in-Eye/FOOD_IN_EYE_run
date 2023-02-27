@@ -1,6 +1,6 @@
 import MenuBar from "../components/MenuBar";
 
-function AnalysisPage() {
+function AdminPage() {
   return (
     <div>
       <MenuBar />
@@ -8,4 +8,4 @@ function AnalysisPage() {
   );
 }
 
-export default AnalysisPage;
+export default AdminPage;
