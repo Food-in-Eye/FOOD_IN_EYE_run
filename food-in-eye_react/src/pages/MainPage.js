@@ -46,7 +46,7 @@ function MainPage() {
         </div>
       </section>
 
-      <section className={Main.container}>
+      <section className={Main.sub_page}>
         <div className={Main.saleAndCal}>
           <div className={Main.sale}>
             <div className={Main.sales}>
@@ -55,20 +55,24 @@ function MainPage() {
             </div>
             <h3 className="saleTrend">+5%(판매량 추이)</h3>
           </div>
-          <p>캘린더-오늘 날짜 알려주기</p>
+          <p>
+            캘린더 <br />- 오늘 날짜 알려주기
+          </p>
         </div>
 
         <div className={Main.order}>
           <h2>현재 주문 현황</h2>
-          <ol>
+          <hr />
+          <ul className={Main.mList}>
             <li>
               쉬림프와사비버거 <button>주문 접수중</button>
             </li>
             <li>
               더블치즈베이컨버거<button>조리완료 및 수령대기</button>
             </li>
-          </ol>
+          </ul>
         </div>
+        <hr className={Main.vertical} />
         <div className={Main.pages}>
           <div className={Main.manage}>
             <h2>관리 페이지</h2>

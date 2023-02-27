@@ -1,29 +1,24 @@
 * {
+  box-sizing: border-box;
   margin: 0px;
   padding: 0px;
-  box-sizing: border-box;
 }
 
 .util {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
   z-index: 1;
-}
-
-.util li {
   float: left;
-}
-
-.util li a {
   display: block;
-  font: 12px/1 "arial";
-  color: #999;
   padding: 0px 10px;
+  position: absolute;
+  font: 18px/1 "arial";
+  color: #999;
 }
 
 .header {
   width: 100%;
+  height: 150px;
   border-bottom: 1px solid #ddd;
   display: flex;
   justify-content: center;
@@ -32,12 +27,13 @@
 }
 
 .header h2 {
-  position: absolute;
   top: 30px;
-  left: 5px;
+  left: 20px;
+  padding: 30px;
   display: flex;
   justify-content: flex-start;
-  align-items: center;
+  position: absolute;
+  font-size: 30px;
 }
 
 ul {
@@ -54,34 +50,35 @@ a {
 }
 
 .profile {
-  position: absolute;
-  right: 10px;
+  width: 150px;
+  right: 20px;
   bottom: 15px;
-  width: 100px;
   display: flex;
   justify-content: space-between;
+  position: absolute;
+  margin-right: 10px;
   background-color: transparent;
 }
 
 .profile img {
-  width: 30px;
+  width: 60px;
   height: auto;
   padding: 0;
-  border-radius: 100%;
   border: 1px solid black;
+  border-radius: 100%;
 }
 
 .profile h3 {
-  margin-top: 5px;
-  font: bold 20px/1 "arial";
+  margin-top: 17px;
+  font: bold 25px/1 "arial";
 }
 
 .gnb {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+  position: relative;
 }
 
 .gnb li {
@@ -91,10 +88,10 @@ a {
 
 .gnb li a {
   display: block;
-  font: bold 15px/1 "arial";
-  color: #555;
   padding: 20px 40px;
   transition: all 0.5s;
+  font: bold 23px/1 "arial";
+  color: #555;
 }
 
 .gnb li a:hover {
@@ -102,35 +99,114 @@ a {
   color: #fff;
 }
 
+.saleAndCal {
+  width: 400px;
+  height: 600px;
+  margin: 40px;
+}
+
 .sale {
   box-sizing: border-box;
-  background-color: #2f365f;
-  width: 300px;
-  height: auto;
-  padding: 30px;
-  border-radius: 20px;
+  width: 350px;
+  height: 200px;
   display: flex;
   flex-flow: column wrap;
   justify-content: space-evenly;
+  padding: 30px;
+  margin: auto;
+  margin-top: 30px;
+  border-radius: 20px;
+  background-color: #2f365f;
+}
+
+.saleAndCal p {
+  box-sizing: border-box;
+  width: 350px;
+  height: 200px;
+  padding: 20px;
+  margin: auto;
+  margin-top: 30px;
+  font: bold 30px/1 "arial";
+  border-radius: 30px;
+  background-color: #fff;
 }
 
 .sales {
+  top: 30px;
+  left: 10px;
+  flex-flow: row wrap;
   font: bold, 15px/1 "arial";
   color: #fff;
-  flex-flow: row wrap;
-  left: 10px;
-  top: 30px;
 }
 
-.container {
+.sub_page {
+  height: 800px;
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
-  padding: 30px;
+  background-color: #e8e6eb;
 }
 
-.sales,
+.order {
+  box-sizing: border-box;
+  width: 700px;
+  height: 650px;
+  margin: 30px;
+  padding: 50px;
+  background-color: #fff;
+}
+
+.order h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  font: bold 30px/1 "arial";
+}
+
+.mList {
+  padding: 15px;
+}
+
+.mList li {
+  box-sizing: border-box;
+  height: 80px;
+  position: relative;
+  padding: 25px;
+  margin-bottom: 10px;
+  font: normal 20px "arial";
+  background-color: #fff;
+  border: 2px solid #2f365f;
+  border-radius: 10px;
+}
+
+.mList li button {
+  float: right;
+  display: flex;
+  margin-left: auto;
+  padding: 7px;
+  font: normal 15px "arial";
+}
+
+.vertical {
+  width: 1px;
+  height: 650px;
+  margin-top: 30px;
+  border-width: 0;
+  background-color: #999;
+}
+
+.manage,
+.analysis {
+  box-sizing: border-box;
+  width: 350px;
+  height: 310px;
+  margin: 30px;
+  padding: 50px;
+  background-color: #fff;
+}
+
+/* .sales,
 .order,
 .managePage {
   flex-basis: calc(33.3% - 50px);
-}
+} */
