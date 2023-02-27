@@ -1,0 +1,96 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.util {
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  float: left;
+  display: block;
+  padding: 0px 10px;
+  position: absolute;
+  font: 18px/1 "arial";
+  color: #999;
+}
+
+.header {
+  width: 100%;
+  height: 150px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.header h2 {
+  top: 30px;
+  left: 20px;
+  padding: 30px;
+  display: flex;
+  justify-content: flex-start;
+  position: absolute;
+  font-size: 30px;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.profile {
+  width: 150px;
+  right: 20px;
+  bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  margin-right: 10px;
+  background-color: transparent;
+}
+
+.profile img {
+  width: 60px;
+  height: auto;
+  padding: 0;
+  border: 1px solid black;
+  border-radius: 100%;
+}
+
+.profile h3 {
+  margin-top: 17px;
+  font: bold 25px/1 "arial";
+}
+
+.gnb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  position: relative;
+}
+
+.gnb li {
+  float: left;
+  flex-direction: row;
+}
+
+.gnb li a {
+  display: block;
+  padding: 20px 40px;
+  transition: all 0.5s;
+  font: bold 23px/1 "arial";
+  color: #555;
+}
+
+.gnb li a:hover {
+  background: #555;
+  color: #fff;
+}

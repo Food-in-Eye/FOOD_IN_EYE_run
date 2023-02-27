@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import Main from "../css/Main.module.css";
+import MenuBar from "../components/MenuBar";
 
 function MainPage() {
   const navigate = useNavigate();
-  const onClickToManagePage = (e) => {
+  const onClickToMenuManagePage = (e) => {
     e.preventDefault();
-    navigate(`./manage`);
+    navigate(`./menu-manage`);
   };
   const onClickToAnalysisPage = (e) => {
     e.preventDefault();
@@ -14,38 +15,7 @@ function MainPage() {
 
   return (
     <div className={Main.inner}>
-      <section className={Main.header}>
-        <h2>LOGO</h2>
-        <ul className={Main.gnb}>
-          <li>
-            <a href="./main">Home</a>
-          </li>
-          <li>
-            <a href="./manage">관리</a>
-          </li>
-          <li>
-            <a href="./analysis">분석</a>
-          </li>
-          <li>
-            <a href="./admin">설정</a>
-          </li>
-        </ul>
-
-        <ul className={Main.util}>
-          <li>
-            <a href="/">Logout</a>
-          </li>
-        </ul>
-
-        <div className={Main.profile}>
-          <img
-            src={require("../images/profile.jpeg")}
-            alt="프로필 이미지"
-          ></img>
-          <h3>00가게</h3>
-        </div>
-      </section>
-
+      <MenuBar />
       <section className={Main.sub_page}>
         <div className={Main.saleAndCal}>
           <div className={Main.sale}>
@@ -76,7 +46,7 @@ function MainPage() {
         <div className={Main.pages}>
           <div className={Main.manage}>
             <h2>관리 페이지</h2>
-            <button onClick={onClickToManagePage}>View more</button>
+            <button onClick={onClickToMenuManagePage}>View more</button>
           </div>
           <div className={Main.analysis}>
             <h2>분석 페이지</h2>
