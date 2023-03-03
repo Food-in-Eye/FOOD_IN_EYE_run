@@ -7,6 +7,6 @@ v1_router = APIRouter(prefix="/api/v1", tags=["v1"])
 v1_router.include_router(admin_router)
 v1_router.include_router(user_router)
 
-@v1_router.get("/")
+@v1_router.get("/hi")
 async def hello_api():
     return {"message": "Hello 'api/v1'"}
