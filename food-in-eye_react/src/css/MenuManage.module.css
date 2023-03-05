@@ -10,21 +10,30 @@
 .menus ul {
   margin-top: 20px;
   position: relative;
+  display: flex;
+  align-content: flex-start;
+  flex-flow: column wrap;
+  overflow: auto;
+  text-align: left;
 }
 
-.menus ul li {
-  float: left;
-  justify-content: space-between;
+.list {
+  padding: 5px 200px 0px 10px;
+  margin-top: 20px;
+  display: inline-block;
 }
 
 .menus {
   box-sizing: border-box;
-  width: 300px;
-  height: 800px;
+  position: relative;
+  width: 400px;
+  height: auto;
   display: flex;
   flex-flow: column wrap;
   align-items: center;
+  margin: 30px;
   padding: 20px;
+  background-color: #fff;
 }
 
 .info .addModifyBtn {
@@ -33,11 +42,22 @@
 }
 
 .info img {
+  box-sizing: border-box;
   width: 180px;
   height: auto;
   padding: 10px;
-  border: 2px dashed black;
-  border-image: url("http://i.stack.imgur.com/wLdVc.png") 1 round;
+  margin-top: 20px;
+  border-image: url("http://i.stack.imgur.com/wLdVc.png");
+  border-radius: 50%;
+  outline: 10px solid #febeb0;
+}
+
+.info p {
+  width: 300px;
+  height: auto;
+  padding: 20px;
+  border: 3px solid #2f365f;
+  box-shadow: 1px 1px 7px #a4a2a2;
 }
 
 .info {
@@ -47,6 +67,6 @@
   display: flex;
   flex-flow: column wrap;
   margin: 30px;
-  padding: 0px;
+  padding: 10px;
   background-color: #fff;
 }

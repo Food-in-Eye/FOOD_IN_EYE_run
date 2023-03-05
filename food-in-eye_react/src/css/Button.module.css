@@ -9,9 +9,25 @@
   text-align: center;
   margin-top: 10px;
   padding: 5px 30px 5px 30px;
-  /* padding-top: 3px; */
-  /* padding-bottom: 3px;
-  padding-left: 30px;
-  padding-right: 30px; */
   border-radius: 10px;
+}
+
+.plus {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: "Akaya Telivigala";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  text-align: center;
+  background: #2f365f;
+  border-radius: 50%;
 }
