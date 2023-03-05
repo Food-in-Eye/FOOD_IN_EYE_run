@@ -2,10 +2,9 @@ import MenuBar from "../components/MenuBar";
 import Main from "../css/Main.module.css";
 import Menu from "../css/MenuManage.module.css";
 import Button from "../css/Button.module.css";
-import Swiper from "swiper";
 import "swiper/swiper-bundle.css";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function MenuManagePage() {
   const [menus, setMenus] = useState([
@@ -15,24 +14,6 @@ function MenuManagePage() {
     "4. 메뉴4",
     "5. 메뉴5",
   ]);
-
-  // useEffect(() => {
-  //   const liElements = document.querySelectorAll("[data-hammer]");
-
-  //   liElements.forEach((liElements) => {
-  //     const mc = new Hammer(liElements);
-  //     mc.on("swipeleft", function () {
-  //       //왼쪽으로 swipe 시 show buttons
-  //       liElements.innerHTML += `
-  //       <button className={Button.style}>메뉴 삭제</button>
-  //       <button className={Button.style}>대표메뉴 설정</button>`;
-  //     });
-  //     mc.on("swiperight", function () {
-  //       //오른쪽으로 swipe 시 hide buttons
-  //       liElements.innerHTML = liElements.textContent;
-  //     });
-  //   });
-  // }, []);
 
   function handleAddMenu() {
     const newMenu = `${menus.length + 1}. 메뉴${menus.length + 1}`;
