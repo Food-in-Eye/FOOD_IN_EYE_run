@@ -4,13 +4,27 @@ import MenuBar from "../components/MenuBar";
 
 function MainPage() {
   const navigate = useNavigate();
+
+  const onClickToAdminManagePage = (e) => {
+    e.preventDefault();
+    navigate(`/store-manage`);
+  };
   const onClickToMenuManagePage = (e) => {
     e.preventDefault();
-    navigate(`./menu-manage`);
+    navigate(`/menu-manage`);
   };
+  const onClickToOrderManagePage = (e) => {
+    e.preventDefault();
+    navigate(`/order-manage`);
+  };
+
   const onClickToAnalysisPage = (e) => {
     e.preventDefault();
-    navigate(`./analysis`);
+    navigate(`/analysis`);
+  };
+  const onClickToDetailAnalysisPage = (e) => {
+    e.preventDefault();
+    navigate(`/detail`);
   };
 
   return (
@@ -46,11 +60,42 @@ function MainPage() {
         <div className={Main.pages}>
           <div className={Main.manage}>
             <h2>관리 페이지</h2>
-            <button onClick={onClickToMenuManagePage}>View more</button>
+            <div className={Main.Btn}>
+              <button onClick={onClickToAdminManagePage} className={Main.mBtn}>
+                가게 관리
+              </button>
+              <div className={Main.mBtnByCol}>
+                <button
+                  onClick={onClickToMenuManagePage}
+                  className={Main.mBtnMenu}
+                >
+                  메뉴 관리
+                </button>
+                <button
+                  onClick={onClickToOrderManagePage}
+                  className={Main.mBtnOrder}
+                >
+                  주문 관리
+                </button>
+              </div>
+            </div>
           </div>
           <div className={Main.analysis}>
             <h2>분석 페이지</h2>
-            <button onClick={onClickToAnalysisPage}>View more</button>
+            <div className={Main.aBtnByCol}>
+              <button
+                onClick={onClickToAnalysisPage}
+                className={Main.aBtnTotal}
+              >
+                전체 메뉴분석
+              </button>
+              <button
+                onClick={onClickToDetailAnalysisPage}
+                className={Main.aBtnDetail}
+              >
+                메뉴별 분석
+              </button>
+            </div>
           </div>
         </div>
       </section>
