@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminManagePage from "./pages/AdminManagePage";
+import AdminPage from "./pages/AdminPage";
 import DetailAnalysisPage from "./pages/DetailAnalysisPage";
 import AnalysisPage from "./pages/AnalysisPage";
 import BenefitManagePage from "./pages/BenefitManagePage";
+import LayoutofMenu from "./pages/LayoutofMenuPage";
 import StoreManagePage from "./pages/StoreManagePage";
 import OrderManagePage from "./pages/OrderManagePage";
 import MenuManagePage from "./pages/MenuManagePage";
@@ -14,10 +15,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/admin" element={<AdminManagePage />} />
-        <Route path="/detail" element={<DetailAnalysisPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/benefit-manage" element={<BenefitManagePage />} />
+        <Route path="/layout" element={<LayoutofMenu />} />
         <Route path="/store-manage" element={<StoreManagePage />} />
         <Route path="/order-manage" element={<OrderManagePage />} />
         <Route path="/menu-manage" element={<MenuManagePage />} />
