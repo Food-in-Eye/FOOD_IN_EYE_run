@@ -69,7 +69,7 @@ ul {
   font: bold 25px/1 "arial";
 }
 
-.dropmenu {
+.dropMenu {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -77,12 +77,12 @@ ul {
   position: relative;
 }
 
-.dropmenu ul li {
+.dropMenu ul li {
   float: left;
   flex-direction: row;
 }
 
-.dropmenu ul li a {
+.dropMenu ul li a {
   display: block;
   padding: 20px 40px;
   transition: all 0.5s;
@@ -90,13 +90,13 @@ ul {
   color: #555;
 }
 
-.dropmenu ul li a:hover,
-.dropmenu ul li:hover a {
+.dropMenu ul li a:hover,
+.dropMenu ul li:hover a {
   background: #555;
   color: #fff;
 }
 
-.dropmenu li ul {
+.dropMenu li ul {
   background: #555;
   display: none;
   height: auto;
@@ -106,15 +106,15 @@ ul {
   z-index: 200;
 }
 
-.dropmenu li:hover ul {
+.dropMenu li:hover ul {
   display: block;
 }
 
-.dropmenu li:hover li a {
+.dropMenu li:hover li a {
   background: none;
 }
 
-.dropmenu li ul a {
+.dropMenu li ul a {
   display: block;
   height: 80px;
   margin: 0px;
@@ -122,8 +122,8 @@ ul {
   text-align: left;
 }
 
-.dropmenu li ul a:hover,
-.dropmenu li ul li:hover a {
+.dropMenu li ul a:hover,
+.dropMenu li ul li:hover a {
   background-color: #ddd;
   border: 0px;
   color: #ffffff;

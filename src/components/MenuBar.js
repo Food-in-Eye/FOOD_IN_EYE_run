@@ -5,7 +5,7 @@ function MenuBar() {
   return (
     <section className={style.header}>
       <h2>LOGO</h2>
-      <div className={style.dropmenu}>
+      <div className={style.dropMenu}>
         <ul>
           <li>
             <a href="./main" className={style.menubar_head}>
