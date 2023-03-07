@@ -1,5 +1,4 @@
 import MenuBar from "../components/MenuBar";
-import Main from "../css/Main.module.css";
 import Detail from "../css/DetailAnalysis.module.css";
 
 function DetailAnalysisPage() {
@@ -8,7 +7,9 @@ function DetailAnalysisPage() {
       <section className="header">
         <MenuBar />
       </section>
-      <div className={Detail.inner}></div>
+      <div className={Detail.inner}>
+        <p>메뉴별 분석 페이지</p>
+      </div>
     </div>
   );
 }

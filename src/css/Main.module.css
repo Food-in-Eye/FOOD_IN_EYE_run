@@ -138,6 +138,13 @@
   color: #fff;
 }
 
+.mBtnMenuLoc {
+  background-color: #2f365f;
+  border: 0px;
+  border-radius: 10px;
+  color: #fff;
+}
+
 .mBtnOrder {
   background-color: #febeb0;
   border: 0px;
@@ -146,7 +153,7 @@
 
 .mBtnByCol button {
   width: 100px;
-  height: 90px;
+  height: 50px;
   margin: 10px;
 }
 

@@ -1,5 +1,5 @@
 import MenuBar from "../components/MenuBar";
-import Main from "../css/Main.module.css";
+import Benefit from "../css/BenefitManage.module.css";
 
 function BenefitManagePage() {
   return (
@@ -7,6 +7,9 @@ function BenefitManagePage() {
       <section className="header">
         <MenuBar />
       </section>
+      <div className={Benefit.inner}>
+        <p>혜택 관리 페이지</p>
+      </div>
     </div>
   );
 }

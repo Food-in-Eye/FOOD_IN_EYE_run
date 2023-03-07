@@ -13,6 +13,12 @@ function MainPage() {
     e.preventDefault();
     navigate(`/menu-manage`);
   };
+
+  const onClickToMenuPosRecPage = (e) => {
+    e.preventDefault();
+    navigate(`/menu-position`);
+  };
+
   const onClickToOrderManagePage = (e) => {
     e.preventDefault();
     navigate(`/order-manage`);
@@ -24,7 +30,7 @@ function MainPage() {
   };
   const onClickToDetailAnalysisPage = (e) => {
     e.preventDefault();
-    navigate(`/detail`);
+    navigate(`/analysis-detail`);
   };
 
   return (
@@ -70,6 +76,12 @@ function MainPage() {
                   className={Main.mBtnMenu}
                 >
                   메뉴 관리
+                </button>
+                <button
+                  onClick={onClickToMenuPosRecPage}
+                  className={Main.mBtnMenuLoc}
+                >
+                  메뉴판 배치
                 </button>
                 <button
                   onClick={onClickToOrderManagePage}

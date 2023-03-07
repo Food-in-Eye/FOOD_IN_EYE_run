@@ -7,7 +7,9 @@ function AnalysisPage() {
       <section className="header">
         <MenuBar />
       </section>
-      <div className={Total.inner}></div>
+      <div className={Total.inner}>
+        <p>전체 메뉴 분석 페이지</p>
+      </div>
     </div>
   );
 }
