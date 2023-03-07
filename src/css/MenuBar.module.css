@@ -40,7 +40,7 @@ ul {
   list-style: none;
 }
 
-a {
+.menubar_head {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -69,7 +69,7 @@ a {
   font: bold 25px/1 "arial";
 }
 
-.gnb {
+.dropmenu {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -77,12 +77,12 @@ a {
   position: relative;
 }
 
-.gnb li {
+.dropmenu ul li {
   float: left;
   flex-direction: row;
 }
 
-.gnb li a {
+.dropmenu ul li a {
   display: block;
   padding: 20px 40px;
   transition: all 0.5s;
@@ -90,7 +90,42 @@ a {
   color: #555;
 }
 
-.gnb li a:hover {
+.dropmenu ul li a:hover,
+.dropmenu ul li:hover a {
   background: #555;
   color: #fff;
+}
+
+.dropmenu li ul {
+  background: #555;
+  display: none;
+  height: auto;
+  border: 0px;
+  position: absolute;
+  width: 200px;
+  z-index: 200;
+}
+
+.dropmenu li:hover ul {
+  display: block;
+}
+
+.dropmenu li:hover li a {
+  background: none;
+}
+
+.dropmenu li ul a {
+  display: block;
+  height: 80px;
+  margin: 0px;
+  padding: 0 10px 0 15px;
+  text-align: left;
+}
+
+.dropmenu li ul a:hover,
+.dropmenu li ul li:hover a {
+  background-color: #ddd;
+  border: 0px;
+  color: #ffffff;
+  text-decoration: none;
 }
