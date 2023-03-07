@@ -27,7 +27,7 @@ function MenuBar() {
                 <a href="./order-manage">주문 관리</a>
               </li>
               <li>
-                <a href="./layout-manage">메뉴판 배치</a>
+                <a href="./menu-position">메뉴판 배치</a>
               </li>
             </ul>
           </li>

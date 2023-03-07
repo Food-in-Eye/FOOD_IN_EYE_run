@@ -3,7 +3,7 @@ import AdminPage from "./pages/AdminPage";
 import DetailAnalysisPage from "./pages/DetailAnalysisPage";
 import AnalysisPage from "./pages/AnalysisPage";
 import BenefitManagePage from "./pages/BenefitManagePage";
-import LayoutofMenu from "./pages/LayoutofMenuPage";
+import MenuPosRecPage from "./pages/MenuPosRecPage";
 import StoreManagePage from "./pages/StoreManagePage";
 import OrderManagePage from "./pages/OrderManagePage";
 import MenuManagePage from "./pages/MenuManagePage";
@@ -19,7 +19,7 @@ function App() {
         <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/benefit-manage" element={<BenefitManagePage />} />
-        <Route path="/layout" element={<LayoutofMenu />} />
+        <Route path="/menu-position" element={<MenuPosRecPage />} />
         <Route path="/store-manage" element={<StoreManagePage />} />
         <Route path="/order-manage" element={<OrderManagePage />} />
         <Route path="/menu-manage" element={<MenuManagePage />} />

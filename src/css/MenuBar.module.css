@@ -97,13 +97,14 @@ ul {
 }
 
 .dropMenu li ul {
-  background: #555;
   display: none;
+  width: 200px;
   height: auto;
+  padding: 10px;
   border: 0px;
   position: absolute;
-  width: 200px;
   z-index: 200;
+  background: #555;
 }
 
 .dropMenu li:hover ul {
@@ -116,16 +117,16 @@ ul {
 
 .dropMenu li ul a {
   display: block;
-  height: 80px;
+  height: 50px;
   margin: 0px;
-  padding: 0 10px 0 15px;
+  padding: 10px 10px 10px 15px;
   text-align: left;
 }
 
 .dropMenu li ul a:hover,
 .dropMenu li ul li:hover a {
-  background-color: #ddd;
   border: 0px;
+  background-color: #ddd;
   color: #ffffff;
   text-decoration: none;
 }
