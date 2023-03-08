@@ -18,7 +18,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:container": "docker run --name my-react-app -d -p 3000:3000 my-react-app",
+    "clear:container": "docker rm -f my-react-app",
+    "build:docker": "docker build -t my-react-app .",
+    "deploy": "run-s clear:container build start:container"
   },
   "eslintConfig": {
     "extends": [
@@ -37,5 +41,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
   }
 }
