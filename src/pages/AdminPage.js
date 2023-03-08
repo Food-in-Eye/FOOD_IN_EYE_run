@@ -6,7 +6,7 @@ function AdminPage() {
     <div>
       <MenuBar />
       <div className={Admin.inner}>
-        <p>관리자 마이페이지</p>
+        <p>설정 페이지</p>
       </div>
     </div>
   );
