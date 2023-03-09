@@ -1,0 +1,14 @@
+.inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column wrap;
+  height: 700px;
+  margin: 0px;
+  padding: 0px;
+  background-color: #e8e6eb;
+}
+
+.inner p {
+  margin: auto;
+  display: block;
+}
