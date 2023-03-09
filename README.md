@@ -10,15 +10,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 2. Docker image 빌드하기
 
-```npm run build:docker
-
-```
+`npm run build:docker`
 
 3. React app 실행 및 Docker container 실행하기
 
-```npm run deploy
-
-```
+`npm run deploy`
 
 ---
 
