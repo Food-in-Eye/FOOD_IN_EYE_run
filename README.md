@@ -2,6 +2,26 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Deploy to Docker
+
+### 실행 방법
+
+1. Dockerfile 이 있는 경로에서 터미널 열기
+
+2. Docker image 빌드하기
+
+```npm run build:docker
+
+```
+
+3. React app 실행 및 Docker container 실행하기
+
+```npm run deploy
+
+```
+
+---
+
 ## Available Scripts
 
 In the project directory, you can run:
