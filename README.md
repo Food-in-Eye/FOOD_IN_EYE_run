@@ -14,11 +14,9 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 3. Docker container(React) 실행하기
 
-   `docker run -it 3000:3000 my-react-app`
+   `docker run -it -p 3000:3000 my-react-app`
 
-   -i: 사용자가 입출력 할 수 있는 상태
-
-   -t: 가상 터미널 환경을 에뮬레이션 하겠다.
+   -it: 사용자가 입출력 할 수 있는 상태로, 테이너를 종료하지 않은체로 터미널의 입력을 계속해서 컨테이너로 전달.
 
 4. 브라우저에서 `localhost:3000` 으로 접속 가능
 
