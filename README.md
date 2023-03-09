@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Deploy to Docker
+## Run React App with Docker
 
 ### 실행 방법
 
@@ -12,11 +12,15 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
    `docker build -t my-react-app .`
 
-3. React app 실행 및 Docker container 실행하기
+3. Docker container(React) 실행하기
 
-   `docker run -p 3000:3000 my-react-app`
+   `docker run -it 3000:3000 my-react-app`
 
-4. 브라우저에서 `localhost:8000` 으로 접속 가능
+   -i: 사용자가 입출력 할 수 있는 상태
+
+   -t: 가상 터미널 환경을 에뮬레이션 하겠다.
+
+4. 브라우저에서 `localhost:3000` 으로 접속 가능
 
 ---
 
