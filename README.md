@@ -10,11 +10,13 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 2. Docker image 빌드하기
 
-`npm run build:docker`
+   `docker build -t my-react-app .`
 
 3. React app 실행 및 Docker container 실행하기
 
-`npm run deploy`
+   `docker run -p 3000:3000 my-react-app`
+
+4. 브라우저에서 `localhost:8000` 으로 접속 가능
 
 ---
 
