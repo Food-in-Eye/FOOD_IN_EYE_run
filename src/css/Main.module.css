@@ -1,0 +1,182 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.inner {
+  margin: 0px auto;
+}
+
+.saleAndCal {
+  width: 350px;
+  height: 600px;
+  margin: 40px;
+}
+
+.sale {
+  box-sizing: border-box;
+  width: 350px;
+  height: 200px;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-evenly;
+  padding: 30px;
+  margin: auto;
+  margin-top: 30px;
+  border-radius: 20px;
+  background-color: #2f365f;
+}
+
+.saleAndCal p {
+  box-sizing: border-box;
+  width: 350px;
+  height: 200px;
+  padding: 20px;
+  margin: auto;
+  margin-top: 30px;
+  font: bold 30px/1 "arial";
+  border-radius: 30px;
+  background-color: #fff;
+}
+
+.sales {
+  top: 30px;
+  left: 10px;
+  flex-flow: row wrap;
+  font: bold, 15px/1 "arial";
+  color: #fff;
+}
+
+.sub_page {
+  height: 800px;
+  display: flex;
+  flex-flow: row wrap;
+  background-color: #e8e6eb;
+}
+
+.order {
+  box-sizing: border-box;
+  width: 500px;
+  height: 650px;
+  margin: 30px;
+  padding: 50px;
+  background-color: #fff;
+}
+
+.order h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  font: bold 30px/1 "arial";
+}
+
+.mList {
+  padding: 15px;
+}
+
+.mList li {
+  box-sizing: border-box;
+  height: 80px;
+  position: relative;
+  padding: 25px;
+  margin-bottom: 10px;
+  font: normal 20px "arial";
+  background-color: #fff;
+  border: 2px solid #2f365f;
+  border-radius: 10px;
+}
+
+.mList li button {
+  float: right;
+  display: flex;
+  margin-left: auto;
+  padding: 7px;
+  font: normal 15px "arial";
+}
+
+.vertical {
+  width: 1px;
+  height: 650px;
+  margin-top: 30px;
+  border-width: 0;
+  background-color: #999;
+}
+
+.Btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.mBtnByCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mBtn {
+  width: 100px;
+  height: 200px;
+}
+
+.mBtn,
+.aBtnTotal {
+  background-color: #d3d2d6;
+  border: 0px;
+  border-radius: 10px;
+}
+
+.mBtnMenu,
+.aBtnDetail {
+  background-color: #3d5a5b;
+  border: 0px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.mBtnMenuLoc {
+  background-color: #2f365f;
+  border: 0px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.mBtnOrder {
+  background-color: #febeb0;
+  border: 0px;
+  border-radius: 10px;
+}
+
+.mBtnByCol button {
+  width: 100px;
+  height: 50px;
+  margin: 10px;
+}
+
+.aBtnByCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.aBtnByCol button {
+  width: 250px;
+  height: 70px;
+  margin: 10px;
+}
+
+.manage,
+.analysis {
+  box-sizing: border-box;
+  width: 350px;
+  height: 310px;
+  margin: 30px;
+  padding: 50px;
+  background-color: #fff;
+}

@@ -1,0 +1,72 @@
+.inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0px;
+  padding: 0px;
+  background-color: #e8e6eb;
+}
+
+.menus ul {
+  margin-top: 20px;
+  position: relative;
+  display: flex;
+  align-content: flex-start;
+  flex-flow: column wrap;
+  overflow: auto;
+  text-align: left;
+}
+
+.list {
+  padding: 5px 200px 0px 10px;
+  margin-top: 20px;
+  display: inline-block;
+}
+
+.menus {
+  box-sizing: border-box;
+  position: relative;
+  width: 400px;
+  height: auto;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  margin: 30px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.info .addModifyBtn {
+  box-sizing: border-box;
+  margin-left: auto;
+}
+
+.info img {
+  box-sizing: border-box;
+  width: 180px;
+  height: auto;
+  padding: 10px;
+  margin-top: 20px;
+  border-image: url("http://i.stack.imgur.com/wLdVc.png");
+  border-radius: 50%;
+  outline: 10px solid #febeb0;
+}
+
+.info p {
+  width: 300px;
+  height: auto;
+  padding: 20px;
+  border: 3px solid #2f365f;
+  box-shadow: 1px 1px 7px #a4a2a2;
+}
+
+.info {
+  box-sizing: border-box;
+  width: 800px;
+  height: auto;
+  display: flex;
+  flex-flow: column wrap;
+  margin: 30px;
+  padding: 10px;
+  background-color: #fff;
+}

@@ -1,0 +1,132 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.util {
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  float: left;
+  display: block;
+  padding: 0px 10px;
+  position: absolute;
+  font: 18px/1 "arial";
+  color: #999;
+}
+
+.header {
+  width: 100%;
+  height: 150px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.header h2 {
+  top: 30px;
+  left: 20px;
+  padding: 30px;
+  display: flex;
+  justify-content: flex-start;
+  position: absolute;
+  font-size: 30px;
+}
+
+ul {
+  list-style: none;
+}
+
+.menubar_head {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.profile {
+  width: 150px;
+  right: 20px;
+  bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  margin-right: 10px;
+  background-color: transparent;
+}
+
+.profile img {
+  width: 60px;
+  height: auto;
+  padding: 0;
+  border: 1px solid black;
+  border-radius: 100%;
+}
+
+.profile h3 {
+  margin-top: 17px;
+  font: bold 25px/1 "arial";
+}
+
+.dropMenu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  position: relative;
+}
+
+.dropMenu ul li {
+  float: left;
+  flex-direction: row;
+}
+
+.dropMenu ul li a {
+  display: block;
+  padding: 20px 40px;
+  transition: all 0.5s;
+  font: bold 23px/1 "arial";
+  color: #555;
+}
+
+.dropMenu ul li a:hover,
+.dropMenu ul li:hover a {
+  background: #555;
+  color: #fff;
+}
+
+.dropMenu li ul {
+  display: none;
+  width: 200px;
+  height: auto;
+  padding: 10px;
+  border: 0px;
+  position: absolute;
+  z-index: 200;
+  background: #555;
+}
+
+.dropMenu li:hover ul {
+  display: block;
+}
+
+.dropMenu li:hover li a {
+  background: none;
+}
+
+.dropMenu li ul a {
+  display: block;
+  height: 50px;
+  margin: 0px;
+  padding: 10px 10px 10px 15px;
+  text-align: left;
+}
+
+.dropMenu li ul a:hover,
+.dropMenu li ul li:hover a {
+  border: 0px;
+  background-color: #ddd;
+  color: #ffffff;
+  text-decoration: none;
+}
