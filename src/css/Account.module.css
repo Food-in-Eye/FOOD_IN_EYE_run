@@ -15,9 +15,12 @@
 
 form {
   padding: 50px;
-  background-color: #fff;
-  border: 7px solid #2f365f;
+  background-color: #000926;
   border-radius: 30px;
+}
+
+form h2 {
+  color: #fff;
 }
 
 .align {
@@ -33,11 +36,17 @@ form {
   width: 250px;
   height: 35px;
   margin: 5px 0px 5px 0px;
-  background-color: #d9d9d9;
+  background-color: #fff;
   border: none;
-  border-radius: 5px;
 }
 
 .align input::placeholder {
   padding: 10px;
+}
+
+.link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
 }
