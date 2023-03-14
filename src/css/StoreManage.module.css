@@ -7,7 +7,28 @@
   padding: 0px;
 }
 
-.inner p {
-  margin: auto;
-  display: block;
+.status {
+  display: flex;
+  flex-direction: row;
+  width: 300px;
+  height: auto;
+  margin: 20px;
+  border: 2px solid #ff9345;
+  border-radius: 10px;
+}
+
+.status button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  padding: 20px;
+  font-size: 20px;
+  font-family: "Akaya Telivigala";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  background: #fff;
+  border: none;
+  border-radius: 10px;
 }

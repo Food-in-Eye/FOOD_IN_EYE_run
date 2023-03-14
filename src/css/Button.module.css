@@ -32,3 +32,13 @@
   background: #2f365f;
   border-radius: 50%;
 }
+
+.modify {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 20px;
+  color: #000;
+  background-color: #d9d9d9;
+}
