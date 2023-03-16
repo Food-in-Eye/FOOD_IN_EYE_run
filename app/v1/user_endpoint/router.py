@@ -14,6 +14,7 @@ router = APIRouter(prefix="/user", tags=["Android"])
 async def hello():
     return {"message": "Hello 'api/v1/user/hi'"}
 
+# 초기 데이터를 넣기 위해 임시로 작성. 실제로는 사용하지 않을예정
 # @router.post("/store")
 # async def create_store(store: StoreModel):
 #     print(store)
@@ -39,29 +40,21 @@ async def hello():
 
 @router.get('/stores')
 async def get_store_list():
-    """ test 할 수 있도록 임시로 추가 """
+    """ 모든 식당의 정보를 받아온다 """
+    fields = ['_id', 'name', 'desc', 'schedule', 'notice', 'status', 'img_src', 'm_id']
+
+    try:
+        response = mongo.read_all(fields)
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': '/stores',
+            'status': 'ERROR',
+            'message': e
+        }
+    
     return {
-	'request': 'api/v1/user/stores',
-	'response': [
-		{
-		    "_id": "640f314539dec4c7ae2cad9e",
-		    "name": "니나노덮밥",
-		    "description": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",
-		    "schedule": "9시~18시 영업, 월요일 휴무",
-			"notice": None,
-			"status": 1,
-			"img_url": None,
-			"m_id": "640f314539dec4c11e2c24d9e"
-		},
-		{
-		    "_id": "640f30d62f922537bd16c4fa",
-		    "name": "파스타",
-		    "description": "다양한 양식 음식이 있습니다.",
-		    "schedule": "9시~18시 영업, 주말 제외",
-			"notice": "개인사정으로 다음주 화요일까지 잠시 휴업합니다.",
-			"status": 2,
-			"img_url": None,
-			"m_id": "640f31451242144c11e2c24d9e"
-		}
-	]
-}
+        'request': 'api/v1/user/stores',
+        'status': 'OK',
+        'response': response
+    }
