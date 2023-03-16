@@ -41,7 +41,7 @@ class MongodbController:
 
         return True
 
-    def read(self, id:str) -> dict:
+    def read_one(self, id:str) -> dict:
         """ id가 일치하는 document를 읽어온다. """
         assert id is not None
 
@@ -50,6 +50,23 @@ class MongodbController:
             raise Exception(f'Failed to READ document with id \'{id}\'')
         
         return result
+    
+    def read_all(self, fields:list[str]) -> list:
+        """ collection의 모든 document를 읽어온다. """
+
+        result = self.coll.find()
+        if result is None:
+            raise Exception(f'Failed to READ document')
+        
+        response = []
+        for r in result:
+            dict = {}
+            dict['_id'] = str(r['_id'])
+            for f in fields:
+                dict[f] = r[f]
+            response.append(dict)
+        
+        return response
         
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """
