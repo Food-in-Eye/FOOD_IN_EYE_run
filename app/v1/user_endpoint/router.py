@@ -4,14 +4,40 @@ User Router
 """
 
 from fastapi import APIRouter
+from core.models.store import StoreModel
+from core.common.mongo import MongodbController
 
+mongo = MongodbController('store')
 router = APIRouter(prefix="/user", tags=["Android"])
 
 @router.get("/hi")
 async def hello():
     return {"message": "Hello 'api/v1/user/hi'"}
 
-@router.get('/api/v1/user/stores')
+# @router.post("/store")
+# async def create_store(store: StoreModel):
+#     print(store)
+#     data = store.dict()
+#     print(data['status'])
+#     data['status'] = data['status'].value
+#     print(data['status'])
+#     try:
+#         id = mongo.create(data)
+#     except Exception as e:
+#         print('ERROR:', e)
+#         return {
+#             'request': '/item',
+#             'status': 'ERROR',
+#             'message': e
+#         }
+    
+#     return {
+#         'request': '/item',
+#         'status': 'OK',
+#         'document_id': str(id)
+#     }
+
+@router.get('/stores')
 async def get_store_list():
     """ test 할 수 있도록 임시로 추가 """
     return {
