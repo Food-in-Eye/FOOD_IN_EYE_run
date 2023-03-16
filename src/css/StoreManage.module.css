@@ -1,5 +1,6 @@
 .inner {
   box-sizing: border-box;
+  position: relative;
   display: flex;
   flex-flow: column wrap;
   height: 700px;
@@ -10,9 +11,11 @@
 .status {
   display: flex;
   flex-direction: row;
-  width: 300px;
+  position: absolute;
+  right: 35px;
+  top: 30px;
+  width: 400px;
   height: auto;
-  margin: 20px;
   border: 2px solid #ff9345;
   border-radius: 10px;
 }
@@ -21,7 +24,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: auto;
   padding: 20px;
   font-size: 20px;
   font-family: "Akaya Telivigala";
@@ -31,4 +33,96 @@
   background: #fff;
   border: none;
   border-radius: 10px;
+}
+
+.content {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column wrap;
+  height: auto;
+}
+
+.desc {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
+  margin-top: 150px;
+  padding: 100px 500px 200px;
+  border: 1px solid black;
+}
+
+.desc h1 {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 125px;
+  left: 80px;
+  width: 300px;
+  height: 50px;
+  background: #ff9345;
+  border-radius: 300px 300px 0 0;
+}
+
+.desc .info {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.desc .info h3,
+.desc .info p {
+  align-self: flex-start;
+}
+
+.desc button {
+  position: absolute;
+  top: 150px;
+  right: 45px;
+}
+
+/* .info {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.info h3 {
+  margin-left: 0;
+}
+
+.info p {
+  margin-left: 0;
+} */
+
+.notice {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 100px;
+  margin-left: 45px;
+  margin-right: 40px;
+  margin-bottom: 30px;
+  padding: 100px 600px 200px;
+  border: 1px solid black;
+}
+
+.notice h1 {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 550px;
+  left: 80px;
+  width: 300px;
+  height: 50px;
+  background: #337db1;
+  border-radius: 0 300px 0 0;
+}
+
+.notice button {
+  position: relative;
+  display: inline-block;
+  left: 743px;
+  bottom: 120px;
 }
