@@ -61,9 +61,11 @@ class MongodbController:
         response = []
         for r in result:
             dict = {}
-            dict['_id'] = str(r['_id'])
             for f in fields:
-                dict[f] = r[f]
+                if '_id' in f:
+                    dict[f] = str(r[f])
+                else: 
+                    dict[f] = r[f]
             response.append(dict)
         
         return response
