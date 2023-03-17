@@ -8,7 +8,6 @@ class Status(Enum):
 
 
 class StoreModel(BaseModel):
-    _id: ObjectId | None
     name: str = Field(title="name of restuarant")
     desc: str = Field(title="description of the restuarant")
     schedule: str = Field(title="schedule of the restuarant")

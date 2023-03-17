@@ -4,6 +4,14 @@ from pymongo import MongoClient
 
 from bson.objectid import ObjectId
 
+
+def dictToStr(d:dict) -> dict:
+    for k, v in d.items():
+        if type(v) is ObjectId:
+            d[k] = str(v)
+
+    return d
+            
 class MongodbController:
     """ 몽고디비를 통해 특정 collection을 지정하고 CRUD를 하도록 돕는 클래스 """
     
@@ -32,12 +40,12 @@ class MongodbController:
         """ id가 일치하는 document의 내용을 변경한다. """
         assert id and data is not None
 
-        result = self.coll.replace_one({'id': ObjectId(id)}, data)
+        result = self.coll.replace_one({'_id': ObjectId(id)}, data)
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
-        # if result.modified_count > 1:
-        #     raise Exception(f'여러 document를 수정함 경고!') -> 고민중
+        if result.modified_count < 1:
+            raise Exception(f'변경사항 없음')
 
         return True
 
@@ -49,7 +57,7 @@ class MongodbController:
         if result is None:
             raise Exception(f'Failed to READ document with id \'{id}\'')
         
-        return result
+        return dictToStr(result)
     
     def read_all(self, fields:list[str]) -> list:
         """ collection의 모든 document를 읽어온다. """
@@ -60,13 +68,7 @@ class MongodbController:
         
         response = []
         for r in result:
-            dict = {}
-            for f in fields:
-                if '_id' in f:
-                    dict[f] = str(r[f])
-                else: 
-                    dict[f] = r[f]
-            response.append(dict)
+            response.append(dictToStr(r))
         
         return response
         
@@ -79,4 +81,3 @@ class MongodbController:
             raise Exception(f'Failed to DELETE document with id \'{id}\'')
         
         return True
-        

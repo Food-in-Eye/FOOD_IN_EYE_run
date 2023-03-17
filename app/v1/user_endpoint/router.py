@@ -42,13 +42,12 @@ async def hello():
 async def get_store_list():
     """ 모든 식당의 정보를 받아온다 """
     fields = ['_id', 'name', 'desc', 'schedule', 'notice', 'status', 'img_src', 'm_id']
-
     try:
         response = mongo.read_all(fields)
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': '/stores',
+            'request': 'api/v1/user/stores',
             'status': 'ERROR',
             'message': e
         }
