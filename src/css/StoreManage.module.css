@@ -1,3 +1,38 @@
+/* styles for screens smaller than 600px */
+@media screen and (max-width: 600px) {
+  .inner {
+    height: auto;
+  }
+
+  .desc {
+    padding: 50px 20px;
+  }
+
+  .notice {
+    padding: 50px 20px;
+  }
+
+  /* adjust other styles as needed */
+}
+
+/* styles for screens between 600px and 1200px */
+@media screen and (min-width: 600px) and (max-width: 1200px) {
+  .desc {
+    margin-left: 70px;
+  }
+
+  /* adjust other styles as needed */
+}
+
+/* styles for screens larger than 1200px */
+@media screen and (min-width: 1200px) {
+  p {
+    font-size: 15px;
+  }
+
+  /* adjust other styles as needed*/
+}
+
 .inner {
   box-sizing: border-box;
   position: relative;
@@ -12,7 +47,7 @@
   display: flex;
   flex-direction: row;
   position: absolute;
-  right: 35px;
+  right: 50px;
   top: 30px;
   width: 400px;
   height: auto;
@@ -20,10 +55,11 @@
   border-radius: 10px;
 }
 
-.status button {
+.statusButton {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 200px;
   padding: 20px;
   font-size: 20px;
   font-family: "Akaya Telivigala";
@@ -35,6 +71,10 @@
   border-radius: 10px;
 }
 
+.statusButton:active {
+  background-color: #ff9345;
+}
+
 .content {
   box-sizing: border-box;
   display: flex;
@@ -43,11 +83,11 @@
 }
 
 .desc {
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
   display: flex;
-  flex-flow: column;
+  width: 1600px;
+  height: 300px;
   margin-top: 150px;
-  padding: 100px 500px 200px;
   border: 1px solid black;
 }
 
@@ -64,8 +104,15 @@
   border-radius: 300px 300px 0 0;
 }
 
+.desc button {
+  position: absolute;
+  top: 150px;
+  right: 52px;
+}
+
 .desc .info {
   display: flex;
+  margin-top: 100px;
   flex: 0 0 auto;
 }
 
@@ -74,36 +121,14 @@
   align-self: flex-start;
 }
 
-.desc button {
-  position: absolute;
-  top: 150px;
-  right: 45px;
-}
-
-/* .info {
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-}
-
-.info h3 {
-  margin-left: 0;
-}
-
-.info p {
-  margin-left: 0;
-} */
-
 .notice {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
   align-items: center;
-  margin-top: 100px;
-  margin-left: 45px;
-  margin-right: 40px;
-  margin-bottom: 30px;
-  padding: 100px 600px 200px;
+  width: 1600px;
+  height: 300px;
+  margin-top: 150px;
   border: 1px solid black;
 }
 
@@ -112,7 +137,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  top: 550px;
+  top: 580px;
   left: 80px;
   width: 300px;
   height: 50px;
@@ -121,8 +146,17 @@
 }
 
 .notice button {
-  position: relative;
-  display: inline-block;
-  left: 743px;
-  bottom: 120px;
+  position: absolute;
+  top: 600px;
+  right: 45px;
+}
+
+.div p {
+  font: normal 15px "arial";
+}
+
+input {
+  width: 300px;
+  height: 30px;
+  font-size: 15px;
 }
