@@ -59,13 +59,13 @@
 
     - 잘못 작성한 경우1 (<object_ID>가 존재하지 않는 경우)   
 
-        ```json
+        ```
         { ..."message": "ERROR Failed to READ document with id '<wrong object_ID>'" }
         ```
 
     - 잘못 작성한 경우2 (<object_ID>의 길이가 형식과 맞지 않은 경우)
 
-        ```json
+        ```
         {..."message": "ERROR '<object_ID - 1>' is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string"}
         ```
 
@@ -73,7 +73,6 @@
     > Body에 다음과 같이 수정하고자 하는 정보를 적어 보내야 한다.
 
     ```json
-    Body(raw .json)  
     {  "name": "str",  "desc": "str",  "schedule": "str",  "notice": "str",  "status": 1,  "img_src": "str",  "m_id": "str"  }
     ```
 
