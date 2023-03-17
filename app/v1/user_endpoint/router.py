@@ -49,7 +49,7 @@ async def get_store_list():
         return {
             'request': 'api/v1/user/stores',
             'status': 'ERROR',
-            'message': e
+            'message': f'ERROR {e}'
         }
     
     return {

@@ -25,7 +25,7 @@ async def get_store(s_id:str):
         return {
             'request': f'api/v1/admin/store/{s_id}',
             'status': 'ERROR',
-            'message': e
+            'message': f'ERROR {e}'
         }
     
     return {
@@ -46,6 +46,13 @@ async def get_store(s_id:str, store: StoreModel):
                 'request': f'api/v1/admin/store/{s_id}',
                 'status': 'OK'
             }
+        
+        else:
+            return {
+            'request': f'api/v1/admin/store/{s_id}',
+            'status': 'ERROR',
+            'message': f'ERROR update failed'
+        }
 
     except Exception as e:
         print('ERROR', e)
