@@ -48,31 +48,31 @@
 ### `GET /api/v1/admin/store/hi`
 Returns test message
 
-    ```json
-    { 
-        "message": "Hello 'api/v1/admin/hi'" 
-    }
-    ```
+```
+{ 
+    "message": "Hello 'api/v1/admin/hi'" 
+}
+```
 
 ### `GET /api/v1/admin/store/<object_ID>` 
 object_ID를 가지는 가게 정보를 받아온다.  
 
 #### Response 
 
-    ```json
-    {
-        "_id": {
-            "$oid": "641458bd4443f2168a32357a"
-        },
-        "name": "니나노덮밥",  
-        "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
-        "schedule": "9시~18시 영업, 수요일 휴무",  
-        "notice": "null",  
-        "status": 1,  
-        "img_src": "image/ninano/store",  
-        "m_id": "null"
-    }
-    ```
+```json
+{
+    "_id": {
+        "$oid": "641458bd4443f2168a32357a"
+    },
+    "name": "니나노덮밥",  
+    "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
+    "schedule": "9시~18시 영업, 수요일 휴무",  
+    "notice": "null",  
+    "status": 1,  
+    "img_src": "image/ninano/store",  
+    "m_id": "null"
+}
+```
 
 - error 1 (<ID>가 존재하지 않는 경우)   
 
@@ -100,34 +100,34 @@ object_ID를 가지는 가게 정보를 수정한다.
 
 #### Request Body
 
-    ```json
-    {  
-        "name": "니나노덮밥",  
-        "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
-        "schedule": "9시~18시 영업, 목요일 휴무",  
-        "notice": "null",  
-        "status": 1,  
-        "img_src": "image/ninano/store",  
-        "m_id": "null" 
-    }
-    ```
+```json
+{  
+    "name": "니나노덮밥",  
+    "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
+    "schedule": "9시~18시 영업, 목요일 휴무",  
+    "notice": "null",  
+    "status": 1,  
+    "img_src": "image/ninano/store",  
+    "m_id": "null" 
+}
+```
 
 #### Response
   
-    ```json
-    {
-        "_id": {
-            "$oid": "641458bd4443f2168a32357a"
-        },
-        "name": "니나노덮밥",  
-        "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
-        "schedule": "9시~18시 영업, 목요일 휴무",  
-        "notice": "null",  
-        "status": 1,  
-        "img_src": "image/ninano/store",  
-        "m_id": "null"
-    }
-    ```
+```json
+{
+    "_id": {
+        "$oid": "641458bd4443f2168a32357a"
+    },
+    "name": "니나노덮밥",  
+    "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
+    "schedule": "9시~18시 영업, 목요일 휴무",  
+    "notice": "null",  
+    "status": 1,  
+    "img_src": "image/ninano/store",  
+    "m_id": "null"
+}
+```
 
 - error 1 (Body에 정보를 보내지 않은 경우)   
     
@@ -164,47 +164,47 @@ Returns test message
 
 #### Response
 
-    ```json
-    {
-        "message": "Hello 'api/v1/user/hi'"
-    }
-    ```
+```json
+{
+    "message": "Hello 'api/v1/user/hi'"
+}
+```
 
 ### `GET /api/v1/user/stores`
 전체 가게 정보를 받아온다.
 
 #### Response   
 
-    ```json
-    {
-        "data": [
-            {
-                "_id": {
-                    "$oid": "641458bd4443f2168a32357a"
-                },
-                "name": "니나노덮밥",  
-                "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
-                "schedule": "9시~18시 영업, 목요일 휴무",  
-                "notice": "null",  
-                "status": 1,  
-                "img_src": "image/ninano/store",  
-                "m_id": "null"
+```json
+{
+    "data": [
+        {
+            "_id": {
+                "$oid": "641458bd4443f2168a32357a"
             },
-            {
-                "_id": {
-                    "$oid": "641459134443f2168a32357b"
-                },
-                "name": "파스타",  
-                "desc": "다양한 양식 음식이 있습니다.",  
-                "schedule": "9시~18시 영업, 주말 제외",  
-                "notice": "개인사정으로 다음주 화요일까지 잠시 휴업합니다.",  
-                "status": 2,  
-                "img_src": "image/pasta/store",  
-                "m_id": "null"
-            }
-        ]
-    }
-    ```
+            "name": "니나노덮밥",  
+            "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
+            "schedule": "9시~18시 영업, 목요일 휴무",  
+            "notice": "null",  
+            "status": 1,  
+            "img_src": "image/ninano/store",  
+            "m_id": "null"
+        },
+        {
+            "_id": {
+                "$oid": "641459134443f2168a32357b"
+            },
+            "name": "파스타",  
+            "desc": "다양한 양식 음식이 있습니다.",  
+            "schedule": "9시~18시 영업, 주말 제외",  
+            "notice": "개인사정으로 다음주 화요일까지 잠시 휴업합니다.",  
+            "status": 2,  
+            "img_src": "image/pasta/store",  
+            "m_id": "null"
+        }
+    ]
+}
+```
 
 - error 1 (식당이 존재하지 않는 경우)
 
