@@ -34,9 +34,6 @@
 }
 
 .modify {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 70px;
   height: 40px;
   color: #000;
