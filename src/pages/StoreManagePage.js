@@ -1,14 +1,18 @@
 import MenuBar from "../components/MenuBar";
 import Store from "../css/StoreManage.module.css";
 import Button from "../css/Button.module.css";
+import axios from "axios";
+
 import { useState, useEffect } from "react";
 
 function StoreManagePage() {
-  const [desc, setDesc] = useState("우리 가게는요 수제 버거 전문점으로 ~");
-  const [schedule, setSchedule] = useState("11시-20시, 매주 월요일 휴무");
-  const [noti, setNoti] = useState(
-    "2023년 3월 6일은 가게 사장님 개인사정으로 임시 휴업합니다."
-  );
+  const [store, setStore] = useState([]);
+  const [loading, setLoading] = useState(null);
+  const [error, setError] = useState(null);
+
+  const [desc, setDesc] = useState("");
+  const [schedule, setSchedule] = useState("");
+  const [noti, setNoti] = useState("");
   const [editDescAndSchedule, setEditDescAndSchedule] = useState(false);
   const [editNoti, setEditNoti] = useState(false);
 
@@ -48,6 +52,28 @@ function StoreManagePage() {
     },
     [currentClick]
   );
+
+  useEffect(() => {
+    const fetchStore = async () => {
+      try {
+        /**요청 시작 시 error과 store 초기화*/
+        setError(null);
+        setStore(null);
+        //loading 상태는 true로 세팅
+        setLoading(true);
+
+        const request = axios
+          .get("/api/v1/admin/store/641458bd4443f2168a32357a")
+          // .then((res) => console.log(1, res.data.response))
+          .then((res) => setStore(res.data.response));
+      } catch (e) {
+        setError(e);
+      }
+      setLoading(false);
+    };
+
+    fetchStore();
+  }, []);
 
   return (
     <div>
