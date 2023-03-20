@@ -45,15 +45,6 @@
 ---
 ## React WEB과 상호작용
 
-### `GET /api/v1/admin/store/hi`
-Returns test message
-
-```
-{ 
-    "message": "Hello 'api/v1/admin/hi'" 
-}
-```
-
 ### `GET /api/v1/admin/store/<object_ID>` 
 object_ID를 가지는 가게 정보를 받아온다.  
 
@@ -61,9 +52,6 @@ object_ID를 가지는 가게 정보를 받아온다.
 
 ```json
 {
-    "_id": {
-        "$oid": "641458bd4443f2168a32357a"
-    },
     "name": "니나노덮밥",  
     "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
     "schedule": "9시~18시 영업, 수요일 휴무",  
@@ -78,9 +66,9 @@ object_ID를 가지는 가게 정보를 받아온다.
 
     ```json
     { 
-        "request": "api/v1/admin/store/<641458bd4443f2168a32357c>", 
+        "request": "api/v1/admin/store/<object_ID>", 
         "status": "OK", 
-        "message": "ERROR Failed to READ document with id '641458bd4443f2168a32357c'" 
+        "message": "ERROR Failed to READ document with id '<object_ID>'" 
     }
     ```
 
@@ -88,9 +76,9 @@ object_ID를 가지는 가게 정보를 받아온다.
 
     ```json
     {
-        "request": "api/v1/admin/store/<641458bd4443f2168a32357>", 
-            "status": "OK", 
-        "message": "ERROR '641458bd4443f2168a32357' is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string"
+        "request": "api/v1/admin/store/<<object_ID>>",   
+        "status": "OK", 
+        "message": "ERROR '<object_ID>' is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string"
     }
     ```
 
@@ -116,9 +104,6 @@ object_ID를 가지는 가게 정보를 수정한다.
   
 ```json
 {
-    "_id": {
-        "$oid": "641458bd4443f2168a32357a"
-    },
     "name": "니나노덮밥",  
     "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
     "schedule": "9시~18시 영업, 목요일 휴무",  
@@ -156,19 +141,19 @@ object_ID를 가지는 가게 정보를 수정한다.
         ]
     }
     ```
+
+- error 3 (저장된 값과 수정 값이 일치하는 경우)
+
+    ```json
+    {
+        "request": "api/v1/admin/store/641458bd4443f2168a32357a",   
+        "status": "ERROR",   
+        "message": "ERROR No write concern mode named 'majority\\\")' found in replica set configuration, full error: {'code': 79, 'codeName': 'UnknownReplWriteConcern', 'errmsg': 'No write concern mode named \\'majority\\\\\")\\' found in replica set configuration', 'errInfo': {'writeConcern': {'w': 'majority\")', 'wtimeout': 0, 'provenance': 'clientSupplied'}}}"
+    }
+    ```
+
 ---
 ## Android APP과 상호작용 
-
-### `GET /api/v1/user/hi`
-Returns test message
-
-#### Response
-
-```json
-{
-    "message": "Hello 'api/v1/user/hi'"
-}
-```
 
 ### `GET /api/v1/user/stores`
 전체 가게 정보를 받아온다.
@@ -179,9 +164,6 @@ Returns test message
 {
     "data": [
         {
-            "_id": {
-                "$oid": "641458bd4443f2168a32357a"
-            },
             "name": "니나노덮밥",  
             "desc": "맛있는 함박오므라이스와 카레라이스를 팝니다~!",  
             "schedule": "9시~18시 영업, 목요일 휴무",  
@@ -192,7 +174,7 @@ Returns test message
         },
         {
             "_id": {
-                "$oid": "641459134443f2168a32357b"
+                "$oid": "<object_ID>"
             },
             "name": "파스타",  
             "desc": "다양한 양식 음식이 있습니다.",  
