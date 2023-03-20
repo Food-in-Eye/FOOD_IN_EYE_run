@@ -56,13 +56,13 @@ object_ID를 가지는 가게 정보를 받아온다.
     "request": "api/v1/admin/store/<object_ID>",
     "status": "OK",
     "response": {
-        "name": "(Before the change) string1",
-        "desc": str,
-        "schedule": str,
-        "notice": str,
-        "status": int,
-        "img_src": str,
-        "m_id": str
+        "name": "str",
+        "desc": "str",
+        "schedule": "str",
+        "notice": "str",
+        "status": "int",
+        "img_src": "str",
+        "m_id": "str"
     }
 }
 ```
@@ -88,13 +88,14 @@ object_ID를 가지는 가게 정보를 수정한다.
 {
     "request": "api/v1/admin/store/<object_ID>",
     "status": "OK",
-        "name": "(After the change) string2",
-        "desc": str,
-        "schedule": str,
-        "notice": str,
-        "status": int,
-        "img_src": str,
-        "m_id": str
+    "response": {
+        "name": "(Before the change) str2",
+        "desc": "str",
+        "schedule": "str",
+        "notice": "str",
+        "status": "int",
+        "img_src": "str",
+        "m_id": "str"
     }
 }
 ```
@@ -123,22 +124,22 @@ object_ID를 가지는 가게 정보를 수정한다.
     "response": {    
         "data": [
             {
-                "name": str,
-                "desc": str,
-                "schedule": str,
-                "notice": str,
-                "status": int,
-                "img_src": str,
-                "m_id": str
+                "name": "str",
+                "desc": "str",
+                "schedule": "str",
+                "notice": "str",
+                "status": "int",
+                "img_src": "str",
+                "m_id": "str"
             },
             {
-                "name": str,
-                "desc": str,
-                "schedule": str,
-                "notice": str,
-                "status": int,
-                "img_src": str,
-                "m_id": str
+                "name": "str",
+                "desc": "str",
+                "schedule": "str",
+                "notice": "str",
+                "status": "int",
+                "img_src": "str",
+                "m_id": "str"
             }
         ]
     }
