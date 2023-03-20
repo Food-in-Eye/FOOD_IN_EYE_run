@@ -56,7 +56,13 @@ object_ID를 가지는 가게 정보를 받아온다.
     "request": "api/v1/admin/store/<object_ID>",
     "status": "OK",
     "response": {
-        "name": "string1"
+        "name": "(Before the change) string1",
+        "desc": str,
+        "schedule": str,
+        "notice": str,
+        "status": int,
+        "img_src": str,
+        "m_id": str
     }
 }
 ```
@@ -71,15 +77,6 @@ object_ID를 가지는 가게 정보를 받아온다.
     }
     ```
 
-- error 2 (ID의 길이가 형식과 맞지 않은 경우)
-
-    ```json
-    {
-        "request": "api/v1/admin/store/<object_ID>",   
-        "status": "OK", 
-        "message": "ERROR '<object_ID>' is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string"
-    }
-    ```
 
 ### `PUT /api/v1/admin/store/<object_ID>` 
 object_ID를 가지는 가게 정보를 수정한다.  
@@ -91,8 +88,13 @@ object_ID를 가지는 가게 정보를 수정한다.
 {
     "request": "api/v1/admin/store/<object_ID>",
     "status": "OK",
-    "response": {
-        "name": "string2"
+        "name": "(After the change) string2",
+        "desc": str,
+        "schedule": str,
+        "notice": str,
+        "status": int,
+        "img_src": str,
+        "m_id": str
     }
 }
 ```
@@ -105,16 +107,6 @@ object_ID를 가지는 가게 정보를 수정한다.
     "status": "OK",
 }
 ```
-
-- error 1 (저장된 값과 수정 값이 일치하는 경우)
-
-    ```json
-    {
-        "request": "api/v1/admin/store/<object_ID>",   
-        "status": "ERROR",   
-        "message": "ERROR No write concern mode named 'majority\\\")' found in replica set configuration, full error: {'code': 79, 'codeName': 'UnknownReplWriteConcern', 'errmsg': 'No write concern mode named \\'majority\\\\\")\\' found in replica set configuration', 'errInfo': {'writeConcern': {'w': 'majority\")', 'wtimeout': 0, 'provenance': 'clientSupplied'}}}"
-    }
-    ```
 
 ---
 ## Android APP과 상호작용 
@@ -131,22 +123,24 @@ object_ID를 가지는 가게 정보를 수정한다.
     "response": {    
         "data": [
             {
-                "name": "string2",
+                "name": str,
+                "desc": str,
+                "schedule": str,
+                "notice": str,
+                "status": int,
+                "img_src": str,
+                "m_id": str
             },
             {
-                "name": "string3",  
+                "name": str,
+                "desc": str,
+                "schedule": str,
+                "notice": str,
+                "status": int,
+                "img_src": str,
+                "m_id": str
             }
         ]
     }
 }
 ```
-
-- error 1 (식당이 존재하지 않는 경우)
-
-    ```json   
-    { 
-        "request": "api/v1/user/stores", 
-        "status": "OK", 
-        "response": [] 
-    }
-    ```
