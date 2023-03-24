@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 from enum import Enum
-
+from datetime import datetime
 class Status(Enum):
     open = 1
     close = 2
@@ -17,13 +17,15 @@ class StoreModel(BaseModel):
     m_id: str | None = Field(title="menu identifier currently in use by restaurant")
     
 class FoodModel(BaseModel):
+    pos: int = Field(title="position of food in menu")
     name: str = Field(title="name of food")
     price: int = Field(title="price of food")
     img_src: str = Field(title="path where food images are stored")
-    cal: int = Field(title="calories of food")
-    desc: int = Field(title="description of food")
-    loc: int = Field(title="location of food in menu")
+    desc: str = Field(title="description of food")
+    allergy: str = Field(title="Indication of food allergy-causing substances")
+    origin: str = Field(title="Food country of origin indication")
 
 class MenuModel(BaseModel):
-    m_id: str = Field(title="menu identifier")
-    menus: list[FoodModel] = Field(title="list of food")
+    s_id: str = Field(title="Restaurant identifier for this menu")
+    date: datetime = Field(title="the date of this menu was created")
+    list: list[FoodModel] = Field(title="list of food")
