@@ -28,4 +28,4 @@ class FoodModel(BaseModel):
 class MenuModel(BaseModel):
     s_id: str = Field(title="Restaurant identifier for this menu")
     date: datetime = Field(title="the date of this menu was created")
-    list: list[FoodModel] = Field(title="list of food")
+    m_list: list[FoodModel] = Field(title="list of food")

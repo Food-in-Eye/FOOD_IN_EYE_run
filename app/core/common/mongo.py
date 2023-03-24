@@ -71,7 +71,17 @@ class MongodbController:
             response.append(dictToStr(r))
         
         return response
+    
+    def read_lastest_one(self, id:str) -> dict:
+        """ s_id가 일치하면서 가장 최신인 document를 읽어온다. """
+        assert id is not None
+
+        result = self.coll.find_one({"s_id": str(id)}, sort=[("date", -1)])
+        if result is None:
+            raise Exception(f'Failed to READ document with id \'{id}\'')
         
+        return dictToStr(result)
+
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """
         assert id is not None
