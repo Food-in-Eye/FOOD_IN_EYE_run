@@ -29,7 +29,10 @@ form h2 {
 }
 
 .align p {
-  font-size: 16px;
+  margin: 10px auto 0px 0px;
+  color: #fff;
+  font-size: 20px;
+  background: none;
 }
 
 .align input {
