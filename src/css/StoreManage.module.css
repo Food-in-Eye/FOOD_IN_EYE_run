@@ -121,8 +121,18 @@
   margin: auto 0px 0px auto;
 }
 
-input {
-  width: 500px;
+p {
+  width: 70%;
   height: 30px;
   font-size: 15px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
+}
+
+input {
+  width: 70%;
+  height: 30px;
+  font-size: 15px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
 }

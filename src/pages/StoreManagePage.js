@@ -10,52 +10,36 @@ function StoreManagePage() {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
 
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [schedule, setSchedule] = useState("");
-  const [noti, setNoti] = useState("");
   const [editDescAndSchedule, setEditDescAndSchedule] = useState(false);
   const [editNoti, setEditNoti] = useState(false);
 
-  const handleEditDescAndScheduleClick = () => {
-    setEditDescAndSchedule(true);
-  };
-
-  const handleEditNotiClick = () => {
-    setEditNoti(true);
-  };
-
-  const handleSaveClick = () => {
-    setEditDescAndSchedule(false);
-    setEditNoti(false);
-  };
-
-  const openBtn = document.getElementById("open");
-  const closeBtn = document.getElementById("close");
+  const [openButtonDisabled, setOpenButtonDisabled] = useState(true);
+  const [closeButtonDisabled, setCloseButtonDisabled] = useState(false);
 
   useEffect(() => {
+    //GET 요청을 보내서 데이터 반영
     const fetchStore = async () => {
       try {
         /**요청 시작 시 error과 store 초기화*/
         setError(null);
-        setStore(null);
+        setStore([]);
         //loading 상태는 true로 세팅
         setLoading(true);
 
-        const request = axios
-          .get("/api/v1/admin/store/641458bd4443f2168a32357a")
-          .then((res) => setStore(res.data.response))
-          .then((res) => console.log(store.status))
-          .then((res) => {
-            /**가게 상태 받아오기 */
-            if (store.status === 1) {
-              openBtn.disabled = false;
-              closeBtn.disabled = true;
-            } else if (store.status === 2) {
-              openBtn.disabled = true;
-              closeBtn.disabled = false;
-            }
-          });
+        const request = await axios.get(
+          "/api/v1/admin/stores/641458bd4443f2168a32357a"
+        );
+        setStore(request.data.response);
+
+        if (request.data.response.status === 1) {
+          console.log("영업 중");
+          setOpenButtonDisabled(false);
+          setCloseButtonDisabled(true);
+        } else if (request.data.response.status === 2) {
+          console.log("영업 종료");
+          setOpenButtonDisabled(true);
+          setCloseButtonDisabled(false);
+        }
       } catch (e) {
         setError(e);
       }
@@ -65,68 +49,99 @@ function StoreManagePage() {
     fetchStore();
   }, []);
 
-  /**가게 상태 => 상태바 클릭해서 변경*/
-  // const [currentClick, setCurrentClick] = useState(null);
-  // const [prevClick, setPrevClick] = useState(null);
+  const [descValue, setDescValue] = useState(store.desc);
+  const [scheduleValue, setScheduleValue] = useState(store.schedule);
+  const [notiValue, setNotiValue] = useState(store.noti);
 
-  // const onClickBtn = (e) => {
-  //   setCurrentClick(e.target.id);
-  // };
+  const handleEditDescAndScheduleClick = () => {
+    setEditDescAndSchedule(true);
+    setDescValue(store.desc);
+    setScheduleValue(store.schedule);
+  };
 
-  // useEffect(
-  //   (e) => {
-  //     if (currentClick !== null) {
-  //       let current = document.getElementById(currentClick);
-  //       current.style.backgroundColor = "#ff9345";
-  //     }
+  const handleEditNotiClick = () => {
+    setEditNoti(true);
+    setNotiValue(store.noti);
+  };
 
-  //     if (prevClick !== null) {
-  //       let prev = document.getElementById(prevClick);
-  //       prev.style.backgroundColor = "#ffffff";
-  //     }
-  //     setPrevClick(currentClick);
-  //   },
-  //   [currentClick]
-  // );
-  // // openBtn 클릭 시
-  // if (openBtn) {
-  //   openBtn.addEventListener("click", function () {
-  //     openBtn.disabled = true;
-  //     openBtn.classList.remove("active");
-  //     closeBtn.disabled = false;
-  //     closeBtn.classList.add("active");
-  //   });
-  // } else {
-  //   console.error("open-btn not found");
-  // }
+  const handleDescAndScheduleSaveClick = () => {
+    axios
+      .put(
+        "/api/v1/admin/stores/641458bd4443f2168a32357a",
+        JSON.stringify({
+          desc: descValue,
+          schedule: scheduleValue,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        console.log("desc, schedule 데이터 수정");
+        setEditDescAndSchedule(false);
+      })
+      .catch((e) => {
+        console.log(e.response);
+      });
+  };
 
-  // // closeBtn 클릭 시
-  // if (closeBtn) {
-  //   closeBtn.addEventListener("click", function () {
-  //     openBtn.disabled = false;
-  //     openBtn.classList.add("active");
-  //     closeBtn.disabled = true;
-  //     closeBtn.classList.remove("active");
-  //   });
-  // } else {
-  //   console.error("close-btn not found");
-  // }
+  const handleNotiSaveClick = () => {
+    axios
+      .put(
+        "/api/v1/admin/stores/641458bd4443f2168a32357a",
+        JSON.stringify({
+          noti: notiValue,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        console.log("noti 데이터 수정");
+        setEditNoti(false);
+      })
+      .catch((e) => {
+        console.log(e.response);
+      });
+  };
 
-  function onClickOpen() {
-    if (openBtn.disabled) {
-      openBtn.disabled = false;
-    } else {
-      openBtn.disabled = true;
+  //open 버튼 클릭 시
+  const handleOpenBtnClick = () => {
+    if (openButtonDisabled && !closeButtonDisabled) {
+      console.log("영업 중으로 변경");
+      axios
+        .put("/api/v1/admin/stores/641458bd4443f2168a32357a", {
+          status: 1,
+        })
+        .then((res) => {
+          console.log("status 1로 수정");
+        });
+      setOpenButtonDisabled(false);
+      setCloseButtonDisabled(true);
     }
-  }
+  };
 
-  function onClickClose() {
-    if (closeBtn.disabled) {
-      closeBtn.disabled = false;
-    } else {
-      closeBtn.disabled = true;
+  //close 버튼 클릭 시
+  const handleCloseBtnClick = () => {
+    if (closeButtonDisabled && !openButtonDisabled) {
+      console.log("영업 종료로 변경");
+      axios
+        .put("/api/v1/admin/stores/641458bd4443f2168a32357a", {
+          status: 2,
+        })
+        .then((res) => {
+          console.log("status 2로 수정");
+        });
+      setOpenButtonDisabled(true);
+      setCloseButtonDisabled(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -140,15 +155,16 @@ function StoreManagePage() {
               <button
                 className={Store.statusButton}
                 id="open"
-                onClick={onClickOpen}
+                onClick={handleOpenBtnClick}
+                disabled={openButtonDisabled}
               >
                 영업 중
               </button>
               <button
                 className={Store.statusButton}
                 id="close"
-                onClick={onClickClose}
-                disabled
+                onClick={handleCloseBtnClick}
+                disabled={closeButtonDisabled}
               >
                 영업 종료
               </button>
@@ -163,8 +179,8 @@ function StoreManagePage() {
                 {editDescAndSchedule ? (
                   <input
                     type="text"
-                    value={desc}
-                    onChange={(e) => setDesc(e.target.value)}
+                    value={descValue}
+                    onChange={(e) => setDescValue(e.target.value)}
                   />
                 ) : (
                   <p>{store.desc}</p>
@@ -175,8 +191,8 @@ function StoreManagePage() {
                 {editDescAndSchedule ? (
                   <input
                     type="text"
-                    value={schedule}
-                    onChange={(e) => setSchedule(e.target.value)}
+                    value={scheduleValue}
+                    onChange={(e) => setScheduleValue(e.target.value)}
                   />
                 ) : (
                   <p>{store.schedule}</p>
@@ -187,7 +203,7 @@ function StoreManagePage() {
                 //show edit button when editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
-                  onClick={handleSaveClick}
+                  onClick={handleDescAndScheduleSaveClick}
                 >
                   저장
                 </button>
@@ -210,8 +226,8 @@ function StoreManagePage() {
                 {editNoti ? (
                   <input
                     type="text"
-                    value={noti}
-                    onChange={(e) => setNoti(e.target.value)}
+                    value={notiValue}
+                    onChange={(e) => setNotiValue(e.target.value)}
                   />
                 ) : (
                   <p>{store.noti}</p>
@@ -221,7 +237,7 @@ function StoreManagePage() {
                 //show edit button when editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
-                  onClick={handleSaveClick}
+                  onClick={handleNotiSaveClick}
                 >
                   저장
                 </button>
