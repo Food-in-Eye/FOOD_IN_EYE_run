@@ -1,5 +1,5 @@
 """
-User Router
+user_store
 :Android APP에서 가게 정보를 불러오기
 """
 
