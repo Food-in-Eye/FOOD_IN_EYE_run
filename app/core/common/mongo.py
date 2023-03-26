@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from pymongo.collection import Collection
 
 from bson.objectid import ObjectId
 
@@ -80,7 +81,7 @@ class MongodbController:
         if result is None:
             raise Exception(f'Failed to READ document with id \'{id}\'')
         
-        return dictToStr(result)
+        return dictToStr(result)    
 
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """
