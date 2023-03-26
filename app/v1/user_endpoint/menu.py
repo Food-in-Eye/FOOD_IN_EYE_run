@@ -44,18 +44,37 @@ async def get_lastest_menu_list(s_id:str):
     try:
         menu = mongo.read_lastest_one(s_id)
 
-        food_list = menu.get('m_list', [])
+        food_ids = [food['m_id'] for food in menu['m_list']]
+        food_list = []
 
-        for item in food_list:
-            food_id = item['m_id']
+        for food_id in food_ids:
             food = mongo_food.read_one(food_id)
-            item['name'] = food['name']
-            item['price'] = food['price']
-            item['img_src'] = food['img_src']
-            item['allergy'] = food['allergy']
-            item['origin'] = food['origin']
+            food_list.append({
+                "name": food['name'],
+                "price": food['price'],
+                "img_src" : food['img_src'],
+                "desc" : food['desc'],
+                "allergy" : food['allergy'],
+                "origin" : food['origin']
+        })
+        response = food_list
 
-        response = menu
+# pos 포함
+        # menu = mongo.read_lastest_one(s_id)
+
+        # food_list = menu.get('m_list', [])
+
+        # for item in food_list:
+        #     food_id = item['m_id']
+        #     food = mongo_food.read_one(food_id)
+        #     item['name'] = food['name']
+        #     item['price'] = food['price']
+        #     item['img_src'] = food['img_src']
+        #     item['desc'] = food['desc']
+        #     item['allergy'] = food['allergy']
+        #     item['origin'] = food['origin']
+
+        # response = food_list
         
     except Exception as e:
         print('ERROR', e)
