@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from pymongo.collection import Collection
 
 from bson.objectid import ObjectId
 
@@ -30,6 +29,9 @@ class MongodbController:
     def create(self, data:dict) -> ObjectId:
         """ 딕셔너리를 받아서 collection에 새로운 document를 추가한다. """
         assert data is not None
+
+        if "_id" in data:
+            del data["_id"]
         
         result = self.coll.insert_one(data)
         if result.acknowledged is False:
@@ -74,7 +76,7 @@ class MongodbController:
         return response
     
     def read_lastest_one(self, id:str) -> dict:
-        """ s_id가 일치하면서 가장 최신인 document를 읽어온다. """
+        """ store_id가 일치하면서 가장 최신인 document를 읽어온다. """
         assert id is not None
 
         result = self.coll.find_one({"s_id": str(id)}, sort=[("date", -1)])
