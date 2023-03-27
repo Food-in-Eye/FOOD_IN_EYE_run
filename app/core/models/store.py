@@ -18,7 +18,7 @@ class StoreModel(BaseModel):
     
 class FoodModel(BaseModel):
     # pos: int = Field(title="position of food in menu")
-    s_id: str = Field(title="name of store")
+    s_id: str = Field(title="Restaurant identifier for this menu")
     name: str = Field(title="name of food")
     price: int = Field(title="price of food")
     img_src: str = Field(title="path where food images are stored")
@@ -26,7 +26,11 @@ class FoodModel(BaseModel):
     allergy: str = Field(title="Indication of food allergy-causing substances")
     origin: str = Field(title="Food country of origin indication")
 
+class FoodPos(BaseModel):
+    pos: int = Field(title="position of food")
+    f_id: str = Field(title="Food identifier")
+
 class MenuModel(BaseModel):
-    s_id: str = Field(title="Restaurant identifier for this menu")
-    date: datetime = Field(title="the date of this menu was created")
-    m_list: list[FoodModel] = Field(title="list of food")
+    # s_id: str = Field(title="Restaurant identifier for this menu")
+    # date: datetime = Field(title="the date of this menu was created")
+    f_list: list[FoodPos] = Field(title="list of food")
