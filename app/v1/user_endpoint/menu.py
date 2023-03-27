@@ -16,35 +16,35 @@ menu_router = APIRouter(prefix="/menus")
 async def hello():
     return {"message": "Hello 'api/v1/user/hi'"}
 
-@menu_router.get('/{s_id}')
-async def get_lastest_menu(s_id:str):
+@menu_router.get('/{m_id}')
+async def get_lastest_menu(m_id:str):
     """ 해당하는 id의 메뉴판 정보를 받아온다. """
     
     try:
-        response = mongo.read_lastest_one(s_id)
+        response = mongo.read_lastest_one(m_id)
 
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/user/menus/{s_id}',
+            'request': f'api/v1/user/menus/{m_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'api/v1/user/menus/{s_id}',
+        'request': f'api/v1/user/menus/{m_id}',
         'status': 'OK',
         'response': response
     }
 
-@menu_router.get('/list/{s_id}')
-async def get_lastest_menu_list(s_id:str):
+@menu_router.get('/list/{m_id}')
+async def get_lastest_menu_list(m_id:str):
     """ 해당하는 id의 메뉴판의 음식 정보를 받아온다. """
     
     try:
-        menu = mongo.read_lastest_one(s_id)
+        menu = mongo.read_lastest_one(m_id)
 
-        food_ids = [food['m_id'] for food in menu['m_list']]
+        food_ids = [food['f_id'] for food in menu['f_list']]
         food_list = []
 
         for food_id in food_ids:
@@ -59,7 +59,7 @@ async def get_lastest_menu_list(s_id:str):
         })
         response = food_list
 
-# pos 포함
+        # pos 포함해서 정보를 얻어오는 경우
         # menu = mongo.read_lastest_one(s_id)
 
         # food_list = menu.get('m_list', [])
@@ -79,13 +79,13 @@ async def get_lastest_menu_list(s_id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/user/menus/list/{s_id}',
+            'request': f'api/v1/user/menus/list/{m_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'api/v1/user/menus/list/{s_id}',
+        'request': f'api/v1/user/menus/list/{m_id}',
         'status': 'OK',
         'response': response
     }
