@@ -71,7 +71,6 @@ async def put_menus(s_id:str, menu:MenuModel):
     data = data['f_list']
     
     sotred_data = sorted(data, key=operator.itemgetter("pos"))
-    # data = sotred_data.dict()
 
     new_menu = {
         's_id': s_id,
@@ -89,7 +88,6 @@ async def put_menus(s_id:str, menu:MenuModel):
                 'schedule': store['schedule'],
                 'notice': store['notice'],
                 'status': store['status'],
-                'img_src': store['img_src'],
                 'm_id': menu['_id']
             }
             mongo_store.update(s_id, new_store)

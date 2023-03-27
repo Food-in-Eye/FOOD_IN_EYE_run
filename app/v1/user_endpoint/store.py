@@ -12,16 +12,22 @@ store_router = APIRouter(prefix="/stores", tags=["Android"])
 @store_router.get('/')
 async def get_store_list():
     """ 모든 식당의 정보를 받아온다 """
-    fields = ['_id', 'name', 'desc', 'schedule', 'notice', 'status', 'img_src', 'm_id']
-    not_null_fields = ['name', 'desc', 'schedule', 'status', 'img_src']
-    
+    fields = ['_id', 'name', 'desc', 'schedule', 'notice', 'status', 'm_id']
+    not_null_fields = ['name', 'desc', 'schedule', 'status']
+
     try:
         result = mongo.read_all(fields)
-        
         response = []
         for r in result:
-            if r['name'] and r['desc'] and r['schedule'] and r['status'] and r['img_src']:
-                response.append(r)
+            for item in not_null_fields:
+                print(item)
+                if r[item] is not None:
+                    if item == 'status':
+                        response.append(r)
+                else:
+                    break
+
+
 
     except Exception as e:
         print('ERROR', e)
