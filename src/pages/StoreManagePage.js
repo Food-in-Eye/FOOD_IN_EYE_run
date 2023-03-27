@@ -6,15 +6,15 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 
 function StoreManagePage() {
-  const [store, setStore] = useState([]);
+  const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
 
   const [editDescAndSchedule, setEditDescAndSchedule] = useState(false);
   const [editNoti, setEditNoti] = useState(false);
 
-  const [openButtonDisabled, setOpenButtonDisabled] = useState(true);
-  const [closeButtonDisabled, setCloseButtonDisabled] = useState(false);
+  const [isOpenButtonClicked, setIsOpenButtonClicked] = useState(false);
+  const [isCloseButtonClicked, setIsCloseButtonClicked] = useState(false);
 
   useEffect(() => {
     //GET 요청을 보내서 데이터 반영
@@ -32,13 +32,9 @@ function StoreManagePage() {
         setStore(request.data.response);
 
         if (request.data.response.status === 1) {
-          console.log("영업 중");
-          setOpenButtonDisabled(false);
-          setCloseButtonDisabled(true);
+          setIsOpenButtonClicked(true);
         } else if (request.data.response.status === 2) {
-          console.log("영업 종료");
-          setOpenButtonDisabled(true);
-          setCloseButtonDisabled(false);
+          setIsCloseButtonClicked(true);
         }
       } catch (e) {
         setError(e);
@@ -49,19 +45,20 @@ function StoreManagePage() {
     fetchStore();
   }, []);
 
+  const [status, setStatus] = useState(store.status);
   const [descValue, setDescValue] = useState(store.desc);
   const [scheduleValue, setScheduleValue] = useState(store.schedule);
-  const [notiValue, setNotiValue] = useState(store.noti);
+  const [notiValue, setNotiValue] = useState(store.notice);
 
   const handleEditDescAndScheduleClick = () => {
-    setEditDescAndSchedule(true);
     setDescValue(store.desc);
     setScheduleValue(store.schedule);
+    setEditDescAndSchedule(true);
   };
 
   const handleEditNotiClick = () => {
+    setNotiValue(store.notice);
     setEditNoti(true);
-    setNotiValue(store.noti);
   };
 
   const handleDescAndScheduleSaveClick = () => {
@@ -69,6 +66,7 @@ function StoreManagePage() {
       .put(
         "/api/v1/admin/stores/641458bd4443f2168a32357a",
         JSON.stringify({
+          ...store,
           desc: descValue,
           schedule: scheduleValue,
         }),
@@ -80,7 +78,11 @@ function StoreManagePage() {
         }
       )
       .then((res) => {
-        console.log("desc, schedule 데이터 수정");
+        setStore((prevState) => ({
+          ...prevState,
+          desc: descValue,
+          schedule: scheduleValue,
+        }));
         setEditDescAndSchedule(false);
       })
       .catch((e) => {
@@ -93,7 +95,8 @@ function StoreManagePage() {
       .put(
         "/api/v1/admin/stores/641458bd4443f2168a32357a",
         JSON.stringify({
-          noti: notiValue,
+          ...store,
+          notice: notiValue,
         }),
         {
           headers: {
@@ -103,8 +106,9 @@ function StoreManagePage() {
         }
       )
       .then((res) => {
-        console.log("noti 데이터 수정");
+        setStore((prevState) => ({ ...prevState, notice: notiValue }));
         setEditNoti(false);
+        return store;
       })
       .catch((e) => {
         console.log(e.response);
@@ -113,35 +117,66 @@ function StoreManagePage() {
 
   //open 버튼 클릭 시
   const handleOpenBtnClick = () => {
-    if (openButtonDisabled && !closeButtonDisabled) {
-      console.log("영업 중으로 변경");
-      axios
-        .put("/api/v1/admin/stores/641458bd4443f2168a32357a", {
+    setIsOpenButtonClicked(true);
+    setIsCloseButtonClicked(false);
+
+    axios
+      .put(
+        "/api/v1/admin/stores/641458bd4443f2168a32357a",
+        JSON.stringify({
+          ...store,
           status: 1,
-        })
-        .then((res) => {
-          console.log("status 1로 수정");
-        });
-      setOpenButtonDisabled(false);
-      setCloseButtonDisabled(true);
-    }
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        setStore((prevState) => ({ ...prevState, status: 1 }));
+      })
+      .catch((e) => {
+        console.log(e.response);
+      });
   };
 
   //close 버튼 클릭 시
   const handleCloseBtnClick = () => {
-    if (closeButtonDisabled && !openButtonDisabled) {
-      console.log("영업 종료로 변경");
-      axios
-        .put("/api/v1/admin/stores/641458bd4443f2168a32357a", {
+    setIsCloseButtonClicked(true);
+    setIsOpenButtonClicked(false);
+    axios
+      .put(
+        "/api/v1/admin/stores/641458bd4443f2168a32357a",
+        JSON.stringify({
+          ...store,
           status: 2,
-        })
-        .then((res) => {
-          console.log("status 2로 수정");
-        });
-      setOpenButtonDisabled(true);
-      setCloseButtonDisabled(false);
-    }
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        setStore((prevState) => ({ ...prevState, status: 2 }));
+      })
+      .catch((e) => {
+        console.log(e.response);
+      });
   };
+
+  const openBtnStyle = {
+    background: store.status === 1 ? "#ff9345" : "#fff",
+  };
+
+  const closeBtnStyle = {
+    background: store.status === 2 ? "#ff9345" : "#fff",
+  };
+
+  useEffect(() => {}, [store]);
 
   return (
     <div>
@@ -156,7 +191,8 @@ function StoreManagePage() {
                 className={Store.statusButton}
                 id="open"
                 onClick={handleOpenBtnClick}
-                disabled={openButtonDisabled}
+                // style={{ background: isOpenButtonClicked ? "#ff9345" : "fff" }}
+                style={openBtnStyle}
               >
                 영업 중
               </button>
@@ -164,7 +200,8 @@ function StoreManagePage() {
                 className={Store.statusButton}
                 id="close"
                 onClick={handleCloseBtnClick}
-                disabled={closeButtonDisabled}
+                // style={{ background: isCloseButtonClicked ? "#ff9345" : "fff" }}
+                style={closeBtnStyle}
               >
                 영업 종료
               </button>
@@ -177,9 +214,11 @@ function StoreManagePage() {
               <div className={Store.intro}>
                 <h3>가게 한줄 소개</h3>
                 {editDescAndSchedule ? (
-                  <input
+                  <textarea
                     type="text"
                     value={descValue}
+                    cols="true"
+                    rows="3"
                     onChange={(e) => setDescValue(e.target.value)}
                   />
                 ) : (
@@ -189,9 +228,11 @@ function StoreManagePage() {
               <div className={Store.opentime}>
                 <h3>운영시간</h3>
                 {editDescAndSchedule ? (
-                  <input
+                  <textarea
                     type="text"
                     value={scheduleValue}
+                    cols="true"
+                    rows="1"
                     onChange={(e) => setScheduleValue(e.target.value)}
                   />
                 ) : (
@@ -224,17 +265,21 @@ function StoreManagePage() {
             <div className={Store.notice}>
               <div className={Store.innerNotice}>
                 {editNoti ? (
-                  <input
+                  <textarea
                     type="text"
-                    value={notiValue}
+                    value={notiValue || ""}
+                    cols="true"
+                    rows="2"
                     onChange={(e) => setNotiValue(e.target.value)}
                   />
                 ) : (
-                  <p>{store.noti}</p>
+                  <p className={Store.noticeInfo}>{store.notice}</p>
                 )}
               </div>
+
               {editNoti ? (
                 //show edit button when editing
+
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleNotiSaveClick}
