@@ -1,14 +1,135 @@
-.inner {
-  box-sizing: border-box;
+.content {
   display: flex;
-  flex-flow: column wrap;
-  height: 700px;
-  margin: 0px;
-  padding: 0px;
-  background-color: #e8e6eb;
+  flex-flow: column;
+  height: auto;
 }
 
-.inner p {
-  margin: auto;
-  display: block;
+.statusBar {
+  width: 100%;
+}
+
+.status {
+  width: 400px;
+  height: auto;
+  display: flex;
+  float: right;
+  flex-direction: row;
+  margin: 10px 50px 10px 0px;
+  border: 2px solid #ff9345;
+  border-radius: 10px;
+}
+
+.statusButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  padding: 20px;
+  font-size: 20px;
+  font-family: "Akaya Telivigala";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  color: #000;
+  background: #fff;
+  border: none;
+  border-radius: 5px;
+}
+
+.description {
+  width: 100%;
+  height: auto;
+}
+
+.description h1 {
+  width: 300px;
+  height: 50px;
+  display: flex;
+  float: left;
+  justify-content: center;
+  margin: 10px 0px 0px 50px;
+  align-items: center;
+  background: #ff9345;
+  border-radius: 300px 300px 0 0;
+}
+
+.desc {
+  width: 93%;
+  height: 300px;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
+  margin: 0px 50px 10px 50px;
+  background-color: #fff;
+  border: 2px solid black;
+}
+
+.intro {
+  height: auto;
+  float: left;
+  padding: 20px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
+}
+
+.opentime {
+  float: left;
+  padding: 20px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
+}
+
+/* 공지사항 CSS*/
+
+.noticeBlock {
+  width: 100%;
+}
+
+.noticeBlock h1 {
+  width: 300px;
+  height: 50px;
+  float: left;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0px 0px 50px;
+  background: #337db1;
+  border-radius: 0px 300px 0px 0px;
+}
+
+.notice {
+  width: 93%;
+  height: 200px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid black;
+  margin: 0px 50px 10px 50px;
+}
+
+.notice .innerNotice {
+  float: left;
+  padding: 20px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
+}
+
+.modifyBtn {
+  margin: auto 0px 0px auto;
+}
+
+p {
+  width: 70%;
+  height: auto;
+  font-size: 15px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
+}
+
+textarea {
+  width: 70%;
+  height: auto;
+  font-size: 15px;
+  margin: 10px 50px 0px 50px;
+  background-color: #d9d9d9;
 }

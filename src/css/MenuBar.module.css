@@ -13,7 +13,11 @@
   padding: 0px 10px;
   position: absolute;
   font: 18px/1 "arial";
-  color: #999;
+  color: #fff;
+}
+
+.util a:visited {
+  color: #fff;
 }
 
 .header {
@@ -24,6 +28,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  background-color: #000926;
 }
 
 .header h2 {
@@ -34,6 +39,7 @@
   justify-content: flex-start;
   position: absolute;
   font-size: 30px;
+  color: #fff;
 }
 
 ul {
@@ -67,6 +73,7 @@ ul {
 .profile h3 {
   margin-top: 17px;
   font: bold 25px/1 "arial";
+  color: #fff;
 }
 
 .dropMenu {
@@ -87,12 +94,12 @@ ul {
   padding: 20px 40px;
   transition: all 0.5s;
   font: bold 23px/1 "arial";
-  color: #555;
+  color: #fff;
 }
 
 .dropMenu ul li a:hover,
 .dropMenu ul li:hover a {
-  background: #555;
+  background: #000926;
   color: #fff;
 }
 
@@ -104,7 +111,7 @@ ul {
   border: 0px;
   position: absolute;
   z-index: 200;
-  background: #555;
+  background: #000926;
 }
 
 .dropMenu li:hover ul {
@@ -121,12 +128,13 @@ ul {
   margin: 0px;
   padding: 10px 10px 10px 15px;
   text-align: left;
+  text-decoration: none;
 }
 
 .dropMenu li ul a:hover,
 .dropMenu li ul li:hover a {
   border: 0px;
-  background-color: #ddd;
-  color: #ffffff;
+  background-color: #000926;
+  color: #fff;
   text-decoration: none;
 }
