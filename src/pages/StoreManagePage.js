@@ -45,7 +45,6 @@ function StoreManagePage() {
     fetchStore();
   }, []);
 
-  const [status, setStatus] = useState(store.status);
   const [descValue, setDescValue] = useState(store.desc);
   const [scheduleValue, setScheduleValue] = useState(store.schedule);
   const [notiValue, setNotiValue] = useState(store.notice);
