@@ -52,6 +52,19 @@ class MongodbController:
 
         return True
 
+    def update_one(self, id:str, field:str, value) -> bool:
+        assert id and field and value is not None
+
+        result = self.coll.update_one({'_id': ObjectId(id)},
+                                      {'$set': {field: value}})
+        if result.acknowledged is False:
+            raise Exception(f'Failed to UPDATE document with id \'{id}\' to set \'{field}:{value}\'')
+        
+        if result.modified_count < 1:
+            raise Exception(f'변경사항 없음')
+        
+        return True
+
     def read_one(self, id:str) -> dict:
         """ id가 일치하는 document를 읽어온다. """
         assert id is not None
@@ -73,19 +86,7 @@ class MongodbController:
         for r in result:
             response.append(dictToStr(r))
         
-        return response
-    
-    def read_lastest_one(self, id:str, field:str, ascending=True) -> dict:
-        """ id가 일치하면서 주어진 field로 정렬한 후 최상위 document를 읽어온다. """
-        assert id and field is not None
-
-        ascending = -1 if ascending == False else 1
-        
-        result = self.coll.find_one({"s_id": str(id)}, sort=[("date", -1)])
-        if result is None:
-            raise Exception(f'Failed to READ document with id \'{id}\'')
-        
-        return dictToStr(result)    
+        return response  
 
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """

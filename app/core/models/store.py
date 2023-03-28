@@ -30,6 +30,6 @@ class FoodPos(BaseModel):
     f_id: str = Field(title="Food identifier")
 
 class MenuModel(BaseModel):
-    # s_id: str = Field(title="Restaurant identifier for this menu")
+    s_id: str = Field(title="Restaurant identifier for this menu")
     # date: datetime = Field(title="the date of this menu was created")
     f_list: list[FoodPos] = Field(title="list of food")

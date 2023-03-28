@@ -9,6 +9,13 @@ from core.common.mongo import MongodbController
 mongo = MongodbController('store')
 store_router = APIRouter(prefix="/stores", tags=["Android"])
 
+def is_null(target:dict, fields:list[str]) -> bool :
+    for field in fields:
+        if target[field] is None:
+            return True
+        
+    return False
+
 @store_router.get('/')
 async def get_store_list():
     """ 모든 식당의 정보를 받아온다 """
@@ -16,31 +23,13 @@ async def get_store_list():
     not_null_fields = ['name', 'desc', 'schedule', 'status']
 
     try:
-        # result = mongo.read_all(fields)
-        # response = []
-        # for r in result:
-        #     for item in not_null_fields:
-        #         print(item) # 프린트 문 삭제 요망
-        #         if r[item] is not None:
-        #             if item == 'status':
-        #                 response.append(r)
-        #         else:
-        #             break
-        
         result = mongo.read_all(fields)
         response = []
         for r in result:
-            btn = True
-            for field in not_null_fields:
-                if r[field] is None:
-                    btn = False
-                    break
+            if is_null(r, not_null_fields):
+                continue
+            response.append(r)
             
-            if btn:
-                response.append(r)
-        
-        return (response)
-
 
     except Exception as e:
         print('ERROR', e)
