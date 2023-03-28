@@ -190,7 +190,6 @@ function StoreManagePage() {
                 className={Store.statusButton}
                 id="open"
                 onClick={handleOpenBtnClick}
-                // style={{ background: isOpenButtonClicked ? "#ff9345" : "fff" }}
                 style={openBtnStyle}
               >
                 영업 중
@@ -199,7 +198,6 @@ function StoreManagePage() {
                 className={Store.statusButton}
                 id="close"
                 onClick={handleCloseBtnClick}
-                // style={{ background: isCloseButtonClicked ? "#ff9345" : "fff" }}
                 style={closeBtnStyle}
               >
                 영업 종료
