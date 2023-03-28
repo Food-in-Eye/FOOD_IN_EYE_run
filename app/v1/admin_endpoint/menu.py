@@ -20,7 +20,7 @@ menu_router = APIRouter(prefix="/menus")
 @menu_router.get('/{s_id}')
 async def get_menu(s_id:str):
     """ 해당하는 id의 menu 정보를 받아온다. """
-    
+    # 메뉴의 아이디로 메뉴 디비에서 받아올 수 있도록. 바꿀 것
     try:
         response = mongo.read_lastest_one(s_id)
     except Exception as e:
@@ -37,6 +37,7 @@ async def get_menu(s_id:str):
         'response': response
     }
 
+# Food 라우터로 나눌 것
 @menu_router.put('/food/{f_id}')
 async def put_food(f_id:str, food:FoodModel):
     """ 해당하는 id의 document를 변경한다.(food 수정) """
@@ -64,8 +65,9 @@ async def put_food(f_id:str, food:FoodModel):
             'message': f'ERROR {e}'
         }
 
-@menu_router.put('/menu/{s_id}')
-async def put_menus(s_id:str, menu:MenuModel):
+# put -> post. 메뉴판을 변경하는 것이 아닌, 새로운 메뉴판을 생성한다의 관점
+@menu_router.post('/')
+async def put_menus(s_id: str, menu:MenuModel):
     """ 해당하는 id의 document를 변경한다.(menu 수정, menu date 갱신) """
     data = menu.dict()
     data = data['f_list']
@@ -79,9 +81,9 @@ async def put_menus(s_id:str, menu:MenuModel):
     }
     
     try:
-        if mongo.create(new_menu):
+        if mongo.create(new_menu): # create의 결과는 새로 생긴 document의 id임
             menu = mongo.read_lastest_one(s_id)
-            store = mongo_store.read_one(s_id)
+            store = mongo_store.read_one(s_id) #S03T08의 update_one 사용하기
             new_store = {
                 'name': store['name'],
                 'desc': store['desc'],

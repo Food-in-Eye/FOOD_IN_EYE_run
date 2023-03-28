@@ -16,17 +16,30 @@ async def get_store_list():
     not_null_fields = ['name', 'desc', 'schedule', 'status']
 
     try:
+        # result = mongo.read_all(fields)
+        # response = []
+        # for r in result:
+        #     for item in not_null_fields:
+        #         print(item) # 프린트 문 삭제 요망
+        #         if r[item] is not None:
+        #             if item == 'status':
+        #                 response.append(r)
+        #         else:
+        #             break
+        
         result = mongo.read_all(fields)
         response = []
         for r in result:
-            for item in not_null_fields:
-                print(item)
-                if r[item] is not None:
-                    if item == 'status':
-                        response.append(r)
-                else:
+            btn = True
+            for field in not_null_fields:
+                if r[field] is None:
+                    btn = False
                     break
-
+            
+            if btn:
+                response.append(r)
+        
+        return (response)
 
 
     except Exception as e:

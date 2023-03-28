@@ -75,10 +75,12 @@ class MongodbController:
         
         return response
     
-    def read_lastest_one(self, id:str) -> dict:
-        """ store_id가 일치하면서 가장 최신인 document를 읽어온다. """
-        assert id is not None
+    def read_lastest_one(self, id:str, field:str, ascending=True) -> dict:
+        """ id가 일치하면서 주어진 field로 정렬한 후 최상위 document를 읽어온다. """
+        assert id and field is not None
 
+        ascending = -1 if ascending == False else 1
+        
         result = self.coll.find_one({"s_id": str(id)}, sort=[("date", -1)])
         if result is None:
             raise Exception(f'Failed to READ document with id \'{id}\'')
@@ -94,3 +96,4 @@ class MongodbController:
             raise Exception(f'Failed to DELETE document with id \'{id}\'')
         
         return True
+    

@@ -19,9 +19,10 @@ async def hello():
 @menu_router.get('/{m_id}')
 async def get_lastest_menu(m_id:str):
     """ 해당하는 id의 메뉴판 정보를 받아온다. """
-    
+    # 메뉴의 아이디로 메뉴 디비에서 받아올 수 있도록.
+    # 아래 함수와 합쳐서 food 정보를 넣을지 넣지 말지 결정할 수 있게 쿼리로 받기
     try:
-        response = mongo.read_lastest_one(m_id)
+        response = mongo.read_lastest_one(m_id, 'date', False)
 
     except Exception as e:
         print('ERROR', e)
