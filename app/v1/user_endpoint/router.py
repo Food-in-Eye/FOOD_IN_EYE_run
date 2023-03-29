@@ -5,9 +5,11 @@ User Router
 
 from fastapi import APIRouter
 from .store import store_router
+from .menu import menu_router
 
 router = APIRouter(prefix="/user", tags=["Android"])
 router.include_router(store_router)
+router.include_router(menu_router)
 
 @router.get("/hi")
 async def hello():

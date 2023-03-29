@@ -29,6 +29,9 @@ class MongodbController:
     def create(self, data:dict) -> ObjectId:
         """ 딕셔너리를 받아서 collection에 새로운 document를 추가한다. """
         assert data is not None
+
+        if "_id" in data:
+            del data["_id"]
         
         result = self.coll.insert_one(data)
         if result.acknowledged is False:
@@ -45,8 +48,21 @@ class MongodbController:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
         if result.modified_count < 1:
-            raise Exception(f'변경사항 없음')
+            return False
 
+        return True
+
+    def update_one(self, id:str, field:str, value) -> bool:
+        assert id and field and value is not None
+
+        result = self.coll.update_one({'_id': ObjectId(id)},
+                                      {'$set': {field: value}})
+        if result.acknowledged is False:
+            raise Exception(f'Failed to UPDATE document with id \'{id}\' to set \'{field}:{value}\'')
+        
+        if result.modified_count != 1:
+            return False
+        
         return True
 
     def read_one(self, id:str) -> dict:
@@ -70,8 +86,8 @@ class MongodbController:
         for r in result:
             response.append(dictToStr(r))
         
-        return response
-        
+        return response  
+
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """
         assert id is not None
@@ -81,3 +97,4 @@ class MongodbController:
             raise Exception(f'Failed to DELETE document with id \'{id}\'')
         
         return True
+    
