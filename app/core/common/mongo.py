@@ -87,6 +87,23 @@ class MongodbController:
             response.append(dictToStr(r))
         
         return response  
+    
+    def read_all_by_id(self, id:str) -> dict:
+        """ id가 일치하는 document를 모두 읽어온다. """
+        assert id is not None
+
+        result = list(self.coll.find({'_id': ObjectId(id)}))
+        
+        if result is None:
+            raise Exception(f'Failed to READ document with id \'{id}\'')
+        
+        if len(result) != 1:
+            raise Exception(f'Duplicate ID Error')
+        
+        else:
+            result = result[0]
+
+        return dictToStr(result)
 
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """
