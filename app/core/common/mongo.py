@@ -48,7 +48,7 @@ class MongodbController:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
         if result.modified_count < 1:
-            raise Exception(f'변경사항 없음')
+            return False
 
         return True
 
@@ -60,8 +60,8 @@ class MongodbController:
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\' to set \'{field}:{value}\'')
         
-        if result.modified_count < 1:
-            raise Exception(f'변경사항 없음')
+        if result.modified_count != 1:
+            return False
         
         return True
 

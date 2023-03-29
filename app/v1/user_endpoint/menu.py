@@ -18,10 +18,8 @@ async def hello():
 
 @menu_router.get('/{m_id}')
 async def get_menu(m_id:str, food_opt: Optional[bool] = True):  
-    """ 해당하는 id의 메뉴판 정보를 받아온다. """
-    """ food_opt 미입력 시, 자동으로 food 출력 """
-    # 메뉴의 아이디로 메뉴 디비에서 받아올 수 있도록.
-    # 아래 함수와 합쳐서 food 정보를 넣을지 넣지 말지 결정할 수 있게 쿼리로 받기
+    """ 해당하는 id의 메뉴판 정보를 받아온다. 
+        쿼리 파라미터(food_opt)을 통해 음식에 대한 정보를 받을지 아닐지 선택 가능(기본값은 True)"""
 
     try:
         menu = mongo_menu.read_one(m_id)
@@ -45,13 +43,13 @@ async def get_menu(m_id:str, food_opt: Optional[bool] = True):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/user/menus/{m_id}',
+            'request': f'api/v1/user/menus/{m_id}?food_opt={food_opt}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'api/v1/user/menus/{m_id}',
+        'request': f'api/v1/user/menus/{m_id}?food_opt={food_opt}',
         'status': 'OK',
         'response': response
     }

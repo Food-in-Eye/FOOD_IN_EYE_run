@@ -10,11 +10,13 @@ from core.common.mongo import MongodbController
 mongo_food = MongodbController('food')
 food_router = APIRouter(prefix="/foods")
 
+# todo: get(read), post(create), delete(delete) 추가할 것 
+#       +) 음식 이미지 변경도 가능해야함
+
 @food_router.get("/hi")
 async def hello():
     return {"message": "Hello 'api/v1/user/foods/hi'"}
 
-# Food 라우터로 나눌 것
 @food_router.put('/{f_id}')
 async def put_food(f_id:str, food:FoodModel):
     """ 해당하는 id의 document를 변경한다.(food 수정) """

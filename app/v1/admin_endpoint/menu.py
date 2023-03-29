@@ -17,7 +17,6 @@ menu_router = APIRouter(prefix="/menus")
 @menu_router.get('/{m_id}')
 async def get_menu(m_id:str):
     """ 해당하는 id의 menu 정보를 받아온다. """
-    # 메뉴의 아이디로 메뉴 디비에서 받아올 수 있도록. 바꿀 것
     try:
         response = mongo.read_one(m_id)
 
@@ -36,7 +35,6 @@ async def get_menu(m_id:str):
         'response': response
     }
 
-# put -> post. 메뉴판을 변경하는 것이 아닌, 새로운 메뉴판을 생성한다의 관점
 @menu_router.post('/')
 async def post_menus(menu:MenuModel):
     """ 해당하는 id의 document를 변경한다.(menu 수정, menu date 갱신) """
@@ -48,11 +46,11 @@ async def post_menus(menu:MenuModel):
         'date': datetime.now(),
         'f_list': sotred_f_list
     }
-    new_menu_id = mongo.create(new_menu)
     
     try:
-        if new_menu_id: # create의 결과는 새로 생긴 document의 id임
-            mongo_store.update_one(data['s_id'], 'm_id', new_menu_id)
+        new_menu_id = mongo.create(new_menu)
+
+        if mongo_store.update_one(data['s_id'], 'm_id', new_menu_id):
             return {
                 'request': f'api/v1/admin/menus/menu',
                 'status': 'OK'
@@ -62,7 +60,7 @@ async def post_menus(menu:MenuModel):
             return {
             'request': f'api/v1/admin/menus/menu',
             'status': 'ERROR',
-            'message': f'ERROR update failed'
+            'message': f'ERROR!! Please contact your administrator'
         }
 
     except Exception as e:
