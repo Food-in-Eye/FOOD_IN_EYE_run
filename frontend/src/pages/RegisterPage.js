@@ -17,7 +17,7 @@ function RegisterPage() {
             <p>가게 이름:</p>
             <input type="text" name="storeName" placeholder="가게명" />
             <p>ID: </p>
-            <input type="text" name="id" placeholder="아이디" />
+            <input type="text" name="id" placeholder="이메일" />
             <p>비밀번호: </p>
             <input type="password" name="password" placeholder="비밀번호" />
             <p>비밀번호 확인: </p>

@@ -52,7 +52,6 @@
   height: 800px;
   display: flex;
   flex-flow: row wrap;
-  background-color: #e8e6eb;
 }
 
 .order {

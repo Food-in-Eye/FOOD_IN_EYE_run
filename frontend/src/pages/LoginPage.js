@@ -16,7 +16,7 @@ function LoginPage() {
         <section className="login-screen">
           <div className={styles.align}>
             <p>ID</p>
-            <input type="text" name="id" placeholder="아이디" />
+            <input type="text" name="id" placeholder="이메일" />
             <p>Password</p>
             <input type="password" name="password" placeholder="비밀번호" />
             <br />
@@ -26,7 +26,9 @@ function LoginPage() {
           </div>
         </section>
         <br />
-        <Link to={`/register`}>회원가입</Link>
+        <Link to={`/register`} className={styles.link}>
+          회원가입
+        </Link>
       </form>
     </div>
   );
