@@ -20,7 +20,7 @@ class FoodModel(BaseModel):
     s_id: str = Field(title="Restaurant identifier for this menu")
     name: str = Field(title="name of food")
     price: int = Field(title="price of food")
-    img_key: str = Field(title="path where food images are stored")
+    img_key: str | None = Field(title="path where food images are stored")
     desc: str = Field(title="description of food")
     allergy: str = Field(title="Indication of food allergy-causing substances")
     origin: str = Field(title="Food country of origin indication")
