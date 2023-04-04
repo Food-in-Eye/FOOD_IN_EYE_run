@@ -2,12 +2,7 @@
   "name": "food-in-eye_react",
   "version": "0.1.0",
   "private": true,
-  "proxy": {
-    "/api": {
-      "target": "http://backend:8000",
-      "changeOrigin": true
-    }
-  },
+  "proxy": "FOOD-IN-EYE-dev.ap-northeast-2.elasticbeanstalk.com",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
