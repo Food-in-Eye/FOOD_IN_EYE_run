@@ -206,7 +206,7 @@ function StoreManagePage() {
           </div>
 
           <section className={Store.description}>
-            <h1>"{store.name}" 가게</h1>
+            <h2>"{store.name}" 가게</h2>
             <div className={Store.desc}>
               <div className={Store.intro}>
                 <h3>가게 한줄 소개</h3>
@@ -258,7 +258,7 @@ function StoreManagePage() {
           </section>
 
           <section className={Store.noticeBlock}>
-            <h1>가게 공지사항</h1>
+            <h2>가게 공지사항</h2>
             <div className={Store.notice}>
               <div className={Store.innerNotice}>
                 {editNoti ? (
