@@ -107,7 +107,8 @@ hr {
 
 .description,
 .allergy,
-.origin {
+.origin,
+.price {
   width: 100%;
   height: auto;
   display: flex;
@@ -117,10 +118,10 @@ hr {
 .details h3 {
   width: 20%;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   margin: 10px auto 20px 10px;
-  padding: 20px 0px 20px 5px;
+  padding: 20px 0px 20px 15px;
   font-size: 20px;
 }
 
