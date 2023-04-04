@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application code to /app
 COPY . .
 
+# Add the following line to your Dockerfile
+RUN echo "webpack-dev-server --disable-host-check" >> node_modules/react-scripts/scripts/start.js
+
 # Build the production-ready code
 RUN npm run build
 
