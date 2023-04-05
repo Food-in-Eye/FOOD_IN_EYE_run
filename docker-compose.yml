@@ -4,7 +4,6 @@ services:
   frontend:
     build:
       context: ./frontend
-    command: npm start -- --disable-host-check
   backend:
     build:
       context: ./backend
