@@ -5,7 +5,7 @@ user_food
 import io
 from PIL import Image
 
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, Query
 from core.models.store import FoodModel
 from core.common.mongo import MongodbController
 from core.common.s3 import Storage
@@ -38,8 +38,8 @@ async def get_food(f_id:str):
         'response': response
     }
 
-@food_router.get("/store_id/{s_id}")
-async def get_food(s_id:str):
+@food_router.get("/")
+async def get_food(s_id:str = Query(None, min_length = 24, max_length = 24)): # 24자리 길이제한
     """ 해당하는 id의 음식 정보를 받아온다. """
 
         # 1. storeDB에서 'm_id' 를 가져와 menuDB에 있는 모든 document 가져오기
