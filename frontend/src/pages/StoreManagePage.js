@@ -27,7 +27,7 @@ function StoreManagePage() {
         setLoading(true);
 
         const request = await axios.get(
-          "http://backend/api/v1/admin/stores/641458bd4443f2168a32357a"
+          "/api/v1/admin/stores/641458bd4443f2168a32357a"
         );
         setStore(request.data.response);
 
