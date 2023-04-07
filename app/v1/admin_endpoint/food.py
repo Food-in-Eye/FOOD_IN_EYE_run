@@ -16,7 +16,7 @@ storage = Storage('foodineye')
 
 @food_router.get("/hi")
 async def hello():
-    return {"message": "Hello 'api/v1/user/foods/hi'"}
+    return {"message": "Hello 'api/v1/admin/foods/hi'"}
 
 @food_router.get("/{f_id}")
 async def get_food(f_id:str):
@@ -27,13 +27,13 @@ async def get_food(f_id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/user/foods/{f_id}',
+            'request': f'api/v1/admin/foods/{f_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'api/v1/user/foods/{f_id}',
+        'request': f'api/v1/admin/foods/{f_id}',
         'status': 'OK',
         'response': response
     }
@@ -51,13 +51,13 @@ async def get_food(s_id:str = Query(None, min_length = 24, max_length = 24)): # 
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/user/foods/{s_id}',
+            'request': f'api/v1/admin/foods/{s_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'api/v1/user/foods/{s_id}',
+        'request': f'api/v1/admin/foods/{s_id}',
         'status': 'OK',
         'response': response
     }
@@ -72,13 +72,13 @@ async def post_food(food:FoodModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/user/foods',
+            'request': f'api/v1/admin/foods',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'api/v1/user/foods',
+        'request': f'api/v1/admin/foods',
         'status': 'OK',
         'document_id': str(id)
     }
