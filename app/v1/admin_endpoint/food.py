@@ -35,7 +35,7 @@ async def get_food(f_id:str = Query(None, min_length = 24, max_length = 24)):
         }
     
     return {
-        'request': f'api/v1/admin/foods/?f_id={f_id}',
+        'request': f'api/v1/admin/foods/image/?f_id={f_id}',
         'status': 'OK',
         'response': response
     }
