@@ -18,7 +18,7 @@ storage = Storage('foodineye')
 async def hello():
     return {"message": "Hello 'api/v1/admin/foods/hi'"}
 
-@food_router.get("/")
+@food_router.get("/image/")
 async def get_food(f_id:str = Query(None, min_length = 24, max_length = 24)):
     """ test API """
 
@@ -29,7 +29,7 @@ async def get_food(f_id:str = Query(None, min_length = 24, max_length = 24)):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'api/v1/admin/foods/?f_id={f_id}',
+            'request': f'api/v1/admin/foods/image/?f_id={f_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
