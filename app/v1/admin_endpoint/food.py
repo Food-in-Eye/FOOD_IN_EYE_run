@@ -10,6 +10,8 @@ from core.models.store import FoodModel
 from core.common.mongo import MongodbController
 from core.common.s3 import Storage
 
+from fastapi.responses import HTMLResponse
+
 mongo = MongodbController('food')
 food_router = APIRouter(prefix="/foods")
 storage = Storage('foodineye')
@@ -26,6 +28,7 @@ async def get_food(f_id:str = Query(None, min_length = 24, max_length = 24)):
         food = mongo.read_one(f_id)
         img_key = food['img_key']
         response = f'https://foodineye.s3.ap-northeast-2.amazonaws.com/{img_key}'
+        return HTMLResponse(content=f"<img src='{response}'/>", status_code=200)
     except Exception as e:
         print('ERROR', e)
         return {
@@ -37,7 +40,7 @@ async def get_food(f_id:str = Query(None, min_length = 24, max_length = 24)):
     return {
         'request': f'api/v1/admin/foods/image/?f_id={f_id}',
         'status': 'OK',
-        'response': response
+        'response': HTMLResponse(content=f"<img src='{response}'/>", status_code=200)
     }
 
 @food_router.get("/{f_id}")
