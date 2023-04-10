@@ -18,28 +18,6 @@ storage = Storage('foodineye')
 async def hello():
     return {"message": "Hello 'api/v1/admin/foods/hi'"}
 
-@food_router.get("/image/")
-async def get_food(f_id:str = Query(None, min_length = 24, max_length = 24)):
-    """ test API """
-
-    try:
-        food = mongo.read_one(f_id)
-        img_key = food['img_key']
-        response = f'https://foodineye.s3.ap-northeast-2.amazonaws.com/{img_key}'
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'api/v1/admin/foods/image/?f_id={f_id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
-    
-    return {
-        'request': f'api/v1/admin/foods/image/?f_id={f_id}',
-        'status': 'OK',
-        'response': response
-    }
-
 @food_router.get("/{f_id}")
 async def get_food(f_id:str):
     """ 해당하는 id의 음식 정보를 받아온다. """
