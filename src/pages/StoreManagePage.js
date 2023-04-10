@@ -1,7 +1,6 @@
 import MenuBar from "../components/MenuBar";
 import Store from "../css/StoreManage.module.css";
 import Button from "../css/Button.module.css";
-import axios from "axios";
 import { getStore, putStore } from "../components/API.module";
 
 import { useState, useEffect } from "react";
