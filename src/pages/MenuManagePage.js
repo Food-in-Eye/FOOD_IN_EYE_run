@@ -3,16 +3,10 @@ import Main from "../css/Main.module.css";
 import Menu from "../css/MenuManage.module.css";
 import Button from "../css/Button.module.css";
 import Bar from "../css/UnderBar.module.css";
+import axios from "axios";
 
-import {
-  getFoodImg,
-  getMenu,
-  getMenus,
-  putMenus,
-} from "../components/API.module";
-// import "swiper/swiper-bundle.css";
-
-import { useState, useEffect, useRef, useMemo } from "react";
+import { getMenu, getMenus, putMenus } from "../components/API.module";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 function MenuManagePage() {
   /** api에서 불러올 menuList */
@@ -22,52 +16,42 @@ function MenuManagePage() {
 
   const [editMenu, setEditMenu] = useState(false);
 
-  const [selectedMenuId, setSelectedMenuId] = useState([]);
-  const [selectedMenu, setSelectedMenu] = useState([]);
+  // const [selectedMenuId, setSelectedMenuId] = useState([]);
+  const [selectedMenu, setSelectedMenu] = useState({});
   const [selectedMenuImgURL, setSelectedMenuImgURL] = useState(``);
+  const selectedMenuIdRef = useRef();
 
   /** GET 메서드 */
   useEffect(() => {
-    //GET 요청을 보내서 데이터 반영
-    const fetchMenu = async () => {
-      try {
-        /**요청 시작 시 error과 menu 초기화*/
-        setError(null);
-        //loading 상태는 true로 세팅
-        setLoading(true);
+    setError(null);
+    setLoading(true);
 
-        const request = await getMenus("641459134443f2168a32357b");
-        setMenuList(request.data.response);
-      } catch (e) {
-        setError(e);
-      }
-      setLoading(false);
-    };
-
-    fetchMenu();
+    getMenus("641459134443f2168a32357b")
+      .then((res) => setMenuList(res.data.response))
+      .catch((e) => setError(e))
+      .finally(() => setLoading(false));
   }, []);
 
   /**리렌더링 최적화 */
   const memorizedGetMenu = useMemo(
-    () => getMenu(selectedMenuId),
-    [selectedMenuId]
+    () => getMenu(selectedMenuIdRef.current),
+    []
   );
 
   /** 선택한 menu -> menuId에 따라 get */
-  async function handleMenuClick(e, menuId) {
+  const handleMenuClick = async (e, menuId) => {
     e.preventDefault();
+    selectedMenuIdRef.current = menuId;
 
-    setSelectedMenuId(menuId);
-    try {
-      const requestMenu = await memorizedGetMenu;
-      setSelectedMenu(requestMenu.data.response);
-      setSelectedMenuImgURL(
-        `https://foodineye.s3.ap-northeast-2.amazonaws.com/${requestMenu.data.response.img_key}`
-      );
-    } catch (e) {
-      setError(e);
-    }
-  }
+    getMenu(selectedMenuIdRef.current)
+      .then((res) => {
+        setSelectedMenu(res.data.response);
+        setSelectedMenuImgURL(
+          `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
+        );
+      })
+      .catch((e) => setError(e));
+  };
 
   /** 메뉴 삭제 관련 코드 */
   /** ----------------------------------------------------- */
@@ -104,9 +88,8 @@ function MenuManagePage() {
   const [originItems, setOriginItems] = useState(selectedMenu.origin);
   const [menuPrice, setMenuPrice] = useState(selectedMenu.price);
 
-  /** edit menuImage */
+  /** 로컬에서 선택한 이미지로 메뉴 이미지 수정 */
   const [menuImg, setMenuImg] = useState(selectedMenuImgURL);
-  const imgRef = useRef(null);
 
   /** 메뉴 세부내용 수정 */
   const handleEditMenuClick = (e, index) => {
@@ -121,19 +104,45 @@ function MenuManagePage() {
     setEditMenu(true);
   };
 
-  /** 수정 내용 저장 */
-  const handleSaveMenuClick = (e) => {
+  //메뉴 이미지 업데이트
+  function handleFileInput(e) {
     e.preventDefault();
 
-    putMenus("641d952818f0b258e9ca025b", {
+    const formData = new FormData();
+    const file = e.target.files[0];
+
+    formData.append("file", file); // key, value 추가
+
+    axios
+      .put(
+        `/api/v1/admin/foods/image/${selectedMenu._id.toString()}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => {
+        setSelectedMenuImgURL(res.data.img_url);
+      })
+      .catch((e) => console.log(e));
+  }
+
+  /** 수정 내용 저장 */
+  const handleSaveMenuClick = async (e) => {
+    e.preventDefault();
+
+    putMenus(selectedMenu._id.toString(), {
       ...selectedMenu,
       name: menuName,
+
       price: menuPrice,
       desc: menuDesc,
       allergy: menuAllergy,
       origin: originItems,
     })
-      .then((res) => {
+      .then(() => {
         setSelectedMenu({
           ...selectedMenu,
           name: menuName,
@@ -146,7 +155,7 @@ function MenuManagePage() {
 
         //menuList 상태 업데이트
         const menuIndex = menuList.findIndex(
-          (menu) => menu._id === selectedMenuId
+          (menu) => menu._id === selectedMenuIdRef
         );
         const updatedMenuList = [...menuList];
         updatedMenuList[menuIndex] = {
@@ -158,7 +167,10 @@ function MenuManagePage() {
           origin: originItems,
         };
         setMenuList(updatedMenuList);
+
+        handleFileInput().then((res) => console.log(res));
       })
+
       .catch((e) => {
         console.log(e.response);
       });
@@ -202,7 +214,7 @@ function MenuManagePage() {
             </div>
           </section>
           <hr className={Menu.vertical} />
-          {selectedMenu.length !== 0 && (
+          {selectedMenuIdRef.current && (
             <section className="menuInfo">
               <div className={Menu.info}>
                 {editMenu ? (
@@ -236,8 +248,8 @@ function MenuManagePage() {
                         type="file"
                         accept="image/*"
                         id="foodImg"
-                        // onChange={saveImgFile}
-                        ref={imgRef}
+                        name="file"
+                        onChange={(e) => handleFileInput(e)}
                       />
                     </form>
                   ) : selectedMenuImgURL !== "" ? (
@@ -333,7 +345,7 @@ function MenuManagePage() {
               </div>
             </section>
           )}
-          {selectedMenu.length === 0 && (
+          {!selectedMenuIdRef.current && (
             <h2 className={Menu.noMenuClicked}>메뉴를 선택해주세요.</h2>
           )}
         </div>

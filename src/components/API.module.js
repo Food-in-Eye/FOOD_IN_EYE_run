@@ -22,11 +22,6 @@ export const getMenu = (m_id) => {
   return axios.get(requestUrl);
 };
 
-export const getFoodImg = (f_id) => {
-  const requestUrl = `${FOOD_IMG_URL}/?f_id=${f_id}`;
-  return axios.get(requestUrl);
-};
-
 /** PUT 메서드 */
 //가게 ID에 따라 URL을 동적으로 구성하는 putStore() 함수
 export const putStore = (storeId, data) => {
