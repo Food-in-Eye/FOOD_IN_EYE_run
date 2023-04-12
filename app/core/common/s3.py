@@ -21,7 +21,7 @@ class Storage:
 
         if key is None:
             key = uuid.uuid4()
-        key = path + '/' + key + '.' + form
+        key = path + '/' + str(key) + '.' + form
 
         self.s3.put_object(Bucket=self.bucket, Key=key, Body=file_data)
 
