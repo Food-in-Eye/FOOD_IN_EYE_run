@@ -15,10 +15,11 @@ function MenuManagePage() {
   const [error, setError] = useState(null);
 
   const [editMenu, setEditMenu] = useState(false);
+  const [editMenuImg, setEditMenuImg] = useState(false);
 
-  // const [selectedMenuId, setSelectedMenuId] = useState([]);
   const [selectedMenu, setSelectedMenu] = useState({});
   const [selectedMenuImgURL, setSelectedMenuImgURL] = useState(``);
+
   const selectedMenuIdRef = useRef();
 
   /** GET 메서드 */
@@ -35,20 +36,25 @@ function MenuManagePage() {
   /**리렌더링 최적화 */
   const memorizedGetMenu = useMemo(
     () => getMenu(selectedMenuIdRef.current),
-    []
+    [selectedMenuIdRef.current]
   );
 
   /** 선택한 menu -> menuId에 따라 get */
   const handleMenuClick = async (e, menuId) => {
     e.preventDefault();
+
+    setSelectedMenu({});
+    setSelectedMenuImgURL(``);
     selectedMenuIdRef.current = menuId;
 
     getMenu(selectedMenuIdRef.current)
       .then((res) => {
         setSelectedMenu(res.data.response);
-        setSelectedMenuImgURL(
-          `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
-        );
+        if (res.data.response.img_key) {
+          setSelectedMenuImgURL(
+            `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
+          );
+        }
       })
       .catch((e) => setError(e));
   };
@@ -89,54 +95,30 @@ function MenuManagePage() {
   const [menuPrice, setMenuPrice] = useState(selectedMenu.price);
 
   /** 로컬에서 선택한 이미지로 메뉴 이미지 수정 */
-  const [menuImg, setMenuImg] = useState(selectedMenuImgURL);
+  const [menuImg, setMenuImg] = useState(selectedMenu.img_key);
+  const [selectedFile, setSelectedFile] = useState("");
 
   /** 메뉴 세부내용 수정 */
-  const handleEditMenuClick = (e, index) => {
+  const handleEditMenuClick = (e) => {
     e.preventDefault();
 
-    setMenuName(selectedMenu.name);
-    setMenuImg(selectedMenuImgURL);
-    setMenuDesc(selectedMenu.desc);
-    setMenuAllergy(selectedMenu.allergy);
-    setOriginItems(selectedMenu.origin);
-    setMenuPrice(selectedMenu.price);
-    setEditMenu(true);
+    if (selectedMenu && selectedMenu._id) {
+      setMenuName(selectedMenu.name);
+      setMenuDesc(selectedMenu.desc);
+      setMenuAllergy(selectedMenu.allergy);
+      setOriginItems(selectedMenu.origin);
+      setMenuPrice(selectedMenu.price);
+      setEditMenu(true);
+    }
   };
 
-  //메뉴 이미지 업데이트
-  function handleFileInput(e) {
-    e.preventDefault();
-
-    const formData = new FormData();
-    const file = e.target.files[0];
-
-    formData.append("file", file); // key, value 추가
-
-    axios
-      .put(
-        `/api/v1/admin/foods/image/${selectedMenu._id.toString()}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-      .then((res) => {
-        setSelectedMenuImgURL(res.data.img_url);
-      })
-      .catch((e) => console.log(e));
-  }
-
-  /** 수정 내용 저장 */
+  /** 메뉴 정보 - 수정 내용 저장 */
   const handleSaveMenuClick = async (e) => {
     e.preventDefault();
 
-    putMenus(selectedMenu._id.toString(), {
+    putMenus(selectedMenu._id, {
       ...selectedMenu,
       name: menuName,
-
       price: menuPrice,
       desc: menuDesc,
       allergy: menuAllergy,
@@ -155,7 +137,7 @@ function MenuManagePage() {
 
         //menuList 상태 업데이트
         const menuIndex = menuList.findIndex(
-          (menu) => menu._id === selectedMenuIdRef
+          (menu) => menu._id === selectedMenuIdRef.current
         );
         const updatedMenuList = [...menuList];
         updatedMenuList[menuIndex] = {
@@ -167,13 +149,48 @@ function MenuManagePage() {
           origin: originItems,
         };
         setMenuList(updatedMenuList);
-
-        handleFileInput().then((res) => console.log(res));
       })
 
       .catch((e) => {
-        console.log(e.response);
+        setError(e);
       });
+  };
+
+  const handleEditImgClick = (e) => {
+    e.preventDefault();
+
+    setMenuImg(selectedMenuImgURL);
+    setEditMenuImg(true);
+  };
+
+  const handleFileInputChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  //메뉴 이미지 업데이트
+  const handleSaveImgClick = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    if (selectedFile.length !== 0) {
+      formData.append("file", selectedFile); // key, value 추가
+
+      axios
+        .put(`/api/v1/admin/foods/image/${selectedMenu._id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          setSelectedMenuImgURL(res.data.img_url);
+          setEditMenuImg(false);
+          setSelectedFile("");
+        })
+        .catch((e) => console.log("put에러: ", e));
+    } else {
+      setEditMenuImg(false);
+    }
   };
 
   return (
@@ -232,7 +249,7 @@ function MenuManagePage() {
                   <div className={Bar.circle}></div>
                 </div>
                 <div className={Menu.Img}>
-                  {editMenu ? (
+                  {editMenuImg ? (
                     <form className={Menu.editMenus}>
                       <img
                         className={Menu.menuImg}
@@ -249,7 +266,7 @@ function MenuManagePage() {
                         accept="image/*"
                         id="foodImg"
                         name="file"
-                        onChange={(e) => handleFileInput(e)}
+                        onChange={handleFileInputChange}
                       />
                     </form>
                   ) : selectedMenuImgURL !== "" ? (
@@ -264,6 +281,23 @@ function MenuManagePage() {
                       src={""}
                       alt="메뉴 이미지 없음"
                     />
+                  )}
+                </div>
+                <div className={Menu.buttons}>
+                  {editMenuImg ? (
+                    <button
+                      className={Button.saveMenu}
+                      onClick={(e) => handleSaveImgClick(e)}
+                    >
+                      저장하기
+                    </button>
+                  ) : (
+                    <button
+                      className={Button.modifyMenu}
+                      onClick={(e) => handleEditImgClick(e)}
+                    >
+                      수정하기
+                    </button>
                   )}
                 </div>
                 <br />
