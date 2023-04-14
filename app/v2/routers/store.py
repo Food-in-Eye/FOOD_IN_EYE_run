@@ -32,17 +32,11 @@ def check_id(id:str):
 async def read_all_store():
     """ DB에 존재하는 모든 식당의 정보를 받아온다 """
 
-    # not null check가 필요할까? 애초에 이러한 내용이 DB에 저장되지 않는 것이 맞음
-    not_null_fields = ['name', 'desc', 'schedule', 'status']
-
     try:
         result = DB.read_all('store')
         response = []
 
-        # 고민..
         for r in result:
-            if is_null(r, not_null_fields):
-                continue
             response.append(r)
             
 

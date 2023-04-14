@@ -55,7 +55,7 @@ class MongodbController:
 
         coll = self.get_collection(collection)
 
-        result = coll.replace_one({'_id': ObjectId(id)}, data)
+        result = coll.update_one({'_id': ObjectId(id)}, {'$set':data})
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
