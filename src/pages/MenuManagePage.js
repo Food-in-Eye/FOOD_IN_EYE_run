@@ -9,6 +9,8 @@ import { getMenu, getMenus, putMenus } from "../components/API.module";
 import { useState, useEffect, useMemo, useRef } from "react";
 
 function MenuManagePage() {
+  const sID = `641459134443f2168a32357b`;
+
   /** api에서 불러올 menuList */
   const [menuList, setMenuList] = useState([]);
   const [loading, setLoading] = useState(null);
@@ -27,7 +29,7 @@ function MenuManagePage() {
     setError(null);
     setLoading(true);
 
-    getMenus("641459134443f2168a32357b")
+    getMenus(sID)
       .then((res) => setMenuList(res.data.response))
       .catch((e) => setError(e))
       .finally(() => setLoading(false));
@@ -97,6 +99,39 @@ function MenuManagePage() {
   /** 로컬에서 선택한 이미지로 메뉴 이미지 수정 */
   const [menuImg, setMenuImg] = useState(selectedMenu.img_key);
   const [selectedFile, setSelectedFile] = useState("");
+
+  /**새로운 메뉴 추가 */
+  const handleAddNewMenu = (e) => {
+    e.preventDefault();
+
+    // POST 메서드를 통해 메뉴 최초 생성
+    axios
+      .post(
+        `/api/v1/admin/foods`,
+        {
+          s_id: sID,
+          name: "new Menu",
+          price: 0,
+          img_key: null,
+          desc: "메뉴에 대한 설명을 입력하세요",
+          allergy: "메뉴에 대한 알러지 정보를 입력하세요",
+          origin: "메뉴에 대한 원산지 정보를 입력하세요",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((res) => {
+        const newMenu = res.data;
+        setMenuList([...menuList, newMenu]);
+      })
+      // .catch((e) => {
+      //   setError(e);
+      // });
+      .catch((e) => console.log("post에러: ", e));
+  };
 
   /** 메뉴 세부내용 수정 */
   const handleEditMenuClick = (e) => {
@@ -227,7 +262,9 @@ function MenuManagePage() {
                   </li>
                 ))}
               </ul>
-              <button className={Button.plus}>+</button>
+              <button className={Button.plus} onClick={handleAddNewMenu}>
+                +
+              </button>
             </div>
           </section>
           <hr className={Menu.vertical} />
