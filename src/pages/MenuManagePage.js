@@ -4,9 +4,10 @@ import Menu from "../css/MenuManage.module.css";
 import Button from "../css/Button.module.css";
 import Bar from "../css/UnderBar.module.css";
 import axios from "axios";
+import imageCompression from "browser-image-compression";
 
 import { getMenu, getMenus, putMenus } from "../components/API.module";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 function MenuManagePage() {
   const sID = `641459134443f2168a32357b`;
@@ -42,52 +43,27 @@ function MenuManagePage() {
   );
 
   /** 선택한 menu -> menuId에 따라 get */
-  const handleMenuClick = async (e, menuId) => {
-    e.preventDefault();
+  const handleMenuClick = useCallback(
+    async (e, menuId) => {
+      e.preventDefault();
 
-    setSelectedMenu({});
-    setSelectedMenuImgURL(``);
-    selectedMenuIdRef.current = menuId;
+      setSelectedMenu({});
+      setSelectedMenuImgURL(``);
+      selectedMenuIdRef.current = menuId;
 
-    getMenu(selectedMenuIdRef.current)
-      .then((res) => {
-        setSelectedMenu(res.data.response);
-        if (res.data.response.img_key) {
-          setSelectedMenuImgURL(
-            `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
-          );
-        }
-      })
-      .catch((e) => setError(e));
-  };
-
-  /** 메뉴 삭제 관련 코드 */
-  /** ----------------------------------------------------- */
-  // const handleAddMenu = () => {
-  //   const newMenu = ` 메뉴 `;
-  //   setMenus([...menuList, newMenu]);
-  // };
-
-  // const [showButtons, setShowButtons] = useState(
-  //   Array(menuList.length).fill(false)
-  // );
-
-  // const handleDeleteMenu = (index) => {
-  //   const newMenus = [...menus];
-  //   newMenus.splice(index, 1);
-  //   setMenus(newMenus);
-
-  //   const newButtons = [...showButtons];
-  //   newButtons.splice(index, 1);
-  //   setShowButtons(newButtons);
-  // };
-
-  // const toggleButton = (index) => {
-  //   const newButtons = [...showButtons];
-  //   newButtons[index] = !newButtons[index];
-  //   setShowButtons(newButtons);
-  // };
-  /** ----------------------------------------------------- */
+      getMenu(selectedMenuIdRef.current)
+        .then((res) => {
+          setSelectedMenu(res.data.response);
+          if (res.data.response.img_key) {
+            setSelectedMenuImgURL(
+              `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
+            );
+          }
+        })
+        .catch((e) => setError(e));
+    },
+    [selectedMenuIdRef]
+  );
 
   /** edit descriptions of menu when click modify button */
   const [menuName, setMenuName] = useState(selectedMenu.name);
@@ -98,6 +74,7 @@ function MenuManagePage() {
 
   /** 로컬에서 선택한 이미지로 메뉴 이미지 수정 */
   const [menuImg, setMenuImg] = useState(selectedMenu.img_key);
+  const [preview, setPreview] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
 
   /**새로운 메뉴 추가 */
@@ -127,10 +104,9 @@ function MenuManagePage() {
         const newMenu = res.data;
         setMenuList([...menuList, newMenu]);
       })
-      // .catch((e) => {
-      //   setError(e);
-      // });
-      .catch((e) => console.log("post에러: ", e));
+      .catch((e) => {
+        setError(e);
+      });
   };
 
   /** 메뉴 세부내용 수정 */
@@ -148,7 +124,7 @@ function MenuManagePage() {
   };
 
   /** 메뉴 정보 - 수정 내용 저장 */
-  const handleSaveMenuClick = async (e) => {
+  const handleSaveMenuClick = useCallback(async (e) => {
     e.preventDefault();
 
     putMenus(selectedMenu._id, {
@@ -185,11 +161,10 @@ function MenuManagePage() {
         };
         setMenuList(updatedMenuList);
       })
-
       .catch((e) => {
         setError(e);
       });
-  };
+  });
 
   const handleEditImgClick = (e) => {
     e.preventDefault();
@@ -198,8 +173,24 @@ function MenuManagePage() {
     setEditMenuImg(true);
   };
 
-  const handleFileInputChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+  const handleFileInputChange = async (e) => {
+    // setSelectedFile(e.target.files[0]);
+    let file = e.target.files[0];
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 500,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      setSelectedFile(compressedFile);
+
+      const promise = imageCompression.getDataUrlFromFile(compressedFile);
+      promise.then((res) => setPreview(res));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   //메뉴 이미지 업데이트
@@ -227,6 +218,34 @@ function MenuManagePage() {
       setEditMenuImg(false);
     }
   };
+
+  /** 메뉴 삭제 관련 코드 */
+  /** ----------------------------------------------------- */
+  // const handleAddMenu = () => {
+  //   const newMenu = ` 메뉴 `;
+  //   setMenus([...menuList, newMenu]);
+  // };
+
+  // const [showButtons, setShowButtons] = useState(
+  //   Array(menuList.length).fill(false)
+  // );
+
+  // const handleDeleteMenu = (index) => {
+  //   const newMenus = [...menus];
+  //   newMenus.splice(index, 1);
+  //   setMenus(newMenus);
+
+  //   const newButtons = [...showButtons];
+  //   newButtons.splice(index, 1);
+  //   setShowButtons(newButtons);
+  // };
+
+  // const toggleButton = (index) => {
+  //   const newButtons = [...showButtons];
+  //   newButtons[index] = !newButtons[index];
+  //   setShowButtons(newButtons);
+  // };
+  /** ----------------------------------------------------- */
 
   return (
     <div>
@@ -354,7 +373,7 @@ function MenuManagePage() {
                     )}
                   </div>
                   <div className={Menu.allergy}>
-                    <h3>알레르기</h3>
+                    <h3>알러지</h3>
                     {editMenu ? (
                       <textarea
                         type="text"

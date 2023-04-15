@@ -1,26 +1,22 @@
-# Use an official Node runtime as a parent image
 FROM node:18.14.0
 
-# Set the working directory to /app
 WORKDIR /app
 
-# Copy package.json and package-lock.json to /app
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm install --only=production
 
-# Copy the rest of the application code to /app
-COPY . .
+RUN npm install -g nodemon
 
-# Build the production-ready code
-RUN npm run build
+# 개발시에는 마운트 하기 때문에 주석처리, 배포시에는 주석 풀 것
+# COPY . .
 
-# Set the environment variable
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 
-# Expose port 3000
 EXPOSE 3000
 
-# Start the server
-CMD ["npm", "start"]
+# 개발할 때의 커멘드
+CMD ["nodemon", "--inspect=0.0.0.0:9229", "src/index.js"]
+
+# 배포할 때의 커멘드
+# CMD ["npm", "start"]

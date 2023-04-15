@@ -11,7 +11,7 @@ function StoreManagePage() {
   const [error, setError] = useState(null);
 
   const [editDescAndSchedule, setEditDescAndSchedule] = useState(false);
-  const [editNoti, setEditNoti] = useState(false);
+  const [editNotice, setEditNotice] = useState(false);
 
   const [isOpenButtonClicked, setIsOpenButtonClicked] = useState(false);
   const [isCloseButtonClicked, setIsCloseButtonClicked] = useState(false);
@@ -45,7 +45,7 @@ function StoreManagePage() {
 
   const [descValue, setDescValue] = useState(store.desc);
   const [scheduleValue, setScheduleValue] = useState(store.schedule);
-  const [notiValue, setNotiValue] = useState(store.notice);
+  const [noticeValue, setNoticeValue] = useState(store.notice);
 
   const handleEditDescAndScheduleClick = () => {
     setDescValue(store.desc);
@@ -53,9 +53,9 @@ function StoreManagePage() {
     setEditDescAndSchedule(true);
   };
 
-  const handleEditNotiClick = () => {
-    setNotiValue(store.notice);
-    setEditNoti(true);
+  const handleEditNoticeClick = () => {
+    setNoticeValue(store.notice);
+    setEditNotice(true);
   };
 
   const handleDescAndScheduleSaveClick = () => {
@@ -77,14 +77,14 @@ function StoreManagePage() {
       });
   };
 
-  const handleNotiSaveClick = () => {
+  const handleNoticeSaveClick = () => {
     putStore("641458bd4443f2168a32357a", {
       ...store,
-      notice: notiValue,
+      notice: noticeValue,
     })
       .then((res) => {
-        setStore((prevState) => ({ ...prevState, notice: notiValue }));
-        setEditNoti(false);
+        setStore((prevState) => ({ ...prevState, notice: noticeValue }));
+        setEditNotice(false);
         return store;
       })
       .catch((e) => {
@@ -220,25 +220,25 @@ function StoreManagePage() {
             <h2>가게 공지사항</h2>
             <div className={Store.notice}>
               <div className={Store.innerNotice}>
-                {editNoti ? (
+                {editNotice ? (
                   <textarea
                     type="text"
-                    value={notiValue || ""}
+                    value={noticeValue || ""}
                     cols="true"
                     rows="2"
-                    onChange={(e) => setNotiValue(e.target.value)}
+                    onChange={(e) => setNoticeValue(e.target.value)}
                   />
                 ) : (
                   <p className={Store.noticeInfo}>{store.notice}</p>
                 )}
               </div>
 
-              {editNoti ? (
+              {editNotice ? (
                 //show edit button when editing
 
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
-                  onClick={handleNotiSaveClick}
+                  onClick={handleNoticeSaveClick}
                 >
                   저장
                 </button>
@@ -246,7 +246,7 @@ function StoreManagePage() {
                 //show modify button when not editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
-                  onClick={handleEditNotiClick}
+                  onClick={handleEditNoticeClick}
                 >
                   수정
                 </button>
