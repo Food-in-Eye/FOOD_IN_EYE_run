@@ -44,7 +44,7 @@ async def read_all_food(s_id:str):
     }
 
 @food_router.get("/food")
-async def get_food(id:str):
+async def read_food(id:str):
     """ 해당하는 id의 음식 정보를 받아온다. """
 
     try:
@@ -66,7 +66,7 @@ async def get_food(id:str):
     }
 
 @food_router.post("/food")
-async def post_food(s_id:str, food:FoodModel):
+async def create_food(s_id:str, food:FoodModel):
     """ 해당하는 id의 음식 정보를 업데이트한다. """
 
     data = food.dict() # body에 s_id, img_key는 미포함
@@ -93,7 +93,7 @@ async def post_food(s_id:str, food:FoodModel):
     }
 
 @food_router.put('/food')
-async def put_food(id:str, food:FoodModel):
+async def update_food(id:str, food:FoodModel):
     """ 해당하는 id의 food 정보를 변경한다. """
     data = food.dict()
 
@@ -114,7 +114,7 @@ async def put_food(id:str, food:FoodModel):
         }
 
 @food_router.post('/food/image')
-async def post_food_image(id: str, file: UploadFile):
+async def create_food_image(id: str, file: UploadFile):
     try:
         Util.check_id(id)
         file_content = await file.read()
@@ -145,7 +145,7 @@ async def post_food_image(id: str, file: UploadFile):
             'message': f'ERROR {e}'
         }
 @food_router.put('/food/image')
-async def post_food_image(id: str, file: UploadFile):
+async def update_food_image(id: str, file: UploadFile):
     try:
         Util.check_id(id)
 
