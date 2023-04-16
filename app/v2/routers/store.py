@@ -2,11 +2,10 @@
 store_router
 """
 
-from bson.objectid import ObjectId
-
 from fastapi import APIRouter
 from core.models.store import StoreModel
 from core.common.mongo2 import MongodbController
+from .src.util import Util
 
 store_router = APIRouter(prefix="/stores")
 
@@ -17,16 +16,6 @@ DB = MongodbController('FIE_DB')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-def is_null(target:dict, fields:list[str]) -> bool :
-    for field in fields:
-        if target[field] is None:
-            return True
-        
-    return False
-
-def check_id(id:str):
-    if not ObjectId.is_valid(id):
-        raise Exception(f'The id format is not valid. Please check')
 
 @store_router.get('/')
 async def read_all_store():
@@ -60,7 +49,7 @@ async def read_store(id:str):
     """ 특정 id의 가게 정보를 받아온다."""
 
     try:
-        check_id(id)
+        Util.check_id(id)
 
         response = DB.read_by_id('store', id)
 
@@ -111,7 +100,7 @@ async def update_store(id:str, store: StoreModel):
     data['status'] = data['status'].value
     
     try:
-        check_id(id)
+        Util.check_id(id)
         
         if DB.update_by_id('store', id, data):
             return {
