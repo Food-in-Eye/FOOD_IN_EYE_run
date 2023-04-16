@@ -39,9 +39,6 @@ class MongodbController:
         assert collection, data is not None
 
         coll = self.get_collection(collection)
-        # 이거 왜 있었더라?
-        # if "_id" in data:
-        #     del data["_id"]
         
         result = coll.insert_one(data)
         if result.acknowledged is False:
@@ -55,12 +52,13 @@ class MongodbController:
 
         coll = self.get_collection(collection)
 
-        result = coll.update_one({'_id': ObjectId(id)}, {'$set':data})
+        result = coll.update_one({'_id': ObjectId(id)},
+                                {'$set':data})
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
-        if result.modified_count < 1:
-            return False
+        if result.modified_count > 1:
+            raise Exception(f'Multiple documents have changed.')
 
         return True
 
