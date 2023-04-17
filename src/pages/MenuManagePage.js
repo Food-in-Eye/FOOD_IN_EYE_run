@@ -36,7 +36,6 @@ function MenuManagePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  /**리렌더링 최적화 */
   const memorizedGetMenu = useMemo(
     () => getMenu(selectedMenuIdRef.current),
     [selectedMenuIdRef.current]

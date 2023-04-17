@@ -2,7 +2,6 @@ import axios from "axios";
 
 const STORE_URL = "/api/v1/admin/stores";
 const MENUS_URL = "/api/v1/admin/foods";
-const FOOD_IMG_URL = MENUS_URL + "/image";
 
 /** GET 메서드 */
 //가게 ID에 따라 URL을 동적으로 구성하는 getStore() 함수

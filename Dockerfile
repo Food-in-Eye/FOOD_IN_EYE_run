@@ -15,6 +15,7 @@ ENV NODE_ENV=development
 
 EXPOSE 3000
 
+
 # 개발할 때의 커멘드
 CMD ["nodemon", "--inspect=0.0.0.0:9229", "src/index.js"]
 
