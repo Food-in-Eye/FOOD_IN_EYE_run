@@ -77,7 +77,7 @@ async def create_store(store:StoreModel):
     data['status'] = data['status'].value
 
     try:
-        id = DB.create('store', data)
+        id = str(DB.create('store', data))
 
     except Exception as e:
         print('ERROR', e)
@@ -90,7 +90,7 @@ async def create_store(store:StoreModel):
     return {
         'request': f'{PREFIX}/store',
         'status': 'OK',
-        'document_id': str(id)
+        'document_id': id
     }
 
 @store_router.put('/store')

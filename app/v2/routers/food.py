@@ -113,37 +113,38 @@ async def update_food(id:str, food:FoodModel):
             'message': f'ERROR {e}'
         }
 
-@food_router.post('/food/image')
-async def create_food_image(id: str, file: UploadFile):
-    try:
-        Util.check_id(id)
-        file_content = await file.read()
+# @food_router.post('/food/image')
+# async def create_food_image(id: str, file: UploadFile):
+#     try:
+#         Util.check_id(id)
+#         file_content = await file.read()
         
-        # re-size 기능 고민
-        if file.content_type not in ["image/jpeg", "image/jpg"]:
-            with Image.open(io.BytesIO(file_content)) as im:
-                im = im.convert('RGB')
-                with io.BytesIO() as output:
-                    im.save(output, format='JPEG')
-                    file_content = output.getvalue()
+#         # re-size 기능 고민
+#         if file.content_type not in ["image/jpeg", "image/jpg"]:
+#             with Image.open(io.BytesIO(file_content)) as im:
+#                 im = im.convert('RGB')
+#                 with io.BytesIO() as output:
+#                     im.save(output, format='JPEG')
+#                     file_content = output.getvalue()
             
-        image_key = storage.upload(file_content, form='jpg', path='images')
+#         image_key = storage.upload(file_content, form='jpg', path='images')
         
-        # image_key를 데이터베이스에 업데이트
-        if DB.update_field_by_id('food', id, 'img_key', image_key):
-            return {
-                'request':f'{PREFIX}/food/image?id={id}',
-                'status': 'OK',
-                'img_url': 'https://foodineye.s3.ap-northeast-2.amazonaws.com/' + image_key
-            }
+#         # image_key를 데이터베이스에 업데이트
+#         if DB.update_field_by_id('food', id, 'img_key', image_key):
+#             return {
+#                 'request':f'{PREFIX}/food/image?id={id}',
+#                 'status': 'OK',
+#                 'img_url': 'https://foodineye.s3.ap-northeast-2.amazonaws.com/' + image_key
+#             }
         
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'{PREFIX}/food/image?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+#     except Exception as e:
+#         print('ERROR', e)
+#         return {
+#             'request': f'{PREFIX}/food/image?id={id}',
+#             'status': 'ERROR',
+#             'message': f'ERROR {e}'
+#         }
+
 @food_router.put('/food/image')
 async def update_food_image(id: str, file: UploadFile):
     try:
