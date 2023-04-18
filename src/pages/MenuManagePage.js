@@ -1,10 +1,11 @@
 import MenuBar from "../components/MenuBar";
-import Main from "../css/Main.module.css";
 import Menu from "../css/MenuManage.module.css";
 import Button from "../css/Button.module.css";
 import Bar from "../css/UnderBar.module.css";
 import axios from "axios";
-// import imageCompression from "browser-image-compression";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import imageCompression from "browser-image-compression";
 
 import { getMenu, getMenus, putMenus } from "../components/API.module";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
@@ -73,8 +74,9 @@ function MenuManagePage() {
 
   /** 로컬에서 선택한 이미지로 메뉴 이미지 수정 */
   const [menuImg, setMenuImg] = useState(selectedMenu.img_key);
-  const [preview, setPreview] = useState("");
-  const [selectedFile, setSelectedFile] = useState("");
+  const cropperRef = useRef(null);
+  const [inputImage, setInputImage] = useState(null);
+  const [croppedImage, setCroppedImage] = useState(null);
 
   /**새로운 메뉴 추가 */
   const handleAddNewMenu = (e) => {
@@ -172,62 +174,55 @@ function MenuManagePage() {
     setEditMenuImg(true);
   };
 
-  const handleFileInputChange = async (e) => {
-    setSelectedFile(e.target.files[0]);
-    // let file = e.target.files[0];
-
-    // const options = {
-    //   maxSizeMB: 1,
-    //   maxWidthOrHeight: 500,
-    // };
-
-    // try {
-    //   const compressedFile = await imageCompression(file, options);
-    //   setSelectedFile(compressedFile);
-
-    //   const promise = imageCompression.getDataUrlFromFile(compressedFile);
-    //   promise.then((res) => setPreview(res));
-    // } catch (e) {
-    //   console.log(e);
-    // }
+  const onCrop = () => {
+    const imageElement = cropperRef?.current;
+    const cropper = imageElement?.cropper;
+    cropper.getCroppedCanvas().toBlob((blob) => {
+      setCroppedImage(blob);
+    });
   };
 
   //메뉴 이미지 업데이트
-  const handleSaveImgClick = (e) => {
+  const handleSaveImgClick = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    console.log(selectedFile);
 
-    if (selectedFile.length !== 0) {
-      formData.append("file", selectedFile); // key, value 추가
+    //이미지 리사이징
+    try {
+      if (croppedImage.length !== 0) {
+        formData.append("file", croppedImage); // key, value 추가
 
-      axios
-        .put(`/api/v1/admin/foods/image/${selectedMenu._id}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((res) => {
-          console.log(res.data);
-          console.log(res.data.img_url);
-          setSelectedMenuImgURL(res.data.img_url);
-          setEditMenuImg(false);
-          setSelectedFile("");
-        })
-        .catch((e) => {
-          for (let key of formData.keys()) {
-            console.log(key, ":", formData.get(key));
-          }
+        axios
+          .put(`/api/v1/admin/foods/image/${selectedMenu._id}`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((res) => {
+            console.log(res.data);
+            console.log(res.data.img_url);
+            setSelectedMenuImgURL(res.data.img_url);
+            setEditMenuImg(false);
+            setInputImage(null);
+            setCroppedImage(null);
+          })
+          .catch((e) => {
+            for (let key of formData.keys()) {
+              console.log(key, ":", formData.get(key));
+            }
 
-          for (let value of formData.values()) {
-            console.log(value);
-          }
+            for (let value of formData.values()) {
+              console.log(value);
+            }
 
-          console.log("put에러: ", e);
-        });
-    } else {
-      setEditMenuImg(false);
+            console.log("put에러: ", e);
+          });
+      } else {
+        setEditMenuImg(false);
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -316,57 +311,69 @@ function MenuManagePage() {
                 <div className={Bar.line}>
                   <div className={Bar.circle}></div>
                 </div>
-                <div className={Menu.Img}>
-                  {editMenuImg ? (
-                    <form className={Menu.editMenus}>
+                <div className={Menu.infoUpper}>
+                  <div className={Menu.imgButtons}>
+                    {editMenuImg ? (
+                      <button
+                        className={Button.saveImgMenu}
+                        onClick={(e) => handleSaveImgClick(e)}
+                      >
+                        저장하기
+                      </button>
+                    ) : (
+                      <button
+                        className={Button.modifyImgMenu}
+                        onClick={(e) => handleEditImgClick(e)}
+                      >
+                        수정하기
+                      </button>
+                    )}
+                  </div>
+                  <div className={Menu.Img}>
+                    {editMenuImg ? (
+                      <form className={Menu.editMenus}>
+                        <img
+                          className={Menu.menuImg}
+                          src={croppedImage}
+                          alt="메뉴 이미지"
+                        />
+                        <label className={Menu.foodImgLabel} htmlFor="foodImg">
+                          메뉴 이미지 추가
+                        </label>
+                        <br />
+                        <input
+                          className={Menu.foodImgInput}
+                          type="file"
+                          accept="image/*"
+                          id="foodImg"
+                          name="file"
+                          onChange={(e) =>
+                            setInputImage(
+                              URL.createObjectURL(e.target.files[0])
+                            )
+                          }
+                        />
+                        <Cropper
+                          src={inputImage}
+                          crop={onCrop}
+                          ref={cropperRef}
+                          className={Menu.crop}
+                        />
+                      </form>
+                    ) : selectedMenuImgURL !== "" ? (
                       <img
                         className={Menu.menuImg}
                         src={selectedMenuImgURL}
                         alt="메뉴 이미지"
                       />
-                      <label className={Menu.foodImgLabel} htmlFor="foodImg">
-                        메뉴 이미지 추가
-                      </label>
-                      <br />
-                      <input
-                        className={Menu.foodImgInput}
-                        type="file"
-                        accept="image/*"
-                        id="foodImg"
-                        name="file"
-                        onChange={handleFileInputChange}
+                    ) : (
+                      <img
+                        className={Menu.menuImg}
+                        src={""}
+                        alt="메뉴 이미지 없음"
                       />
-                    </form>
-                  ) : selectedMenuImgURL !== "" ? (
-                    <img
-                      className={Menu.menuImg}
-                      src={selectedMenuImgURL}
-                      alt="메뉴 이미지"
-                    />
-                  ) : (
-                    <img
-                      className={Menu.menuImg}
-                      src={""}
-                      alt="메뉴 이미지 없음"
-                    />
-                  )}
-                </div>
-                <div className={Menu.buttons}>
-                  {editMenuImg ? (
-                    <button
-                      className={Button.saveMenu}
-                      onClick={(e) => handleSaveImgClick(e)}
-                    >
-                      저장하기
-                    </button>
-                  ) : (
-                    <button
-                      className={Button.modifyMenu}
-                      onClick={(e) => handleEditImgClick(e)}
-                    >
-                      수정하기
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </div>
                 <br />
                 <div className={Menu.details}>

@@ -46,3 +46,14 @@
   font-family: "Akaya Telivigala";
   background-color: #ff9345;
 }
+
+.modifyImgMenu,
+.saveImgMenu {
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-family: "Akaya Telivigala";
+  background-color: #2f365f;
+}

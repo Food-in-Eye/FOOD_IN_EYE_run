@@ -8,6 +8,10 @@ RUN npm install --only=production
 
 RUN npm install -g nodemon
 
+RUN npm install -g react-cropper
+
+RUN npm install -g browser-image-compression
+
 # 개발시에는 마운트 하기 때문에 주석처리, 배포시에는 주석 풀 것
 # COPY . .
 

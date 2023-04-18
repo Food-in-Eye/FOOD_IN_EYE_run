@@ -59,7 +59,7 @@ h2 {
 .menus li span {
   margin: 0px auto 0px 50px;
 }
-
+/* 
 .menus li button {
   width: 20%;
   height: 100%;
@@ -72,7 +72,7 @@ h2 {
   border: none;
   border-radius: 0px 20px 20px 0px;
   font-size: 20px;
-}
+} */
 
 .menus button {
   margin: 60px 0px 5px auto;
@@ -82,8 +82,36 @@ hr {
   margin-left: 10%;
 }
 
-.Img {
+.menuName {
+  position: relative;
+  margin: 10px;
+  border: none;
   text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: #bc0202;
+  background-color: #fff;
+}
+
+.infoUpper {
+  display: flex;
+  flex-direction: column;
+}
+
+.Img {
+  display: flex;
+  flex: 1;
+  text-align: center;
+}
+
+.infoUpper button {
+  margin-right: 500px;
+}
+
+.crop {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .editMenus {
@@ -91,14 +119,14 @@ hr {
   flex-flow: column;
   justify-content: center;
   align-items: center;
-  margin-top: 20%;
+  margin-top: 30%;
   margin-bottom: 10%;
 }
 
 .Img .menuImg {
   width: 30%;
   height: auto;
-  margin-top: 30px;
+  margin-top: 10%;
 }
 
 .Img form {
@@ -157,22 +185,11 @@ hr {
   background-color: #fff;
 }
 
-.menuName {
-  text-align: center;
-  font-size: 40px;
-  font-weight: 700;
-  color: #bc0202;
-  margin: 10px;
-  border: none;
-  background-color: #fff;
-}
-
-.info .buttons {
+.button {
   width: 30%;
-  display: flex;
-  flex-flow: row;
+
   align-items: center;
-  margin-top: 10%;
+  margin-top: 80%;
 }
 
 textarea {
