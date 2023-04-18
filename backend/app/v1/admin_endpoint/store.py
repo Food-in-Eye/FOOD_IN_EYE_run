@@ -10,6 +10,29 @@ from core.common.mongo import MongodbController
 mongo = MongodbController('store')
 store_router = APIRouter(prefix="/stores")
 
+@store_router.post("/")
+async def post_food(store:StoreModel):
+    """ 입력받은 정보의 가게를 생성한다. """
+    data = store.dict()
+    data['status'] = data['status'].value
+
+    try:
+        id = mongo.create(data)
+
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'api/v1/user/foods',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+    
+    return {
+        'request': f'api/v1/user/foods',
+        'status': 'OK',
+        'document_id': str(id)
+    }
+
 @store_router.get('/{s_id}')
 async def get_store(s_id:str):
     """ 해당하는 id의 식당 정보를 받아온다. """
