@@ -32,13 +32,13 @@ async def read_all_food(s_id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}?s_id={s_id}',
+            'request': f'GET {PREFIX}?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}?s_id={s_id}',
+        'request': f'GET {PREFIX}?s_id={s_id}',
         'status': 'OK',
         'response': response
     }
@@ -54,13 +54,13 @@ async def read_food(id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/food?id={id}',
+            'request': f'GET {PREFIX}/food?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/food?id={id}',
+        'request': f'GET {PREFIX}/food?id={id}',
         'status': 'OK',
         'response': response
     }
@@ -81,13 +81,13 @@ async def create_food(s_id:str, food:FoodModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/food?s_id={s_id}',
+            'request': f'POST {PREFIX}/food?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/food?s_id={s_id}',
+        'request': f'POST {PREFIX}/food?s_id={s_id}',
         'status': 'OK',
         'document_id': id
     }
@@ -101,14 +101,14 @@ async def update_food(id:str, food:FoodModel):
         Util.check_id(id)
         if DB.update_by_id('food', id, data):
             return {
-                'request': f'{PREFIX}/food?id={id}',
+                'request': f'PUT {PREFIX}/food?id={id}',
                 'status': 'OK'
             }
 
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/food?id={id}',
+            'request': f'PUT {PREFIX}/food?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
@@ -132,7 +132,7 @@ async def update_food(id:str, food:FoodModel):
 #         # image_key를 데이터베이스에 업데이트
 #         if DB.update_field_by_id('food', id, 'img_key', image_key):
 #             return {
-#                 'request':f'{PREFIX}/food/image?id={id}',
+#                 'request':f'POST {PREFIX}/food/image?id={id}',
 #                 'status': 'OK',
 #                 'img_url': 'https://foodineye.s3.ap-northeast-2.amazonaws.com/' + image_key
 #             }
@@ -140,7 +140,7 @@ async def update_food(id:str, food:FoodModel):
 #     except Exception as e:
 #         print('ERROR', e)
 #         return {
-#             'request': f'{PREFIX}/food/image?id={id}',
+#             'request': f'POST {PREFIX}/food/image?id={id}',
 #             'status': 'ERROR',
 #             'message': f'ERROR {e}'
 #         }
@@ -169,7 +169,7 @@ async def update_food_image(id: str, file: UploadFile):
         
         if DB.update_field_by_id('food', id, 'img_key', image_key):
             return {
-                'request':f'{PREFIX}/food/image?id={id}',
+                'request':f'PUT {PREFIX}/food/image?id={id}',
                 'status': 'OK',
                 'img_url': 'https://foodineye.s3.ap-northeast-2.amazonaws.com/' + image_key
             }
@@ -177,7 +177,7 @@ async def update_food_image(id: str, file: UploadFile):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/food/image?id={id}',
+            'request': f'PUT {PREFIX}/food/image?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }

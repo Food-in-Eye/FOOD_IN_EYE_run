@@ -22,20 +22,21 @@ async def hello():
 @menu_router.get("/")
 async def read_menus_of_store(s_id:str):
     """ 주어진 가게 아이디의 모든 메뉴판들을 불러온다. """
+    print('hi')
     try:
         Util.check_id(s_id)
-        response = DB.read_all_by_feild('menus', 's_id', s_id)
+        response = DB.read_all_by_feild('menu', 's_id', s_id) # menus -> menu로 수정 DB 이름 오류
         # 날짜별로 정리 or 가장 최신 것만 주는거 고민
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}?s_id={s_id}',
+            'request': f'GET {PREFIX}?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}?s_id={s_id}',
+        'request': f'GET {PREFIX}?s_id={s_id}',
         'status': 'OK',
         'response': response
     }
@@ -50,13 +51,13 @@ async def read_menu(id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}?id={id}',
+            'request': f'GET {PREFIX}?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}?id={id}',
+        'request': f'GET {PREFIX}?id={id}',
         'status': 'OK',
         'response': response
     }
@@ -82,13 +83,13 @@ async def create_menu(s_id:str, menu:MenuModel):
 
         if DB.update_field_by_id('store', s_id, 'm_id', new_id):
             return {
-                'request': f'{PREFIX}/menu/s_id={s_id}',
+                'request': f'POST {PREFIX}/menu/?s_id={s_id}',  # 경로 수정 s_id -> ?s_id
                 'status': 'OK'
             }
         
         else:
             return {
-            'request': f'{PREFIX}/menu/s_id={s_id}',
+            'request': f'POST {PREFIX}/menu/?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR!! Please contact your administrator'
         }
@@ -96,7 +97,7 @@ async def create_menu(s_id:str, menu:MenuModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/menu/s_id={s_id}',
+            'request': f'POST {PREFIX}/menu/?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
@@ -129,13 +130,13 @@ async def read_menu_with_foods(id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/menu/foods?id={id}',
+            'request': f'GET {PREFIX}/menu/foods?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/menu/foods?id={id}',
+        'request': f'GET {PREFIX}/menu/foods?id={id}',
         'status': 'OK',
         'response': response
     }

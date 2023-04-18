@@ -32,13 +32,13 @@ async def read_all_store():
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': PREFIX,
+            'request': f'GET {PREFIX}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': PREFIX,
+        'request': f'GET {PREFIX}',
         'status': 'OK',
         'response': response
     }
@@ -56,13 +56,13 @@ async def read_store(id:str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/store?id={id}',
+            'request': f'GET {PREFIX}/store?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/store?id={id}',
+        'request': f'GET {PREFIX}/store?id={id}',
         'status': 'OK',
         'response': response
     }
@@ -82,13 +82,13 @@ async def create_store(store:StoreModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/store',
+            'request': f'POST {PREFIX}/store',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/store',
+        'request': f'POST {PREFIX}/store',
         'status': 'OK',
         'document_id': id
     }
@@ -104,7 +104,7 @@ async def update_store(id:str, store: StoreModel):
         
         if DB.update_by_id('store', id, data):
             return {
-                'request': f'{PREFIX}/store?id={id}',
+                'request': f'PUT {PREFIX}/store?id={id}',
                 'status': 'OK'
             }
         
@@ -114,7 +114,7 @@ async def update_store(id:str, store: StoreModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/store?id={id}',
+            'request': f'PUT {PREFIX}/store?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
