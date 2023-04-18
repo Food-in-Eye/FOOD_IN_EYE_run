@@ -59,7 +59,6 @@ function StoreManagePage() {
   };
 
   const handleDescAndScheduleSaveClick = () => {
-<<<<<<< HEAD
     putStore("641458bd4443f2168a32357a", {
       ...store,
       desc: descValue,
@@ -70,28 +69,6 @@ function StoreManagePage() {
           ...prevState,
           desc: descValue,
           schedule: scheduleValue,
-=======
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          desc: descValue,
-          schedule: scheduleValue,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        setStore((prevState) => ({
-          ...prevState,
-          desc: descValue,
-          schedule: scheduleValue,
->>>>>>> main
         }));
         setEditDescAndSchedule(false);
       })
@@ -101,27 +78,10 @@ function StoreManagePage() {
   };
 
   const handleNotiSaveClick = () => {
-<<<<<<< HEAD
     putStore("641458bd4443f2168a32357a", {
       ...store,
       notice: notiValue,
     })
-=======
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          notice: notiValue,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
->>>>>>> main
       .then((res) => {
         setStore((prevState) => ({ ...prevState, notice: notiValue }));
         setEditNoti(false);
@@ -137,27 +97,10 @@ function StoreManagePage() {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
 
-<<<<<<< HEAD
     putStore("641458bd4443f2168a32357a", {
       ...store,
       status: 1,
     })
-=======
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          status: 1,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
->>>>>>> main
       .then((res) => {
         setStore((prevState) => ({ ...prevState, status: 1 }));
       })
@@ -170,28 +113,11 @@ function StoreManagePage() {
   const handleCloseBtnClick = () => {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
-<<<<<<< HEAD
 
     putStore("641458bd4443f2168a32357a", {
       ...store,
       status: 2,
     })
-=======
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          status: 2,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
->>>>>>> main
       .then((res) => {
         setStore((prevState) => ({ ...prevState, status: 2 }));
       })
