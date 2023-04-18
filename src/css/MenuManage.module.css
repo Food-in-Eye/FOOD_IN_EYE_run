@@ -1,71 +1,216 @@
 .inner {
   box-sizing: border-box;
+  height: auto;
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   margin: 0px;
   padding: 0px;
 }
 
-.menus ul {
-  margin-top: 20px;
-  position: relative;
+.menus,
+.info {
+  height: auto;
   display: flex;
-  align-content: flex-start;
   flex-flow: column wrap;
-  overflow: auto;
-  text-align: left;
-}
-
-.list {
-  padding: 5px 200px 0px 10px;
-  margin-top: 20px;
-  display: inline-block;
+  margin-top: 50px;
 }
 
 .menus {
-  box-sizing: border-box;
-  position: relative;
-  width: 400px;
-  height: auto;
-  display: flex;
-  flex-flow: column wrap;
-  align-items: center;
-  margin: 30px;
-  padding: 20px;
-  background-color: #fff;
-}
-
-.info .addModifyBtn {
-  box-sizing: border-box;
-  margin-left: auto;
-}
-
-.info img {
-  box-sizing: border-box;
-  width: 180px;
-  height: auto;
-  padding: 10px;
-  margin-top: 20px;
-  border-image: url("http://i.stack.imgur.com/wLdVc.png");
-  border-radius: 50%;
-  outline: 10px solid #febeb0;
-}
-
-.info p {
-  width: 300px;
-  height: auto;
-  padding: 20px;
-  border: 3px solid #2f365f;
-  box-shadow: 1px 1px 7px #a4a2a2;
+  width: 500px;
+  padding: 30px;
+  margin-left: 5%;
+  box-shadow: 0px 2px 15px #353333;
 }
 
 .info {
-  box-sizing: border-box;
-  width: 800px;
+  width: 700px;
+  padding: 20px 80px 20px 80px;
+  border: 3px solid #000;
+}
+
+h1 {
+  font-size: 50px;
+}
+
+h2 {
+  font-size: 40px;
+}
+
+.menus ul {
+  width: 400px;
+  height: auto;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.menus li {
+  width: 100%;
+  height: 70px;
+  margin: 20px 10px 10px 0px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-size: 30px;
+  border: 2px solid #2f365f;
+  border-radius: 20px;
+}
+
+.menus li span {
+  margin: 0px auto 0px 50px;
+}
+/* 
+.menus li button {
+  width: 20%;
+  height: 100%;
+  float: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0px -1px 0px 0px;
+  padding: 20px;
+  border: none;
+  border-radius: 0px 20px 20px 0px;
+  font-size: 20px;
+} */
+
+.menus button {
+  margin: 60px 0px 5px auto;
+}
+
+hr {
+  margin-left: 10%;
+}
+
+.menuName {
+  position: relative;
+  margin: 10px;
+  border: none;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: #bc0202;
+  background-color: #fff;
+}
+
+.infoUpper {
+  display: flex;
+  flex-direction: column;
+}
+
+.Img {
+  display: flex;
+  flex: 1;
+  text-align: center;
+}
+
+.infoUpper button {
+  margin-right: 500px;
+}
+
+.crop {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.editMenus {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30%;
+  margin-bottom: 10%;
+}
+
+.Img .menuImg {
+  width: 30%;
+  height: auto;
+  margin-top: 10%;
+}
+
+.Img form {
+  height: 10px;
+  text-align: center;
+  background-color: transparent;
+}
+
+.Img .foodImgLabel {
+  margin: 20px 0 10px 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #616162;
+  cursor: pointer;
+}
+
+.Img .foodImgInput input[type="file"] {
+  display: none;
+}
+
+.details {
+  width: 100%;
+  height: auto;
+  /* margin-top: 40%; */
+  box-shadow: 0px 2px 15px #353333;
+}
+
+.description,
+.allergy,
+.origin,
+.price {
+  width: 100%;
   height: auto;
   display: flex;
-  flex-flow: column wrap;
-  margin: 30px;
-  padding: 10px;
+  flex-flow: row;
+  margin-bottom: 20px;
+}
+
+.details h3 {
+  width: 50%;
+  justify-content: left;
+  align-items: center;
+  margin: 10px auto 20px 10px;
+  padding: 20px 0px 20px 15px;
+  font-size: 20px;
+}
+
+.details p {
+  width: 80%;
+  height: 30%;
+  float: left;
+  margin-top: 6%;
+  margin-right: 20%;
+  padding: 5px 0px 5px 5px;
+  font-size: 20px;
   background-color: #fff;
+}
+
+.button {
+  width: 30%;
+
+  align-items: center;
+  margin-top: 80%;
+}
+
+textarea {
+  width: 70%;
+  height: auto;
+  font-size: 20px;
+  margin: 30px 30px 0px 30px;
+  background-color: #fff;
+}
+
+.vertical {
+  width: 1px;
+  height: 800px;
+  margin-top: 40px;
+  background-color: #999;
+}
+
+.noMenuClicked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 30px;
 }

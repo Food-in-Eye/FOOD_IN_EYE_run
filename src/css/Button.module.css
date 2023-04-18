@@ -14,22 +14,17 @@
 }
 
 .plus {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  bottom: 10px;
-  right: 10px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  font-size: 13px;
+  font-size: 50px;
   font-family: "Akaya Telivigala";
-  font-style: normal;
-  font-weight: 400;
-  line-height: 16px;
-  text-align: center;
+  font-style: bold;
   background: #2f365f;
+  border: none;
   border-radius: 50%;
 }
 
@@ -39,4 +34,26 @@
   color: #000;
   font-size: 20px;
   background-color: #d9d9d9;
+}
+
+.modifyMenu,
+.saveMenu {
+  width: 150px;
+  height: 50px;
+  border-radius: 30px;
+  color: #000;
+  font-size: 25px;
+  font-family: "Akaya Telivigala";
+  background-color: #ff9345;
+}
+
+.modifyImgMenu,
+.saveImgMenu {
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-family: "Akaya Telivigala";
+  background-color: #2f365f;
 }
