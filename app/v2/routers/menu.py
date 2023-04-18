@@ -83,13 +83,13 @@ async def create_menu(s_id:str, menu:MenuModel):
 
         if DB.update_field_by_id('store', s_id, 'm_id', new_id):
             return {
-                'request': f'POST {PREFIX}/menu/?s_id={s_id}',  # 경로 수정 s_id -> ?s_id
+                'request': f'POST {PREFIX}/menu?s_id={s_id}',  # 경로 수정 s_id -> ?s_id
                 'status': 'OK'
             }
         
         else:
             return {
-            'request': f'POST {PREFIX}/menu/?s_id={s_id}',
+            'request': f'POST {PREFIX}/menu?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR!! Please contact your administrator'
         }
@@ -97,7 +97,7 @@ async def create_menu(s_id:str, menu:MenuModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/menu/?s_id={s_id}',
+            'request': f'POST {PREFIX}/menu?s_id={s_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
