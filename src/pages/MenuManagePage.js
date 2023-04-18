@@ -5,7 +5,6 @@ import Bar from "../css/UnderBar.module.css";
 import axios from "axios";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import imageCompression from "browser-image-compression";
 
 import { getMenu, getMenus, putMenus } from "../components/API.module";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
