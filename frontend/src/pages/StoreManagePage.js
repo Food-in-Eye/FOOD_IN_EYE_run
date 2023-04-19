@@ -1,7 +1,7 @@
 import MenuBar from "../components/MenuBar";
 import Store from "../css/StoreManage.module.css";
 import Button from "../css/Button.module.css";
-import axios from "axios";
+import { getStore, putStore } from "../components/API.module";
 
 import { useState, useEffect } from "react";
 
@@ -26,9 +26,7 @@ function StoreManagePage() {
         //loading 상태는 true로 세팅
         setLoading(true);
 
-        const request = await axios.get(
-          "/api/v1/admin/stores/641458bd4443f2168a32357a"
-        );
+        const request = await getStore("641458bd4443f2168a32357a");
         setStore(request.data.response);
 
         if (request.data.response.status === 1) {
@@ -61,21 +59,11 @@ function StoreManagePage() {
   };
 
   const handleDescAndScheduleSaveClick = () => {
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          desc: descValue,
-          schedule: scheduleValue,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
+    putStore("641458bd4443f2168a32357a", {
+      ...store,
+      desc: descValue,
+      schedule: scheduleValue,
+    })
       .then((res) => {
         setStore((prevState) => ({
           ...prevState,
@@ -90,20 +78,10 @@ function StoreManagePage() {
   };
 
   const handleNotiSaveClick = () => {
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          notice: notiValue,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
+    putStore("641458bd4443f2168a32357a", {
+      ...store,
+      notice: notiValue,
+    })
       .then((res) => {
         setStore((prevState) => ({ ...prevState, notice: notiValue }));
         setEditNoti(false);
@@ -119,20 +97,10 @@ function StoreManagePage() {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
 
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          status: 1,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
+    putStore("641458bd4443f2168a32357a", {
+      ...store,
+      status: 1,
+    })
       .then((res) => {
         setStore((prevState) => ({ ...prevState, status: 1 }));
       })
@@ -145,20 +113,11 @@ function StoreManagePage() {
   const handleCloseBtnClick = () => {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
-    axios
-      .put(
-        "/api/v1/admin/stores/641458bd4443f2168a32357a",
-        JSON.stringify({
-          ...store,
-          status: 2,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
+
+    putStore("641458bd4443f2168a32357a", {
+      ...store,
+      status: 2,
+    })
       .then((res) => {
         setStore((prevState) => ({ ...prevState, status: 2 }));
       })
@@ -206,7 +165,7 @@ function StoreManagePage() {
           </div>
 
           <section className={Store.description}>
-            <h1>"{store.name}" 가게</h1>
+            <h2>"{store.name}" 가게</h2>
             <div className={Store.desc}>
               <div className={Store.intro}>
                 <h3>가게 한줄 소개</h3>
@@ -258,7 +217,7 @@ function StoreManagePage() {
           </section>
 
           <section className={Store.noticeBlock}>
-            <h1>가게 공지사항</h1>
+            <h2>가게 공지사항</h2>
             <div className={Store.notice}>
               <div className={Store.innerNotice}>
                 {editNoti ? (

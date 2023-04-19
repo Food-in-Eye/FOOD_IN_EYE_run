@@ -104,6 +104,21 @@ class MongodbController:
             result = result[0]
 
         return dictToStr(result)
+    
+    def read_all_by_feild(self, field:str, value:str) -> dict:
+        """ field의 value가 일치하는 document를 모두 읽어온다. """
+        assert id is not None
+
+        result = list(self.coll.find({field: value}))
+        
+        if result is None:
+            raise Exception(f'Failed to READ document with field \'{field}\'')
+
+        response = []
+        for r in result:
+            response.append(dictToStr(r))
+        
+        return response  
 
     def delete(self, id:str) -> bool:
         """ id가 일치하는 document를 삭제한다. """

@@ -31,6 +31,7 @@ async def get_menu(m_id:str, food_opt: Optional[bool] = True):
             for id in food_ids:
                 food = mongo_food.read_one(id)
                 food_list.append({
+                    "f_id": id,
                     "name": food['name'],
                     "price": food['price'],
                     "img_key" : food['img_key'],
