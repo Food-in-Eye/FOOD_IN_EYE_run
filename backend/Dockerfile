@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app /code/app
 
 # Local에서 테스트 할 때만 아래 주석을 풀어서 사용할 것
-COPY .env /code/app
+# COPY .env /code/app
 
 
 WORKDIR /code/app
