@@ -10,7 +10,8 @@ import { getMenu, getMenus, putMenus } from "../components/API.module";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 function MenuManagePage() {
-  const sID = `641459134443f2168a32357b`;
+  const sID = `641459134443f2168a32357b`; //파스타가게 id;
+  // const sID = `6440fe9bd85a73634c457a32`; //일식가게 id;
 
   /** api에서 불러올 menuList */
   const [menuList, setMenuList] = useState([]);
@@ -102,7 +103,7 @@ function MenuManagePage() {
       )
       .then((res) => {
         const newMenu = res.data;
-        setMenuList([...menuList, newMenu]);
+        setMenuList([...menuList.filter(Boolean), newMenu]);
       })
       .catch((e) => {
         setError(e);
@@ -116,6 +117,7 @@ function MenuManagePage() {
     if (selectedMenu && selectedMenu._id) {
       setMenuName(selectedMenu.name);
       setMenuDesc(selectedMenu.desc);
+      setMenuImg(selectedMenuImgURL);
       setMenuAllergy(selectedMenu.allergy);
       setOriginItems(selectedMenu.origin);
       setMenuPrice(selectedMenu.price);
@@ -187,7 +189,6 @@ function MenuManagePage() {
 
     const formData = new FormData();
 
-    //이미지 리사이징
     try {
       if (croppedImage.length !== 0) {
         formData.append("file", croppedImage); // key, value 추가
