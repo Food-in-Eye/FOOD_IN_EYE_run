@@ -102,7 +102,7 @@ function MenuManagePage() {
       )
       .then(async (res) => {
         const newMenu = await getMenu(res.data.document_id);
-        setMenuList([...menuList, newMenu]);
+        setMenuList([...menuList, newMenu.response]);
       })
       .catch((e) => {
         setError(e);
