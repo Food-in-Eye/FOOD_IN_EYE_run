@@ -16,8 +16,8 @@ export const getMenus = (s_id) => {
   return axios.get(requestUrl);
 };
 
-export const getMenu = (m_id) => {
-  const requestUrl = `${MENUS_URL}/${m_id}`;
+export const getMenu = (f_id) => {
+  const requestUrl = `${MENUS_URL}/${f_id}`;
   return axios.get(requestUrl);
 };
 

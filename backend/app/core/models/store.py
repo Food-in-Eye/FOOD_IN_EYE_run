@@ -16,7 +16,7 @@ class StoreModel(BaseModel):
     # m_id: str | None = Field(title="menu identifier currently in use by restaurant")
     
 class FoodModel(BaseModel):
-    # s_id: str = Field(title="Restaurant identifier for this menu")
+    s_id: str = Field(title="Restaurant identifier for this menu")
     name: str = Field(title="name of food")
     price: int = Field(title="price of food")
     img_key: str | None = Field(title="path where food images are stored")

@@ -100,8 +100,8 @@ function MenuManagePage() {
           },
         }
       )
-      .then((res) => {
-        const newMenu = res.data;
+      .then(async (res) => {
+        const newMenu = await getMenu(res.data.document_id);
         setMenuList([...menuList, newMenu]);
       })
       .catch((e) => {
