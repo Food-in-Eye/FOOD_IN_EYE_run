@@ -101,9 +101,9 @@ function MenuManagePage() {
           },
         }
       )
-      .then((res) => {
-        const newMenu = res.data;
-        setMenuList([...menuList.filter(Boolean), newMenu]);
+      .then(async (res) => {
+        const newMenu = await getMenu(res.data.document_id);
+        setMenuList([...menuList, newMenu.data.response]);
       })
       .catch((e) => {
         setError(e);
@@ -271,7 +271,6 @@ function MenuManagePage() {
                 {menuList.map((menu) => (
                   <li
                     key={menu._id}
-                    data-hammer
                     className={Menu.list}
                     onClick={(e) => handleMenuClick(e, menu._id)}
                   >

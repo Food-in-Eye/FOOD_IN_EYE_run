@@ -26,7 +26,7 @@ function StoreManagePage() {
         //loading 상태는 true로 세팅
         setLoading(true);
 
-        const request = await getStore("641458bd4443f2168a32357a");
+        const request = await getStore(sID);
         setStore(request.data.response);
 
         if (request.data.response.status === 1) {
