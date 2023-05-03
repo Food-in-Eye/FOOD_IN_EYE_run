@@ -7,10 +7,6 @@ services:
   backend:
     build:
       context: ./backend
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
-      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
   nginx:
     build:
       context: ./nginx
@@ -19,5 +15,3 @@ services:
     depends_on:
       - frontend
       - backend
-    # volumes:
-    # - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
