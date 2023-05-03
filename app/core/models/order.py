@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field
 
-class FoodCount(BaseModel):
-    f_id: str = Field(title="food identifier")
-    count: int = Field(title="number of food")
+# class FoodCount(BaseModel):
+#     f_id: str = Field(title="food identifier")
+#     count: int = Field(title="number of food")
 
 class StoreOrder(BaseModel):
     s_id: str = Field(title="food identifier")
     m_id: str = Field(title="menu identifier")
-    f_list: list[FoodCount]
+    f_list: list
 
 class OrderModel(BaseModel):
     u_id: str = Field(title="user identifier")
