@@ -114,8 +114,8 @@ async def read_menu_with_foods(id:str):
         food_ids = [food['f_id'] for food in response['f_list']]
         food_list = []
 
-        for id in food_ids:
-            food = DB.read_by_id('food', id)
+        for f_id in food_ids:
+            food = DB.read_by_id('food', f_id)
             food_list.append({
                 "f_id": id,
                 "name": food['name'],
