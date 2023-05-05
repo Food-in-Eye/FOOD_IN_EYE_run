@@ -19,15 +19,17 @@ async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
 @order_router.get("/")
-async def get_order(s_id: str=None, u_id: str=None, today: bool=False, ascending: bool=True):
+async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: str=None, asc: bool=True):
     ''' 특정 조건을 만족하는 주문 내역 전체를 반환한다.
         - s_id: 주문을 받은 가게가 일치하는 주문내역만 가져온다.
         - u_id: 주문자가 일치하는 주문내역만 가져온다.
         - today: True인 경우, 요청 날짜의 주문내역만 가져온다.
-        - ascending: True인 경우, 오름차순으로 정렬한다.
+        - asc_by: 어떤 필드에 대해서 정렬할지.(지정하지 않을 경우 _id 기준)
+        - asc: True면 오름차순, False면 내림차순(기본은 오름차순)
     '''
     query = {}
     q_str_list = []
+    q_str = ""
     if s_id:
         query["s_id"] = s_id
         q_str_list.append(f"s_id={s_id}")
@@ -41,27 +43,27 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, ascending
         query["date"] = {"$gte": today_start, "$lt": today_end}
         q_str_list.append(f"today={today}")
     
-    if ascending:
-        q_str_list.append(f"ascending={ascending}")
+    if asc_by:
+        q_str_list.append(f"asc_by={asc_by}")
     
-    if len(q_str_list) > 1:
-        q_str = q_str_list.pop(0)
+    if len(q_str_list) > 0:
+        q_str = "?" + q_str_list.pop(0)
         for str in q_str_list:
             q_str = q_str + "&" + str
 
     try:
-        response = DB.read_all_by_query('order', query, ascending)
+        response = DB.read_all_by_query('order', query, asc_by, asc)
     
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'GET {PREFIX}?{q_str}',
+            'request': f'GET {PREFIX}{q_str}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'GET {PREFIX}?{q_str}',
+        'request': f'GET {PREFIX}{q_str}',
         'status': 'OK',
         'response': response
     }
@@ -112,7 +114,8 @@ async def change_status(id: str):
     
     return {
         'request': f'GET {PREFIX}/order?id={id}',
-        'status': 'OK'
+        'status': 'OK',
+        'message': f'status is now {s+1}'
     }
 
 @order_router.post("/order")
@@ -127,18 +130,21 @@ async def new_order(body:OrderModel):
         모든 과정이 마무리되면 OK 응답을 보낸다.
     '''
     try:
+        # u_id 채크도 나중에 추가할 것
+
         order_id_list = []
         for store_order in body.content:
-            print(store_order)
             order = {
+                "date": datetime.now(),
                 "u_id": body.u_id,
                 "s_id": store_order.s_id,
                 "m_id": store_order.m_id,
+                "status": 0,
                 "f_list": store_order.f_list
             }
 
-            order_id_list.append(str(DB.create('test', order))) # 임시로 test 디비에 보낸다.
-        # history DB에도 넣는다 (지금은 임시로 test디비에)
+            order_id_list.append(str(DB.create('order', order)))
+
         history = {
            "u_id": body.u_id,
            "date": datetime.now(),
@@ -147,10 +153,8 @@ async def new_order(body:OrderModel):
            "orders": order_id_list
         }
         
-        h_id = str(DB.create('test', history)) # todo: colection 수정 필요
+        h_id = str(DB.create('history', history))
 
-        # print("h_id:", h_id)
-        # print("\t", history)
         return {
             'request': f'POST {PREFIX}/order',
             'status': 'OK'

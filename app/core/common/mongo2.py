@@ -103,15 +103,19 @@ class MongodbController:
         
         return response 
     
-    def read_all_by_query(self, collection:str, query:dict, ascending:bool|None) -> list:
+    def read_all_by_query(self, collection:str, query:dict, asc_by: str=None, asc:bool=True) -> list:
         """ collection에서 전달받은 query에 일치하는 모든 데이터를 찾는다. """
         assert collection is not None
         coll = self.get_collection(collection)
 
-        result = coll.find(query).sort([("_id", 1 if ascending else -1)])
+        result = coll.find(query)
+        
         if result is None:
             raise Exception(f'Failed to READ document')
         
+        if asc_by:
+            result.sort([(asc_by, 1 if asc else -1)])
+            
         response = []
         for r in result:
             response.append(dictToStr(r))
