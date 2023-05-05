@@ -1,0 +1,55 @@
+.body {
+  margin-top: 10%;
+  margin-bottom: 10%;
+}
+
+.vertical {
+  width: 2px;
+  height: 180px;
+  margin-right: 3%;
+  background-color: #686868;
+}
+
+.body h3 {
+  margin-left: 0;
+  max-width: 40%;
+  padding: 2%;
+  border-radius: 0 20px 0 0;
+  background-color: #ff9345;
+}
+
+.icons {
+  box-sizing: border-box;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row;
+  padding: 5%;
+  border-radius: 0 20px 20px 0;
+  box-shadow: 0 6px 5px #686868;
+}
+
+.icons div {
+  flex-flow: column;
+}
+
+.icons button:hover {
+  border: 2px solid #337db1;
+}
+
+.icons button,
+.icons button p {
+  border: none;
+  background: none;
+}
+
+.icons button p {
+  margin: 2% 0 10% 15%;
+  white-space: nowrap;
+}
+
+.icons button img {
+  max-width: 45%;
+  height: auto;
+}
