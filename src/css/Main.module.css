@@ -29,9 +29,8 @@
 
 .orderInfo {
   width: 40%;
-  height: auto;
+  height: 100%;
   margin-right: 2%;
-  margin-bottom: 5%;
   border-radius: 40px 40px 0 20px;
   background-color: #fff;
   box-shadow: 2px 5px 10px #686868;

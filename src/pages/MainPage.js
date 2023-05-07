@@ -15,23 +15,31 @@ import cooking from "../images/cooking.jpeg";
 import finishCook from "../images/finished_cooking.jpeg";
 import arrow from "../images/right_arrow.jpeg";
 
-import { getOrders, getFood } from "../components/API.module";
+import { getOrders, getFoods, getFood } from "../components/API.module";
 import { useState, useEffect } from "react";
 
 function MainPage() {
+  // const sID = `641459134443f2168a32357b`; //일식가게 id
+  const sID = `641458bd4443f2168a32357a`; //파스타가게 id
+
   const [value, onChange] = useState(new Date());
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(null);
+  const [orderData, setOrderData] = useState([]);
+
+  const [buttonStates, setButtonStates] = useState([]);
 
   useEffect(() => {
     setLoading(true);
 
-    const fetchOrderList = async () => {
+    const orderLists = async () => {
       try {
         const ordersResponse = await getOrders();
         const orders = await ordersResponse.data.response;
 
-        const foodIds = orders.map((order) => order.f_list[0].f_id);
+        const filteredOrders = orders.filter((order) => order.s_id === sID);
+
+        const foodIds = filteredOrders.map((order) => order.f_list[0].f_id);
         const foodsResponse = await Promise.all(
           foodIds.map((fID) => getFood(fID))
         );
@@ -39,47 +47,58 @@ function MainPage() {
           foodsResponse.map((res) => res.data.response)
         );
 
-        const orderListWithFoods = orders.map((order, index) => ({
-          ...order,
-          foodName: foods[index].name,
-        }));
+        console.log(filteredOrders);
+        const orderListWithFoods = filteredOrders
+          .map((order, index) => ({
+            ...order,
+            foodName: foods[index].name,
+          }))
+          .map((order, index) => ({
+            ...order,
+            index: filteredOrders.length - index,
+          }));
 
-        setOrderList(orderListWithFoods).then(setLoading(false));
+        setOrderList(orderListWithFoods);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchOrderList();
+    orderLists();
   }, []);
 
-  /** 가장 최근 order부터 내림차순 */
-  const mostRecent = orderList.reduce((acc, current) => {
-    return new Date(current.date) > new Date(acc.date) ? current : acc;
-  }, orderList[0]);
+  // /** 가장 최근 order부터 내림차순 */
+  // const mostRecent = orderList.reduce((acc, current) => {
+  //   return new Date(current.date) > new Date(acc.date) ? current : acc;
+  // }, orderList[0]);
 
-  const orderData = [
-    {
-      menuName: "더블치즈베이컨시그니처",
-      menuCount: 2,
-      menuPrice: 8000,
-    },
-    {
-      menuName: "감자튀김L",
-      menuCount: 1,
-      menuPrice: 4500,
-    },
-    {
-      menuName: "코카콜라L",
-      menuCount: 2,
-      menuPrice: 3000,
-    },
-    {
-      menuName: "치즈스틱",
-      menuCount: 2,
-      menuPrice: 3000,
-    },
-  ];
+  const handleOrderClick = (order) => {
+    setOrderData([]);
+    const promises = order.f_list.map((f) => getFoods(order.s_id));
+
+    Promise.all(promises).then((foodLists) => {
+      const data = order.f_list.map((f, index) => {
+        const foodItem = foodLists[index].data.response.find(
+          (item) => item._id === f.f_id
+        );
+        return {
+          menuName: foodItem.name,
+          menuCount: f.count,
+          menuPrice: foodItem.price * f.count,
+        };
+      });
+      setOrderData(data);
+    });
+  };
+
+  const handleOrderButtonClick = (index) => {
+    setButtonStates((prevStates) => {
+      const newStates = [...prevStates];
+      newStates[index] = (newStates[index] + 1) % 3; // 0, 1, 2 중 하나의 값을 가짐
+      return newStates;
+    });
+  };
 
   return (
     <div>
@@ -115,16 +134,26 @@ function MainPage() {
                 <hr />
                 {orderList
                   .sort((a, b) => new Date(b.date) - new Date(a.date))
+
                   .map((order, index) => (
                     <div key={index}>
-                      <li>{`${orderList.length - index}. ${
+                      <li onClick={() => handleOrderClick(order)}>{`${
+                        orderList.length - index
+                      }. ${
                         order.foodName.length > 5
                           ? order.foodName.substring(0, 5) + "..."
                           : order.foodName
                       }`}</li>
                       <section className={Main.manageBtn}>
-                        <button className={Button.getOrder}>
-                          <span>주문 접수</span>
+                        <button
+                          className={Button.getOrder}
+                          onClick={() => handleOrderButtonClick(order.index)}
+                        >
+                          <span>
+                            {buttonStates[order.index] === 0 && "접수 대기"}
+                            {buttonStates[order.index] === 1 && "수령 대기"}
+                            {buttonStates[order.index] === 2 && "완료"}
+                          </span>
                         </button>
                       </section>
                       <hr />
