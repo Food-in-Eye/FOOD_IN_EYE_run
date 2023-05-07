@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Calendar from "react-calendar";
 import moment from "moment";
 import "react-calendar/dist/Calendar.css";
@@ -16,8 +15,48 @@ import cooking from "../images/cooking.jpeg";
 import finishCook from "../images/finished_cooking.jpeg";
 import arrow from "../images/right_arrow.jpeg";
 
+import { getOrders, getFood } from "../components/API.module";
+import { useState, useEffect } from "react";
+
 function MainPage() {
   const [value, onChange] = useState(new Date());
+  const [orderList, setOrderList] = useState([]);
+  const [loading, setLoading] = useState(null);
+
+  useEffect(() => {
+    setLoading(true);
+
+    const fetchOrderList = async () => {
+      try {
+        const ordersResponse = await getOrders();
+        const orders = await ordersResponse.data.response;
+
+        const foodIds = orders.map((order) => order.f_list[0].f_id);
+        const foodsResponse = await Promise.all(
+          foodIds.map((fID) => getFood(fID))
+        );
+        const foods = await Promise.all(
+          foodsResponse.map((res) => res.data.response)
+        );
+
+        const orderListWithFoods = orders.map((order, index) => ({
+          ...order,
+          foodName: foods[index].name,
+        }));
+
+        setOrderList(orderListWithFoods).then(setLoading(false));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchOrderList();
+  }, []);
+
+  /** 가장 최근 order부터 내림차순 */
+  const mostRecent = orderList.reduce((acc, current) => {
+    return new Date(current.date) > new Date(acc.date) ? current : acc;
+  }, orderList[0]);
 
   const orderData = [
     {
@@ -74,21 +113,23 @@ function MainPage() {
               </div>
               <ul>
                 <hr />
-                <li>1. --- </li>
-                <section className={Main.manageBtn}>
-                  <button className={Button.getOrder}>
-                    <span>주문 접수</span>
-                  </button>
-                </section>
-                <hr />
-                <li>2. --- </li>
-                <hr />
-                <li>3. --- </li>
-                <hr />
-                <li>4. --- </li>
-                <hr />
-                <li>5. --- </li>
-                <hr />
+                {orderList
+                  .sort((a, b) => new Date(b.date) - new Date(a.date))
+                  .map((order, index) => (
+                    <div key={index}>
+                      <li>{`${orderList.length - index}. ${
+                        order.foodName.length > 5
+                          ? order.foodName.substring(0, 5) + "..."
+                          : order.foodName
+                      }`}</li>
+                      <section className={Main.manageBtn}>
+                        <button className={Button.getOrder}>
+                          <span>주문 접수</span>
+                        </button>
+                      </section>
+                      <hr />
+                    </div>
+                  ))}
               </ul>
             </div>
           </div>
