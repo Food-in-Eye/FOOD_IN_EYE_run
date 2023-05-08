@@ -22,8 +22,13 @@ export const getFood = (f_id) => {
   return axios.get(requestUrl);
 };
 
-export const getOrders = () => {
-  const requestUrl = ORDER_URL;
+// export const getOrders = (today) => {
+//   const requestUrl = `${ORDER_URL}`;
+//   return axios.get(requestUrl);
+// };
+
+export const getOrders = (query) => {
+  const requestUrl = `${ORDER_URL}${query}`;
   return axios.get(requestUrl);
 };
 
