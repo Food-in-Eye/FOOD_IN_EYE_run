@@ -9,6 +9,8 @@ from .src.util import Util
 
 from datetime import datetime, timedelta
 
+from .user import manager
+
 order_router = APIRouter(prefix="/orders")
 
 PREFIX = 'api/v2/orders'
@@ -17,6 +19,11 @@ DB = MongodbController('FIE_DB')
 @order_router.get("/hello")
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
+
+@order_router.get("/websocket")
+async def get():
+    manager.printList()
+    return f'hi {manager.active_connections}'
 
 @order_router.get("/")
 async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: str=None, asc: bool=True):
