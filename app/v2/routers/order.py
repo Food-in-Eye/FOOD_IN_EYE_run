@@ -20,11 +20,6 @@ DB = MongodbController('FIE_DB')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-@order_router.get("/websocket")
-async def get():
-    manager.printList()
-    return f'hi {manager.active_connections}'
-
 @order_router.get("/")
 async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: str=None, asc: bool=True):
     ''' 특정 조건을 만족하는 주문 내역 전체를 반환한다.
@@ -108,6 +103,9 @@ async def change_status(id: str):
         
         if s < 2:
             DB.update_field_by_id('order', id, 'status', s+1)
+
+            # websocket에 전달하기
+            await manager.send_json(response['u_id'], {id : 'updated'})
         else:
             raise Exception('status is already finish')
 
@@ -140,6 +138,8 @@ async def new_order(body:OrderModel):
         # u_id 채크도 나중에 추가할 것
 
         order_id_list = []
+        store_list = [] # websocket으로 전달할 store list
+
         for store_order in body.content:
             order = {
                 "date": datetime.now(),
@@ -149,7 +149,8 @@ async def new_order(body:OrderModel):
                 "status": 0,
                 "f_list": store_order.f_list
             }
-
+            store_list.append(store_order.s_id)
+            
             order_id_list.append(str(DB.create('order', order)))
 
         history = {
@@ -161,6 +162,16 @@ async def new_order(body:OrderModel):
         }
         
         h_id = str(DB.create('history', history))
+        
+        # websocket에 전달하기
+        store_id_List = []
+        for store in store_list:
+            result = DB.read_all_by_feild('user', 's_id', store)
+            result = result[0]
+            result = result['_id']
+            store_id_List.append(result)
+            
+        await manager.send_json_to_users(store_id_List, 'created')
 
         return {
             'request': f'POST {PREFIX}/order',

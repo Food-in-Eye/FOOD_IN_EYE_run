@@ -32,6 +32,9 @@ html = """
             <label for="username">사용자 이름:</label>
             <input type="text" id="username" name="username">
             <br>
+            <label for="token">토큰:</label>
+            <input type="text" id="token" name="token">
+            <br>
             <input type="submit" value="로그인">
         </form>
         <h1>WebSocket Chat</h1>
@@ -52,7 +55,7 @@ html = """
                 e.preventDefault();
                 const username = document.getElementById('username').value;
                 const response = await fetch(`http://127.0.0.1:8000/api/v2/users/login?user_id=${username}`);
-                const token = 27593;
+                const token = document.getElementById('token').value;
                 if (token) {
                     const wsId = username;
                     wsIdElem.textContent = wsId;
@@ -86,66 +89,91 @@ class CustomJSONEncoder(json.JSONEncoder):  # json.dumps() 변환 불가 시 ret
             return super().default(obj)
         except TypeError:
             return False
-        
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: list[dict[str, any]] = []
-        self.websocket: WebSocket = None
+class websocketClient:
 
-    async def connect(self, user_id : str, websocket: WebSocket):
+    async def connect(self, websocket : WebSocket):
         self.websocket = websocket
         await self.websocket.accept()
-        connection = {"user_id": user_id, "websocket": websocket}
-        self.active_connections.append(connection)
-        
-        self.printList()
+        return True
+    
+    async def send_json(self, data : json):
+        await self.websocket.send_json({'data' : data}) # data : 'user_id' , 'message'
+        return data
 
-    # async def send_json(self, websocket : WebSocket, user_id : str, data : json):
-    #     await websocket.send_json(data)
-    #     print(f"# Send To ({user_id}) : {data}")
-    # 테스트 중
-    async def send_json(self, user_id : str, data : json):
-        print("hi")
-        await self.websocket.send_json(data)
-        print(f"# Send To ({user_id}) : {data}")
-
-    async def send_json_unicast(self, user_ids: list[str], data : json):
-        for conn in self.active_connections:
-            if conn["user_id"] in user_ids:
-                await conn["websocket"].send_json(data)
-                print(f"# Send To ({conn['user_id']}) : {data}")
-
-    async def receive_json(self, websocket : WebSocket, user_id : str) -> json:
-        data = await websocket.receive_text()
+    async def receive_json(self):
+        data = await self.websocket.receive_text()
         if json.dumps(data):
-            print(f'# Receive From ({user_id}) : {data}')
             return data
         self.send_json({'state' : 'error', 'event' : 'send data tpye is not json'})  # 혹시라도 json.dumps() 불가 시 에러(연결 종료)를 방지하기 위한 에러 메시지
 
-    async def handle_message(self, websocket : WebSocket, user_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
+    async def disconnect(self):
+        if await self.websocket.close() == None:
+            return True
+        return False
+
+
+class ConnectionManager:
+
+    def __init__(self):
+        self.active_connections: list[dict[str, any]] = []
+
+    async def connect(self, user_id : str, websocket: WebSocket):
+        client = websocketClient()
+        if await client.connect(websocket):
+            connection = {"user_id": user_id, "websocket": client}
+            self.active_connections.append(connection)
+        self.printList()
+
+    async def get_client(self, user_id : str):
+        for connect in self.active_connections:
+            if connect['user_id'] == user_id:
+                return connect['websocket']
+        return None
+    
+    async def send_json(self, user_id : str, data : json):
+        client = await self.get_client(user_id)
+
+        if client:
+            await client.send_json({'client' : user_id, 'msg' : data})
+            print(f"# Send To ({user_id}) : {data}")
+
+    async def send_json_to_users(self, user_ids : list[str], data : json):
+        for user_id in user_ids:
+            client = await self.get_client(user_id)
+            print(user_id)
+            if client:
+                print(client)
+                await client.send_json({'client' : user_id, 'msg' : data})
+                print(f"# Send To ({user_id}) : {data}")
+
+    async def receive_json(self, user_id : str):
+        client = await self.get_client(user_id)
+
+        if client:
+            data = await client.receive_json()
+            print(f'# Receive From ({user_id}) : {data}')
+            return data
+
+    async def handle_message(self, user_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
+
         if data == "close":
-            raise WebSocketDisconnect(f'The client({websocket.client}) requested to terminate the connection.')
+            # await self.disconnect(user_id)
+            raise WebSocketDisconnect(f'The client({user_id}) requested to terminate the connection.')
         else:
             if data == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
                 data = 'connected'
 
-            await manager.send_json(websocket, user_id, {'client' : user_id, 'msg' : data})
+            await self.send_json(user_id, data)
 
-    # 보류, 우선 close 입력시 자동으로 입력 해지
-    async def disconnect(self, websocket: WebSocket, user_id : str):
-        if not self.active_connections:
-            print('hi')
-            return
-        for connection in self.active_connections:
-            if connection["websocket"] == websocket:
-                print('hi1')
-                self.active_connections.remove(connection)
-                print(f"Disconnected: ({user_id})")
-                await websocket.close()
-                print('hi2')
-                        
-                # self.printList()
-                break
+    async def disconnect(self, user_id : str):
+        client = await self.get_client(user_id)
+
+        if client:
+            if await client.disconnect():
+                for i, conn in enumerate(self.active_connections):
+                    if conn['user_id'] == user_id:
+                        del self.active_connections[i]
+                        break
     
     def printList(self):
         for i in range(0, len(self.active_connections)):
@@ -182,13 +210,16 @@ async def websocket_endpoint(websocket: WebSocket, user_id : str, token : str): 
             # asyncio.ensure_future(manager.send_heartbeat(websocket))
 
             while True:
-                data = await manager.receive_json(websocket, user_id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
-                await manager.handle_message(websocket, user_id, data)
+                data = await manager.receive_json(user_id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
+                await manager.handle_message(user_id, data)
         else:
             raise WebSocketDisconnect(f'The client({websocket.client})\'s token does not match.')
 
     except WebSocketDisconnect as d:
         print(f'Websocket ERROR : {d}')
+
+        await manager.disconnect(user_id)
+        manager.printList()
         #await del_token(user_id) # 이 코드 없으면 접속하기 너무 힘듦 왜냐 html을 내가 못해서
 
 
