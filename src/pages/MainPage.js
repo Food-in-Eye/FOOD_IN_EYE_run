@@ -34,12 +34,11 @@ function MainPage() {
 
     const orderLists = async () => {
       try {
-        const ordersResponse = await getOrders();
+        const ordersResponse = await getOrders(
+          `?s_id=${sID}&asc=false&asc_by=date`
+        );
         const orders = await ordersResponse.data.response;
-
-        const filteredOrders = orders.filter((order) => order.s_id === sID);
-
-        const foodIds = filteredOrders.map((order) => order.f_list[0].f_id);
+        const foodIds = orders.map((order) => order.f_list[0].f_id);
         const foodsResponse = await Promise.all(
           foodIds.map((fID) => getFood(fID))
         );
@@ -47,15 +46,11 @@ function MainPage() {
           foodsResponse.map((res) => res.data.response)
         );
 
-        console.log(filteredOrders);
-        const orderListWithFoods = filteredOrders
+        const orderListWithFoods = orders
+          .filter((order, index) => foods[index])
           .map((order, index) => ({
             ...order,
             foodName: foods[index].name,
-          }))
-          .map((order, index) => ({
-            ...order,
-            index: filteredOrders.length - index,
           }));
 
         setOrderList(orderListWithFoods);
@@ -67,11 +62,6 @@ function MainPage() {
 
     orderLists();
   }, []);
-
-  // /** 가장 최근 order부터 내림차순 */
-  // const mostRecent = orderList.reduce((acc, current) => {
-  //   return new Date(current.date) > new Date(acc.date) ? current : acc;
-  // }, orderList[0]);
 
   const handleOrderClick = (order) => {
     setOrderData([]);
@@ -85,7 +75,8 @@ function MainPage() {
         return {
           menuName: foodItem.name,
           menuCount: f.count,
-          menuPrice: foodItem.price * f.count,
+          menuPrice: foodItem.price,
+          menuPrices: foodItem.price * f.count,
         };
       });
       setOrderData(data);

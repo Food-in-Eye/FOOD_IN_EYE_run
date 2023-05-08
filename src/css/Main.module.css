@@ -13,9 +13,18 @@
 }
 
 .orderDashboard {
-  width: 50%;
+  width: 45%;
   height: auto;
   margin-bottom: 10%;
+}
+
+.orderInfo {
+  width: 35%;
+  height: 100%;
+  margin-right: 2%;
+  border-radius: 40px 40px 0 20px;
+  background-color: #fff;
+  box-shadow: 2px 5px 10px #686868;
 }
 
 .rest .cal {
@@ -25,15 +34,6 @@
 
 .rest .shortcut {
   margin-top: 10%;
-}
-
-.orderInfo {
-  width: 40%;
-  height: 100%;
-  margin-right: 2%;
-  border-radius: 40px 40px 0 20px;
-  background-color: #fff;
-  box-shadow: 2px 5px 10px #686868;
 }
 
 .rest .sales {
@@ -67,13 +67,13 @@
   color: #337db1;
 }
 
-.orders {
+.orderDashboard .orders {
   display: flex;
   justify-content: center;
   align-content: center;
 }
 
-.orderTodays {
+.orderDashboard .orders .orderTodays {
   width: 400px;
   height: auto;
   position: relative;
@@ -83,7 +83,7 @@
   background-color: #fff;
 }
 
-.dashboardBackground {
+.orderDashboard .orders .dashboardBackground {
   width: 30%;
   height: 90%;
   position: absolute;
@@ -93,59 +93,59 @@
   box-shadow: inset 0 0 10px #686868;
 }
 
-.orders h2 {
+.orderDashboard .orders h2 {
   margin-left: 12%;
   white-space: nowrap;
   font-size: 30px;
 }
 
-.orderTodays hr {
+.orderDashboard .orders .orderTodays hr {
   width: 90%;
   margin-top: 10%;
   margin-left: 0;
   border: 1px solid #b8b3b3;
 }
 
-.orderTodays ul {
+.orderDashboard .orders .orderTodays ul {
   margin-top: 2%;
   max-height: 75%;
   overflow: scroll;
 }
 
-.orderTodays li {
+.orderDashboard .orders .orderTodays li {
   margin: 10% 0 0 0;
   font-size: 24px;
 }
 
-.orderTodays .manageBtn {
+.orderDashboard .orders .orderTodays .manageBtn {
   float: right;
   margin-top: -10%;
 }
 
-.infoHeader {
+.orderInfo .infoHeader {
   padding: 2%;
   text-align: center;
   border-radius: 40px 40px 0 0;
   background-color: #ff9345;
 }
 
-.infoHeader h2 {
+.orderInfo .infoHeader h2 {
   font-size: 30px;
 }
 
-.infoBody {
+.orderInfo .infoBody {
   width: 100%;
   height: auto;
   display: flex;
 }
 
-.infoBody .orderSeq {
+.orderInfo .infoBody .orderSeq {
   display: flex;
   justify-content: center;
   position: absolute;
 }
 
-.infoBody .orderSeq .arrow {
+.orderInfo .infoBody .orderSeq .arrow {
   max-width: 8%;
   height: 5%;
   position: relative;
@@ -153,7 +153,7 @@
   margin-right: 2%;
 }
 
-.infoBody .orderSeq div img {
+.orderInfo .infoBody .orderSeq div img {
   max-width: 40%;
   height: auto;
   position: relative;
@@ -161,7 +161,7 @@
   left: 27%;
 }
 
-.infoBody .orderSeq div p {
+.orderInfo .infoBody .orderSeq div p {
   position: relative;
   top: 20%;
   left: -20%;
@@ -169,7 +169,7 @@
   background: none;
 }
 
-.infoBody .orderDetail {
+.orderInfo .infoBody .orderDetail {
   width: 90%;
   height: auto;
   display: flex;
@@ -179,7 +179,7 @@
   margin-top: 30%;
 }
 
-.infoBody .orderDetail h3 {
+.orderInfo .infoBody .orderDetail h3 {
   margin-left: 0;
   padding: 10px;
   border-radius: 5px 5px 0 0;
@@ -187,7 +187,7 @@
   background-color: #000926;
 }
 
-.infoBody .orderDetail .orderContents {
+.orderInfo .infoBody .orderDetail .orderContents {
   width: 100%;
   box-sizing: border-box;
   padding: 50px;
@@ -196,6 +196,6 @@
   border: 2px solid #000926;
 }
 
-.infoBody .orderDetail .orderContents Table {
+.orderInfo .infoBody .orderDetail .orderContents Table {
   margin-left: -8%;
 }
