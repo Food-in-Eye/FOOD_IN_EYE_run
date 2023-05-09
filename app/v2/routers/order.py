@@ -71,23 +71,36 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
     }
 
 @order_router.get("/order")
-async def get_order(id: str):
+async def get_order(id: str, detail: bool=False):
     ''' 특정 id에 대한 주문내역을 찾아서 반환'''
-
+    q_str = ""
     try:
+        q_str += f"id={id}"
         Util.check_id(id)
-
         response = DB.read_by_id('order', id)
+        if detail:
+            q_str += f"detail={detail}"
+            f_list = response["f_list"]
+            new_list = []
+            for dict in f_list:
+                food_detail = DB.read_by_id("food", dict["f_id"])
+                new_list.append({
+                    "name": food_detail["name"],
+                    "count": dict["count"],
+                    "price": food_detail["price"]
+                })
+            response["f_list"] = new_list
+
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'GET {PREFIX}/order?id={id}',
+            'request': f'GET {PREFIX}/order?{q_str}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'GET {PREFIX}/order?id={id}',
+        'request': f'GET {PREFIX}/order?{q_str}',
         'status': 'OK',
         'response': response
     }
@@ -105,7 +118,7 @@ async def change_status(id: str):
             DB.update_field_by_id('order', id, 'status', s+1)
 
             # websocket에 전달하기
-            await manager.send_json(response['u_id'], {id : 'updated'})
+            # await manager.send_json(response['u_id'], {id : 'updated'})
         else:
             raise Exception('status is already finish')
 
@@ -136,9 +149,10 @@ async def new_order(body:OrderModel):
     '''
     try:
         # u_id 채크도 나중에 추가할 것
-
+        
+        response_list = []
         order_id_list = []
-        store_list = [] # websocket으로 전달할 store list
+        # store_list = [] # websocket으로 전달할 store list
 
         for store_order in body.content:
             order = {
@@ -149,9 +163,14 @@ async def new_order(body:OrderModel):
                 "status": 0,
                 "f_list": store_order.f_list
             }
-            store_list.append(store_order.s_id)
-            
-            order_id_list.append(str(DB.create('order', order)))
+            # store_list.append(store_order.s_id)  
+            o_id =  str(DB.create('order', order))         
+            order_id_list.append(o_id)
+
+            response_list.append({
+                "s_id": store_order.s_id,
+                "o_id": o_id
+            })
 
         history = {
            "u_id": body.u_id,
@@ -161,21 +180,22 @@ async def new_order(body:OrderModel):
            "orders": order_id_list
         }
         
-        h_id = str(DB.create('history', history))
+        # h_id = str(DB.create('history', history)) # 이친구 안쓰는거같음! -jiin
         
-        # websocket에 전달하기
-        store_id_List = []
-        for store in store_list:
-            result = DB.read_all_by_feild('user', 's_id', store)
-            result = result[0]
-            result = result['_id']
-            store_id_List.append(result)
+        # # websocket에 전달하기
+        # store_id_List = []
+        # for store in store_list:
+        #     result = DB.read_all_by_feild('user', 's_id', store)
+        #     result = result[0]
+        #     result = result['_id']
+        #     store_id_List.append(result)
             
-        await manager.send_json_to_users(store_id_List, 'created')
+        # await manager.send_json_to_users(store_id_List, 'created')
 
         return {
             'request': f'POST {PREFIX}/order',
-            'status': 'OK'
+            'status': 'OK',
+            'response': response_list
         }
             
     except Exception as e:
