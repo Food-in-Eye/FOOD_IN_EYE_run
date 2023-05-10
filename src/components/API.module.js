@@ -57,6 +57,18 @@ export const putFoods = (f_id, data) => {
   });
 };
 
+// 주문 status 값 업데이트
+export const putOrderStatus = (o_id, data) => {
+  const requestUrl = `${ORDER_URL}/order/status?id=${o_id}`;
+
+  return axios.put(requestUrl, JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+};
+
 //특정 가게에 새로운 음식 추가하는 postFood() 함수
 export const postFood = (s_id, data) => {
   const requestUrl = `${FOODS_URL}/food?s_id=${s_id}`;
