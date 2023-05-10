@@ -79,7 +79,7 @@ async def get_order(id: str, detail: bool=False):
         Util.check_id(id)
         response = DB.read_by_id('order', id)
         if detail:
-            q_str += f"detail={detail}"
+            q_str += f"&detail={detail}"
             f_list = response["f_list"]
             new_list = []
             for dict in f_list:
