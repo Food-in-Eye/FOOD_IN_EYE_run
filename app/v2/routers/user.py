@@ -139,9 +139,8 @@ class ConnectionManager:
     
     async def send_json(self, user_id : str, data : json):
         client = await self.get_client(user_id)
-        print(client)
+
         if client:
-            print('hi')
             await client.send_json({'client' : user_id, 'msg' : data})
             print(f"# Send To ({user_id}) : {data}")
 
@@ -221,40 +220,25 @@ async def check_token(id : str, token : str):
     else :
         return False
 
-# @user_router.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket, id : str, token : str): # token 이 추가되어야 함
-#     try:
-#         await manager.connect(id, websocket)
-#         if await check_token(id, token):
-#             # asyncio.ensure_future(manager.send_heartbeat(websocket))
-
-#             while True:
-#                 data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
-#                 await manager.handle_message(id, data)
-#         else:
-#             raise WebSocketDisconnect(f'The client({websocket.client})\'s token does not match.')
-
-#     except WebSocketDisconnect as d:
-#         print(f'Websocket ERROR : {d}')
-
-#         await manager.disconnect(id)
-#         manager.printList()
-#         await del_token(id)
-
 @user_router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, id : str, token : str): # token 이 추가되어야 함
     try:
+        await manager.connect(id, websocket)
+        if await check_token(id, token):
+            # asyncio.ensure_future(manager.send_heartbeat(websocket))
 
-        while True:
-            data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
-            await manager.handle_message(id, data)
+            while True:
+                data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
+                await manager.handle_message(id, data)
+        else:
+            raise WebSocketDisconnect(f'The client({websocket.client})\'s token does not match.')
 
     except WebSocketDisconnect as d:
         print(f'Websocket ERROR : {d}')
 
-        await manager.disconnect(id)
-        manager.printList()
-
+        # await manager.disconnect(id)
+        # manager.printList()
+        # await del_token(id)
 
 
 
