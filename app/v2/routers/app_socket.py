@@ -1,5 +1,5 @@
 """
-user_router
+app_socket_router
 """
 
 from fastapi import APIRouter
@@ -11,12 +11,12 @@ from fastapi.responses import HTMLResponse
 import json
 
 
-user_router = APIRouter(prefix="/users")
+app_socket_router = APIRouter(prefix="/app_socket")
 
 PREFIX = 'api/v2/users'
 DB = MongodbController('FIE_DB')
 
-@user_router.get("/hello")
+@app_socket_router.get("/hello")
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
@@ -201,12 +201,12 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@user_router.get("/")
+@app_socket_router.get("/")
 async def client_get():
     return HTMLResponse(html)
 
 # client가 사용할지 의문이라서 우선 주석 처리
-# @user_router.get("/websocket/list")
+# @app_socket_router.get("/websocket/list")
 # async def get():
 #     manager.printList()
 #     print(manager.active_connections)
@@ -221,40 +221,25 @@ async def check_token(id : str, token : str):
     else :
         return False
 
-# @user_router.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket, id : str, token : str): # token 이 추가되어야 함
-#     try:
-#         await manager.connect(id, websocket)
-#         if await check_token(id, token):
-#             # asyncio.ensure_future(manager.send_heartbeat(websocket))
-
-#             while True:
-#                 data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
-#                 await manager.handle_message(id, data)
-#         else:
-#             raise WebSocketDisconnect(f'The client({websocket.client})\'s token does not match.')
-
-#     except WebSocketDisconnect as d:
-#         print(f'Websocket ERROR : {d}')
-
-#         await manager.disconnect(id)
-#         manager.printList()
-#         await del_token(id)
-
-@user_router.websocket("/ws")
+@app_socket_router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, id : str, token : str): # token 이 추가되어야 함
     try:
+        await manager.connect(id, websocket)
+        if await check_token(id, token):
+            # asyncio.ensure_future(manager.send_heartbeat(websocket))
 
-        while True:
-            data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
-            await manager.handle_message(id, data)
+            while True:
+                data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
+                await manager.handle_message(id, data)
+        else:
+            raise WebSocketDisconnect(f'The client({websocket.client})\'s token does not match.')
 
     except WebSocketDisconnect as d:
         print(f'Websocket ERROR : {d}')
 
         await manager.disconnect(id)
         manager.printList()
-
+        await del_token(id)
 
 
 
@@ -263,11 +248,11 @@ import random
 def generate_token():
     return random.randint(10000, 99999)
 
-@user_router.get("/hello")
+@app_socket_router.get("/hello")
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-@user_router.get("/login")
+@app_socket_router.get("/login")
 async def client_check_login(id : str): # 로그인으로 확장
     try:
         Util.check_id(id)
@@ -297,7 +282,7 @@ async def client_check_login(id : str): # 로그인으로 확장
     }
 
 # check_token랑 코드 일치한데 애매함
-@user_router.get("/token")
+@app_socket_router.get("/token")
 async def client_check_token(id : str, token : str):
     try:
         user = DB.read_by_id('user', id)
@@ -320,7 +305,7 @@ async def client_check_token(id : str, token : str):
     }
 
 # token 삭제 -> http 뺄지 말지 고민
-@user_router.get("/logout")
+@app_socket_router.get("/logout")
 async def del_token(id : str): # 토큰 삭제
     try:
         user = DB.read_by_id('user', id)
@@ -345,7 +330,7 @@ async def del_token(id : str): # 토큰 삭제
 
 # client가 websocket이 연결되었는지 websocket으로 확인 받을 코드
 # 어떤 오류를 세워야하는지 애매(http or websocket)
-@user_router.get("/websocket/connect")
+@app_socket_router.get("/websocket/connect")
 async def client_check_connect(id : str, token : str):
     if await check_token(id, token):
         await manager.send_json(id, 'connected')

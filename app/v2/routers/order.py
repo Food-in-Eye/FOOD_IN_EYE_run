@@ -180,8 +180,11 @@ async def new_order(body:OrderModel):
            "orders": order_id_list
         }
         
-        # h_id = str(DB.create('history', history)) # 이친구 안쓰는거같음! -jiin
-        
+        h_id = str(DB.create('history', history))
+        response_list.append({
+            "h_id": h_id
+        })
+
         # # websocket에 전달하기
         # store_id_List = []
         # for store in store_list:
