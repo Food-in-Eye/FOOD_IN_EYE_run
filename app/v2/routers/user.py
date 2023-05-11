@@ -32,9 +32,7 @@ html = """
             <label for="username">사용자 이름:</label>
             <input type="text" id="username" name="username">
             <br>
-            <label for="token">토큰:</label>
-            <input type="text" id="token" name="token">
-            <br>
+
             <input type="submit" value="로그인">
         </form>
         <h1>WebSocket Chat</h1>
@@ -54,12 +52,13 @@ html = """
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const username = document.getElementById('username').value;
-                const response = await fetch(`http://127.0.0.1:8000/api/v2/users/login?user_id=${username}`);
-                const token = document.getElementById('token').value;
+                const response = await fetch(`http://127.0.0.1:8000/api/v2/users/login?id=${username}`);
+                const result = await response.json();
+                const token = result.response;
                 if (token) {
                     const wsId = username;
                     wsIdElem.textContent = wsId;
-                    socket = new WebSocket(`${wsUrl}/${wsId}?token=${token}`);
+                    socket = new WebSocket(`${wsUrl}?id=${wsId}&token=${token}`);
                     socket.onmessage = function(event) {
                         const messages = document.getElementById('messages');
                         const message = document.createElement('li');
@@ -118,12 +117,20 @@ class ConnectionManager:
         self.active_connections: list[dict[str, any]] = []
 
     async def connect(self, user_id : str, websocket: WebSocket):
-        client = websocketClient()
-        if await client.connect(websocket):
-            connection = {"user_id": user_id, "websocket": client}
-            self.active_connections.append(connection)
-        self.printList()
+        pre_websocket = await self.get_client(user_id)
 
+        if pre_websocket:
+            for connect in self.active_connections:
+                if connect['user_id'] == pre_websocket:
+                    connect['websocket'] = websocket
+            print(f'{user_id}, {websocket}')
+        else:
+            client = websocketClient()
+            if await client.connect(websocket):
+                connection = {"user_id": user_id, "websocket": client}
+                self.active_connections.append(connection)
+        self.printList()
+    
     async def get_client(self, user_id : str):
         for connect in self.active_connections:
             if connect['user_id'] == user_id:
@@ -132,8 +139,9 @@ class ConnectionManager:
     
     async def send_json(self, user_id : str, data : json):
         client = await self.get_client(user_id)
-
+        print(client)
         if client:
+            print('hi')
             await client.send_json({'client' : user_id, 'msg' : data})
             print(f"# Send To ({user_id}) : {data}")
 
@@ -157,7 +165,8 @@ class ConnectionManager:
     async def handle_message(self, user_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
 
         if data == "close":
-            # await self.disconnect(user_id)
+            data = 'closed'
+            await self.send_json(user_id, data)
             raise WebSocketDisconnect(f'The client({user_id}) requested to terminate the connection.')
         else:
             if data == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
@@ -193,45 +202,58 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 @user_router.get("/")
-async def get():
+async def client_get():
     return HTMLResponse(html)
 
-@user_router.get("/websocket/list")
-async def get():
-    manager.printList()
-    print(manager.active_connections)
-    return f'hi {manager.active_connections}'
+# client가 사용할지 의문이라서 우선 주석 처리
+# @user_router.get("/websocket/list")
+# async def get():
+#     manager.printList()
+#     print(manager.active_connections)
+#     return f'hi {manager.active_connections}'
 
-@user_router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id : str, token : str): # token 이 추가되어야 함
+# websocket을 연견할 때 서버가 id, token이 일치하는지 확인하는 코드
+async def check_token(id : str, token : str):
+    user = DB.read_by_id('user', id)
+
+    if str(user['token']) == token:
+        return user['_id']
+    else :
+        return False
+
+@user_router.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, id : str, token : str): # token 이 추가되어야 함
     try:
-        await manager.connect(user_id, websocket)
-        if await check_token(user_id, token):
+        await manager.connect(id, websocket)
+        if await check_token(id, token):
             # asyncio.ensure_future(manager.send_heartbeat(websocket))
 
             while True:
-                data = await manager.receive_json(user_id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
-                await manager.handle_message(user_id, data)
+                data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
+                await manager.handle_message(id, data)
         else:
             raise WebSocketDisconnect(f'The client({websocket.client})\'s token does not match.')
 
     except WebSocketDisconnect as d:
         print(f'Websocket ERROR : {d}')
 
-        await manager.disconnect(user_id)
+        await manager.disconnect(id)
         manager.printList()
-        #await del_token(user_id) # 이 코드 없으면 접속하기 너무 힘듦 왜냐 html을 내가 못해서
+        await del_token(id)
 
 
-from core.common.mongo2 import MongodbController
+
 import random
 
 def generate_token():
     return random.randint(10000, 99999)
 
-# DB에 존재하는 id 입력시 랜덤값(token) return
+@user_router.get("/hello")
+async def hello():
+    return {"message": f"Hello '{PREFIX}'"}
+
 @user_router.get("/login")
-async def user_check(id : str): # 로그인으로 확장
+async def client_check_login(id : str): # 로그인으로 확장
     try:
         Util.check_id(id)
 
@@ -248,42 +270,41 @@ async def user_check(id : str): # 로그인으로 확장
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/login',
+            'request': f'{PREFIX}/login?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/login',
+        'request': f'{PREFIX}/login?id={id}',
         'status': 'OK',
         'response': response
     }
 
-# token 확인 -> true or false
+# check_token랑 코드 일치한데 애매함
 @user_router.get("/token")
-async def check_token(id : str, token : str):
+async def client_check_token(id : str, token : str):
     try:
         user = DB.read_by_id('user', id)
 
         if str(user['token']) == token:
-            return user['_id']
-        else :
-             return False
+            response =  user['_id']
 
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/token',
+            'request': f'{PREFIX}/token?id={id}?token={token}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/token',
+        'request': f'{PREFIX}/token?id={id}?token={token}',
         'status': 'OK',
+        'response': response
     }
 
-# token 삭제
+# token 삭제 -> http 뺄지 말지 고민
 @user_router.get("/logout")
 async def del_token(id : str): # 토큰 삭제
     try:
@@ -297,12 +318,27 @@ async def del_token(id : str): # 토큰 삭제
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'{PREFIX}/logout',
+            'request': f'{PREFIX}/logout?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'{PREFIX}/logout',
+        'request': f'{PREFIX}/logout?id={id}',
         'status': 'OK',
+    }
+
+# client가 websocket이 연결되었는지 websocket으로 확인 받을 코드
+# 어떤 오류를 세워야하는지 애매(http or websocket)
+@user_router.get("/websocket/connect")
+async def client_check_connect(id : str, token : str):
+    if await check_token(id, token):
+        await manager.send_json(id, 'connected')
+        response = f'hi {id}, check your websocket response'
+    else:
+        response = f'Error {id}, check your id or token'
+    return {
+        'request': f'{PREFIX}/websocket/connect?id={id}',
+        'status': 'OK',
+        'response': response
     }
