@@ -181,9 +181,6 @@ async def new_order(body:OrderModel):
         }
         
         h_id = str(DB.create('history', history))
-        response_list.append({
-            "h_id": h_id
-        })
 
         # # websocket에 전달하기
         # store_id_List = []
@@ -198,7 +195,8 @@ async def new_order(body:OrderModel):
         return {
             'request': f'POST {PREFIX}/order',
             'status': 'OK',
-            'response': response_list
+            'response': response_list,
+            'history_id': h_id
         }
             
     except Exception as e:
