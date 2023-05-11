@@ -166,6 +166,7 @@ class ConnectionManager:
         if data == "close":
             data = 'closed'
             await self.send_json(user_id, data)
+            await self.disconnect(id)
             raise WebSocketDisconnect(f'The client({user_id}) requested to terminate the connection.')
         else:
             if data == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
@@ -244,7 +245,21 @@ async def websocket_endpoint(websocket: WebSocket, id : str): # token 이 추가
             raise WebSocketDisconnect(f'The client({websocket.client})\'s h_id is not match.')
 
     except WebSocketDisconnect as d:
-        print(f'Websocket ERROR : {d}')
+        print(f'Websocket : {d}')
 
         await manager.disconnect(id)
         manager.printList()
+
+# 어떤 오류를 세워야하는지 애매(http or websocket)
+@app_socket_router.get("/websocket/connect")
+async def client_check_connect(id : str):
+    if DB.read_by_id('history', id):
+        await manager.send_json(id, 'connected')
+        response = f'hi {id}, check your websocket response'
+    else:
+        response = f'Error {id}, check your id or token'
+    return {
+        'request': f'{PREFIX}/websocket/connect?id={id}',
+        'status': 'OK',
+        'response': response
+    }
