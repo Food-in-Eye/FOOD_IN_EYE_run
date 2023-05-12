@@ -10,6 +10,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 import json
 
+from .web_socket import manager as web_websocket
 
 app_socket_router = APIRouter(prefix="/app_socket")
 
@@ -98,7 +99,7 @@ class websocketClient:
         return True
     
     async def send_json(self, data : json):
-        await self.websocket.send_json(data) # data : 'user_id' , 'message'
+        await self.websocket.send_json(data)
         return data
 
     async def receive_json(self):
@@ -148,15 +149,6 @@ class ConnectionManager:
             data = await client.receive_json()
             print(f'# Receive From ({h_id}) : {data}')
             return data
-        
-    # web에게 create 전송하기
-    # async def send_update(self, user_id : str):
-    #     client = await web_websocket.get_client(user_id)
-
-    #     if client:
-    #         data = await client.receive_json()
-    #         print(f'# Receive From ({user_id}) : {data}')
-    #         return data
 
     async def handle_message(self, h_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
         data = json.loads(data)
@@ -171,6 +163,7 @@ class ConnectionManager:
                 raise WebSocketDisconnect(f'The client({h_id}) requested to terminate the connection.')
             elif data['condition'] == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
                 data['condition'] = 'connected'
+                await self.send_json(h_id, data)
             else:
                 await self.send_json(h_id, data)
 
@@ -189,7 +182,15 @@ class ConnectionManager:
         for i in range(0, len(self.active_connections)):
             print(f"App Connection : {i}, {self.active_connections[i]}")
 
-    
+            
+    # web에게 create 전송하기
+    # async def send_create(self, user_id : str):
+    #     client = await web_websocket.get_client(user_id)
+
+    #     if client:
+    #         data = await client.receive_json()
+    #         print(f'# Receive From ({user_id}) : {data}')
+    #         return data
     
     async def get_client_to_o_id(self, o_id : str):
         for connect in self.active_connections:
@@ -197,7 +198,7 @@ class ConnectionManager:
             orders = history['orders']
 
             for order in orders:
-                if order['order_id'] == o_id:
+                if order['o_id'] == o_id:
                     order['status'] += 1
 
                     return connect['websocket']
@@ -250,9 +251,10 @@ async def check_history(id : str):
         orders_list = []
         for o_id in history['orders']:
             order = DB.read_by_id('order', o_id)
+            s_id = order['s_id']
             if order:
                 status = order['status']
-            orders_list.append({"order_id": o_id, "status": status})
+            orders_list.append({"o_id": o_id, "s_id": s_id, "status": status})
         history["orders"] = orders_list
         return history
     return False

@@ -1,5 +1,5 @@
 """
-user_router
+web_socket_router
 """
 
 from fastapi import APIRouter
@@ -12,12 +12,12 @@ import json
 
 from .app_socket import manager as app_websocket
 
-user_router = APIRouter(prefix="/users")
+web_socket_router = APIRouter(prefix="/web_socket")
 
-PREFIX = 'api/v2/users'
+PREFIX = 'api/v2/web_socket'
 DB = MongodbController('FIE_DB')
 
-@user_router.get("/hello")
+@web_socket_router.get("/hello")
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
@@ -47,7 +47,7 @@ html = """
         <script>
             const loginForm = document.getElementById('loginForm');
             const wsIdElem = document.querySelector('#ws-id');
-            const wsUrl = 'ws://localhost:8000/api/v2/users/ws';
+            const wsUrl = 'ws://localhost:8000/api/v2/web_socket/ws';
             let socket = null;
 
             loginForm.addEventListener('submit', async (e) => {
@@ -87,6 +87,7 @@ class CustomJSONEncoder(json.JSONEncoder):  # json.dumps() 변환 불가 시 ret
             return super().default(obj)
         except TypeError:
             return False
+        
 class websocketClient:
 
     async def connect(self, websocket : WebSocket):
@@ -95,14 +96,14 @@ class websocketClient:
         return True
     
     async def send_json(self, data : json):
-        await self.websocket.send_json(data) # data : 'user_id' , 'message'
+        await self.websocket.send_json(data)
         return data
 
     async def receive_json(self):
         data = await self.websocket.receive_text()
         if json.dumps(data):
             return data
-        self.send_json({'state' : 'error', 'event' : 'send data tpye is not json'})  # 혹시라도 json.dumps() 불가 시 에러(연결 종료)를 방지하기 위한 에러 메시지
+        self.send_json({'type' : 'error', 'event' : 'send data tpye is not json'})  # 혹시라도 json.dumps() 불가 시 에러(연결 종료)를 방지하기 위한 에러 메시지
 
     async def disconnect(self):
         if await self.websocket.close() == None:
@@ -115,74 +116,87 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: list[dict[str, any]] = []
 
-    async def connect(self, u_id : str, websocket: WebSocket):
+    async def connect(self, s_id : str, websocket: WebSocket):
 
         client = websocketClient()
         if await client.connect(websocket):
-            connection = {"websocket": client, "user_id": u_id}
+            connection = {"websocket": client, "s_id": s_id}
             self.active_connections.append(connection)
         self.printList()
     
-    async def get_client(self, u_id : str):
+    async def get_client(self, s_id : str):
         for connect in self.active_connections:
-            if connect['user_id'] == u_id:
+            if connect['s_id'] == s_id:
                 return connect['websocket']
         return None
     
-    async def send_json(self, u_id : str, data : json):
-        client = await self.get_client(u_id)
-
+    async def send_json(self, s_id : str, data : json):
+        client = await self.get_client(s_id)
+        
         if client:
             await client.send_json(data)
-            print(f"# Send To ({u_id}) : {data}")
+            print(f"# Send To ({s_id}) : {data}")
             return True
 
-    async def receive_json(self, u_id : str):
-        client = await self.get_client(u_id)
+    async def receive_json(self, s_id : str):
+        client = await self.get_client(s_id)
 
         if client:
             data = await client.receive_json()
-            print(f'# Receive From ({u_id}) : {data}')
-            return data
-    
-    # app에게 update 전송하기
-    async def send_update(self, user_id : str):
-        client = await app_websocket.get_client(user_id)
-
-        if client:
-            data = await client.receive_json()
-            print(f'# Receive From ({user_id}) : {data}')
+            print(f'# Receive From ({s_id}) : {data}')
             return data
 
-    async def handle_message(self, u_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
+    async def handle_message(self, s_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
         data = json.loads(data)
 
         if data['type'] == 'update':
-            await app_websocket.send_update(data['o_id'])
+            order_state = await app_websocket.send_update(data['o_id'])
+            await self.send_json(s_id, order_state)
         elif data['type'] == 'connect':
             if data['condition'] == "close":
                 data['condition'] = 'closed'
-                await self.send_json(u_id, data)
-                await self.disconnect(u_id)
-                raise WebSocketDisconnect(f'The client({u_id}) requested to terminate the connection.')
+                await self.send_json(s_id, data)
+                await self.disconnect(s_id)
+                raise WebSocketDisconnect(f'The client({s_id}) requested to terminate the connection.')
             elif data['condition'] == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
                 data['condition'] = 'connected'
+                await self.send_json(s_id, data)
             else:
-                await self.send_json(u_id, data)
+                await self.send_json(s_id, data)
 
-    async def disconnect(self, user_id : str):
-        client = await self.get_client(user_id)
+    async def disconnect(self, s_id : str):
+        client = await self.get_client(s_id)
 
         if client:
             if await client.disconnect():
                 for i, conn in enumerate(self.active_connections):
-                    if conn['user_id'] == user_id:
+                    if conn['s_id'] == s_id:
                         del self.active_connections[i]
                         break
     
     def printList(self):
         for i in range(0, len(self.active_connections)):
             print(f"Web Connection : {i}, {self.active_connections[i]}")
+
+
+    # app에게 update 전송하기
+    async def send_update(self, s_id : str):
+        client = await app_websocket.get_client(s_id)
+
+        if client:
+            data = await client.receive_json()
+            print(f'# Receive From ({s_id}) : {data}')
+            return data
+
+
+    # async def send_update(self, u_ids : list[str]):
+    #     for u_id in u_ids:    
+    #         client = await self.get_client(u_id)
+    #         print(user_id)
+    #         if client:
+    #             print(client)
+    #             await client.send_json({'client' : user_id, 'msg' : data})
+    #             print(f"# Send To ({user_id}) : {data}")
 
 
     # 테스트 중 -> client 에서 보내면 server 는 응답
@@ -197,12 +211,12 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@user_router.get("/")
+@web_socket_router.get("/")
 async def client_get():
     return HTMLResponse(html)
 
 # client가 사용할지 의문이라서 우선 주석 처리
-# @user_router.get("/websocket/list")
+# @web_socket_router.get("/websocket/list")
 # async def get():
 #     manager.printList()
 #     print(manager.active_connections)
@@ -217,11 +231,11 @@ async def client_get():
 #     else :
 #         return False
 
-@user_router.websocket("/ws")
+@web_socket_router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, id : str): # token 이 추가되어야 함
     try:
         await manager.connect(id, websocket)
-
+        
         while True:
             data = await manager.receive_json(id) # websocket 형식 정하고 json으로 바꿀 것 json_str = json.dumps(data)
             await manager.handle_message(id, data)
@@ -240,11 +254,11 @@ async def websocket_endpoint(websocket: WebSocket, id : str): # token 이 추가
 # def generate_token():
 #     return random.randint(10000, 99999)
 
-@user_router.get("/hello")
+@web_socket_router.get("/hello")
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-# @user_router.get("/login")
+# @web_socket_router.get("/login")
 # async def client_check_login(id : str): # 로그인으로 확장
 #     try:
 #         Util.check_id(id)
@@ -274,7 +288,7 @@ async def hello():
 #     }
 
 # # check_token랑 코드 일치한데 애매함
-# @user_router.get("/token")
+# @web_socket_router.get("/token")
 # async def client_check_token(id : str, token : str):
 #     try:
 #         user = DB.read_by_id('user', id)
@@ -297,7 +311,7 @@ async def hello():
 #     }
 
 # token 삭제 -> http 뺄지 말지 고민
-# @user_router.get("/logout")
+# @web_socket_router.get("/logout")
 # async def del_token(id : str): # 토큰 삭제
 #     try:
 #         user = DB.read_by_id('user', id)
@@ -322,9 +336,9 @@ async def hello():
 
 # client가 websocket이 연결되었는지 websocket으로 확인 받을 코드
 # 어떤 오류를 세워야하는지 애매(http or websocket)
-@user_router.get("/websocket/connect")
+@web_socket_router.get("/websocket/connect")
 async def client_check_connect(id : str):
-    if DB.read_by_id('user', id):
+    if DB.read_by_id('store', id):
         data = {"type":"connect", "condition":"connected"}
 
         if await manager.send_json(id, data):
@@ -339,9 +353,9 @@ async def client_check_connect(id : str):
         'response': response
     }
 
-@user_router.get("/websocket/close")
+@web_socket_router.get("/websocket/close")
 async def client_check_connect(id : str):
-    if DB.read_by_id('user', id):
+    if DB.read_by_id('store', id):
         data = {"type":"connect", "condition":"closed"}
 
         if await manager.send_json(id, data):
@@ -357,7 +371,7 @@ async def client_check_connect(id : str):
         'response': response
     }
 
-@user_router.get("/websocket/update")
+@web_socket_router.get("/websocket/update")
 async def client_send_to_app(o_id : str):
     try:
         Util.check_id(o_id)
