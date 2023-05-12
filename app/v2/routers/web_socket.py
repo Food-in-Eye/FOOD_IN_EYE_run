@@ -189,14 +189,14 @@ class ConnectionManager:
             return data
 
 
-    # async def send_update(self, u_ids : list[str]):
-    #     for u_id in u_ids:    
-    #         client = await self.get_client(u_id)
-    #         print(user_id)
-    #         if client:
-    #             print(client)
-    #             await client.send_json({'client' : user_id, 'msg' : data})
-    #             print(f"# Send To ({user_id}) : {data}")
+    async def send_create(self, s_ids : list[str]):
+        for s_id in s_ids:    
+            client = await self.get_client(s_id)
+
+            if client:
+
+                await client.send_json({'client' : user_id, 'msg' : data})
+                print(f"# Send To : {data}")
 
 
     # 테스트 중 -> client 에서 보내면 server 는 응답

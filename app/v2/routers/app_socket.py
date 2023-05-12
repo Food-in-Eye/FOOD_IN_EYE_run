@@ -200,7 +200,6 @@ class ConnectionManager:
 
             for order in orders:
                 if order['o_id'] == o_id:
-                    del order['s_id']
                     order['status'] += 1
 
                     return connect['websocket']
@@ -215,6 +214,9 @@ class ConnectionManager:
                     data = connect['history']
             await client.send_json(data)
             print(f'# Send To : {data}')
+            return data
+        else:
+            data = {"type": "update", "condition": "error"}
             return data
 
 
