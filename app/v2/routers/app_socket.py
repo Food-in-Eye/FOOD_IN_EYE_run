@@ -132,6 +132,7 @@ class ConnectionManager:
         for connect in self.active_connections:
             history = connect['history']
             if history['_id'] == h_id:
+                await connect['websocket'].send_json({"test":"test"})
                 return connect['websocket']
         return None
     
