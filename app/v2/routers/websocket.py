@@ -166,6 +166,7 @@ async def websocket_endpoint(websocket: WebSocket, s_id:Optional[str] = None, h_
             
 
     except WebSocketDisconnect as d:
+        websocket_manager.check_connections(websocket)
         print(f'Websocket : {d}')
 
 

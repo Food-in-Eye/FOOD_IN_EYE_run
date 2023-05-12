@@ -16,7 +16,7 @@ class ConnectionManager:
         1. self.web_connections : Web 연결 정보 
             -> {websocket, s_id}
         2. self.app_connections : Web 연결 정보 
-            -> {websocket, history{_id, orders[{o_id, s_id, status}]}}
+            -> {websocket, history{h_id, orders[{o_id, s_id, status}]}}
     """
 
     def __init__(self):
@@ -24,32 +24,54 @@ class ConnectionManager:
         self.app_connections: list[dict[str, any]] = []
 
     async def connect(self, websocket: WebSocket, s_id: str|None, h_id: str|None):
-        """ websocket 연결을 허용하고 s_id, history 입력값에 따라 web, app을 구분하여 저장한다. """
+        """ websocket 연결을 허용하고 s_id, history 입력값에 따라 web, app을 구분하여 저장한다. 
+            1. s_id 입력시, web_connections에 저장
+            2. h_id 입력시, app_connections에 저장
+        """
         
         await websocket.accept()
 
-        if s_id:        # web connection
+        if s_id:
+            self.check_connections(s_id)
             connection = {"websocket": websocket, "s_id": s_id}
             self.web_connections.append(connection)
-        elif h_id:      # app connection      
+
+        elif h_id:
+            self.check_connections(h_id)
             history = DB.read_by_id('history', h_id)
 
             orders_list = []
             for o_id in history['orders']:
                 order = DB.read_by_id('order', o_id)
-                status = order['status']
-                orders_list.append({"o_id": o_id, "s_id": order['s_id'], "status": status})
+                orders_list.append({"o_id": o_id, "s_id": order['s_id'], "status": order['status']})
 
             connection = {"websocket": websocket, "h_id": history['_id'], "orders": orders_list}
             self.app_connections.append(connection)
+
         else:
             raise WebSocketDisconnect(f'The connection is denied.')
 
         self.printList()
 
-            
+    def check_connections(self, check:any):
+        """ web_connections, app_connections의 요소들을 검사한다. 
+            1. self.connect() : s_id(web), h_id(app)을 이용해 list에서 존재하는 경우 삭제
+            2. self.disconnect() : websocket을 이용해 list에서 삭제
+            - input : check -> websocket, s_id, h_id
+            - return : X
+        """
+        for i, conn in enumerate(self.web_connections):
+            if conn['websocket'] == check or conn['s_id'] == check:
+                del self.web_connections[i]
+                break
+        for i, conn in enumerate(self.app_connections):
+            if conn['websocket'] == check or conn['h_id'] == check:
+                del self.app_connections[i]
+                break
+
+
     async def get_app_connection(self, o_id: str):
-        """ PUT (web -> app) : o_id를 가지는 app의 websocket 리턴 """
+        """ o_id를 가지는 app의 websocket 리턴 """
 
         for connect in self.app_connections:
             for order in connect['orders']:
@@ -80,7 +102,7 @@ class ConnectionManager:
             print(f"# Send To ({client}) : {data}")
         else:
             data = {"type": "send_client", "condition": "ERROR 'the client is not connected'"}
-            await self.send_client_json(client, data)
+            await client.send_json(data)
     
     async def receive_client_json(self, client:WebSocket):
         """ client(web or app)로부터 data를 수신한다.
@@ -112,10 +134,10 @@ class ConnectionManager:
 
         if data['type'] == 'update state':
             data = await self.send_update(data['o_id'])
-            await client.send_json(data)                # 요청자에게 보내기
+            await self.send_client_json(client, data)                # 요청자에게 보내기
         elif data['type'] == 'create order':
             data = await self.send_create(data['h_id'])
-            await client.send_json(data)                # 요청자에게 보내기
+            await self.send_client_json(client, data)                # 요청자에게 보내기
 
         elif data['type'] == 'connect':
             if data['condition'] == "close":
@@ -131,27 +153,18 @@ class ConnectionManager:
 
     async def disconnect(self, client:WebSocket):
         """ client(web or app)의 연결을 해지한다.
-            - parameter : WebSocket
-                - WebSocket이 web이면, web_connections에서 삭제
-                - WebSocket이 app이면, app_connections 삭제
+            - input : client
+                - client가 web이면, web_connections에서 삭제
+                - client가 app이면, app_connections 삭제
             - return : X
             - error : raise WebSocketDisconnect()
+            - 예외가 발생할 때 
         """
-        if await client.close() == None:
-            for i, conn in enumerate(self.web_connections):
-                if conn['websocket'] == client:
-                    del self.web_connections[i]
-                    break
-            for i, conn in enumerate(self.app_connections):
-                if conn['websocket'] == client:
-                    del self.app_connections[i]
-                    break
+        await client.close()
+        self.check_connections(client)
                 
     def printList(self):
-        """ web_connections, app_connections 관리를 위해 현재 상태를 출력한다.
-            - patameter : X
-            - return : X
-        """
+        """ web_connections, app_connections 관리를 위해 현재 상태를 출력한다. """
         for i in range(0, len(self.web_connections)):
             print(f"Web Connection : {i}, {self.web_connections[i]}")
         for i in range(0, len(self.app_connections)):
@@ -161,7 +174,7 @@ class ConnectionManager:
 
     async def send_create(self, h_id:str):
         """ (POST order) app이 web에게 주문 생성을 알린다.
-            - parameter : h_id
+            - input : h_id
             - return : data
                 - 전송 성공 : {"o_id" : o_id}
                 - 전송 실패 : {"type": "create order", "condition": "ERROR"}
@@ -172,20 +185,22 @@ class ConnectionManager:
             if connect['h_id'] == h_id:
                 for order in connect['orders']:
                     client = await self.get_web_connection(order['s_id'])
-                    data['type'] = 'create order'
-                    data['o_id'] = order['o_id']
-                    await client.send_json(data)
 
-                    s_id = order['s_id']
-                    print(f'# Send To ({s_id}): {data}')
-                return data
+                    if client:
+                        data['type'] = 'create order'
+                        data['o_id'] = order['o_id']
+                        await self.send_client_json(client, data)
+
+                        s_id = order['s_id']
+                        print(f'# Send To ({s_id}): {data}')
+                        return data
             
-        data = {"type": "create order", "condition": "ERROR 'web client is not connected'"}
-        return data
+                    data = {"type": "create order", "condition": "ERROR 'web client is not connected'"}
+                    return data
     
     async def send_update(self, o_id : str):
         """ (PUT order) web이 app에게 주문 상태 변경을 알린다.
-            - parameter : o_id
+            - input : o_id
             - return : data
                 - 전송 성공 : {"o_id" : o_id, 'status" : int}
                 - 전송 실패 : {"type": "update status", "condition": "ERROR"}
@@ -202,7 +217,7 @@ class ConnectionManager:
                             data['o_id'] = order['o_id']
                             order['status'] += 1
                             data['status'] = order['status']
-                    await client.send_json(data)
+                    await self.send_client_json(client, data)
                     print(f'# Send To : {data}')
             return data
 
