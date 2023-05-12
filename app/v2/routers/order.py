@@ -9,7 +9,8 @@ from .src.util import Util
 
 from datetime import datetime, timedelta
 
-from .user import manager
+from .user import manager as web_websocket
+from .app_socket import manager as app_websocket
 
 order_router = APIRouter(prefix="/orders")
 
@@ -118,7 +119,7 @@ async def change_status(id: str):
             DB.update_field_by_id('order', id, 'status', s+1)
 
             # websocket에 전달하기
-            # await manager.send_json(response['u_id'], {id : 'updated'})
+            await app_websocket.send_update(id)
         else:
             raise Exception('status is already finish')
 
@@ -190,7 +191,7 @@ async def new_order(body:OrderModel):
         #     result = result['_id']
         #     store_id_List.append(result)
             
-        # await manager.send_json_to_users(store_id_List, 'created')
+        # await web_websocket.send_json_to_users(store_id_List, 'created')
 
         return {
             'request': f'POST {PREFIX}/order',

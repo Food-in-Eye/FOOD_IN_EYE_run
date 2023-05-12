@@ -10,6 +10,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 import json
 
+from .app_socket import manager as app_websocket
 
 user_router = APIRouter(prefix="/users")
 
@@ -94,7 +95,7 @@ class websocketClient:
         return True
     
     async def send_json(self, data : json):
-        await self.websocket.send_json({'data' : data}) # data : 'user_id' , 'message'
+        await self.websocket.send_json(data) # data : 'user_id' , 'message'
         return data
 
     async def receive_json(self):
@@ -114,63 +115,60 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: list[dict[str, any]] = []
 
-    async def connect(self, user_id : str, websocket: WebSocket):
-        pre_websocket = await self.get_client(user_id)
+    async def connect(self, u_id : str, websocket: WebSocket):
 
-        if pre_websocket:
-            for connect in self.active_connections:
-                if connect['user_id'] == pre_websocket:
-                    connect['websocket'] = websocket
-            print(f'{user_id}, {websocket}')
-        else:
-            client = websocketClient()
-            if await client.connect(websocket):
-                connection = {"user_id": user_id, "websocket": client}
-                self.active_connections.append(connection)
+        client = websocketClient()
+        if await client.connect(websocket):
+            connection = {"websocket": client, "user_id": u_id}
+            self.active_connections.append(connection)
         self.printList()
     
-    async def get_client(self, user_id : str):
+    async def get_client(self, u_id : str):
         for connect in self.active_connections:
-            if connect['user_id'] == user_id:
+            if connect['user_id'] == u_id:
                 return connect['websocket']
         return None
     
-    async def send_json(self, user_id : str, data : json):
-        client = await self.get_client(user_id)
+    async def send_json(self, u_id : str, data : json):
+        client = await self.get_client(u_id)
 
         if client:
-            await client.send_json({'client' : user_id, 'msg' : data})
-            print(f"# Send To ({user_id}) : {data}")
+            await client.send_json(data)
+            print(f"# Send To ({u_id}) : {data}")
+            return True
 
-    async def send_json_to_users(self, user_ids : list[str], data : json):
-        for user_id in user_ids:
-            client = await self.get_client(user_id)
-            print(user_id)
-            if client:
-                print(client)
-                await client.send_json({'client' : user_id, 'msg' : data})
-                print(f"# Send To ({user_id}) : {data}")
+    async def receive_json(self, u_id : str):
+        client = await self.get_client(u_id)
 
-    async def receive_json(self, user_id : str):
-        client = await self.get_client(user_id)
+        if client:
+            data = await client.receive_json()
+            print(f'# Receive From ({u_id}) : {data}')
+            return data
+    
+    # app에게 update 전송하기
+    async def send_update(self, user_id : str):
+        client = await app_websocket.get_client(user_id)
 
         if client:
             data = await client.receive_json()
             print(f'# Receive From ({user_id}) : {data}')
             return data
 
-    async def handle_message(self, user_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
+    async def handle_message(self, u_id : str, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
+        data = json.loads(data)
 
-        if data == "close":
-            data = 'closed'
-            await self.send_json(user_id, data)
-            await self.disconnect(id)
-            raise WebSocketDisconnect(f'The client({user_id}) requested to terminate the connection.')
-        else:
-            if data == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
-                data = 'connected'
-
-            await self.send_json(user_id, data)
+        if data['type'] == 'update':
+            await app_websocket.send_update(data['o_id'])
+        elif data['type'] == 'connect':
+            if data['condition'] == "close":
+                data['condition'] = 'closed'
+                await self.send_json(u_id, data)
+                await self.disconnect(u_id)
+                raise WebSocketDisconnect(f'The client({u_id}) requested to terminate the connection.')
+            elif data['condition'] == "connect": # 연결 확인 -> 정해진 문자열 입력 시 정해진 문자열 출력
+                data['condition'] = 'connected'
+            else:
+                await self.send_json(u_id, data)
 
     async def disconnect(self, user_id : str):
         client = await self.get_client(user_id)
@@ -184,7 +182,7 @@ class ConnectionManager:
     
     def printList(self):
         for i in range(0, len(self.active_connections)):
-            print(f"Connection : {i}, {self.active_connections[i]}")
+            print(f"Web Connection : {i}, {self.active_connections[i]}")
 
 
     # 테스트 중 -> client 에서 보내면 server 는 응답
@@ -327,12 +325,55 @@ async def hello():
 @user_router.get("/websocket/connect")
 async def client_check_connect(id : str):
     if DB.read_by_id('user', id):
-        await manager.send_json(id, 'connected')
-        response = f'hi {id}, check your websocket response'
+        data = {"type":"connect", "condition":"connected"}
+
+        if await manager.send_json(id, data):
+            response = data
+        else:
+            response = False
     else:
-        response = f'Error {id}, check your id or token'
+        response = False
     return {
         'request': f'{PREFIX}/websocket/connect?id={id}',
+        'status': 'OK',
+        'response': response
+    }
+
+@user_router.get("/websocket/close")
+async def client_check_connect(id : str):
+    if DB.read_by_id('user', id):
+        data = {"type":"connect", "condition":"closed"}
+
+        if await manager.send_json(id, data):
+            await manager.disconnect(id)
+            response = data
+        else:
+            response = False
+    else:
+        response = False
+    return {
+        'request': f'{PREFIX}/websocket/connect?id={id}',
+        'status': 'OK',
+        'response': response
+    }
+
+@user_router.get("/websocket/update")
+async def client_send_to_app(o_id : str):
+    try:
+        Util.check_id(o_id)
+
+        response = await app_websocket.send_update(o_id)
+        
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'{PREFIX}/websocket/update?o_id={o_id}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+    
+    return {
+        'request': f'{PREFIX}/websocket/update?o_id={o_id}',
         'status': 'OK',
         'response': response
     }
