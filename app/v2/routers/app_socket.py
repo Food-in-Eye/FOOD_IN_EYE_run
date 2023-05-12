@@ -10,6 +10,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 import json
 
+# from .web_socket import manager as web_websocket
 
 app_socket_router = APIRouter(prefix="/app_socket")
 
@@ -90,7 +91,6 @@ class CustomJSONEncoder(json.JSONEncoder):  # json.dumps() 변환 불가 시 ret
 class websocketClient:
 
     def __init__(self):
-        from .web_socket import manager as web_websocket
         self.websocket : WebSocket
     
     async def connect(self, websocket : WebSocket):
@@ -185,13 +185,13 @@ class ConnectionManager:
 
             
     # web에게 create 전송하기
-    # async def send_create(self, user_id : str):
-    #     client = await web_websocket.get_client(user_id)
+    async def send_create(self, s_id : str, o_id : str):
+        client = await web_websocket.get_client(s_id)
 
-    #     if client:
-    #         data = await client.receive_json()
-    #         print(f'# Receive From ({user_id}) : {data}')
-    #         return data
+        if client:
+            data = await client.receive_json()
+            print(f'# Receive From ({s_id}) : {data}')
+            return data
     
     async def get_client_to_o_id(self, o_id : str):
         for connect in self.active_connections:
@@ -208,15 +208,22 @@ class ConnectionManager:
     async def send_update(self, o_id : str):
         client = await self.get_client_to_o_id(o_id)
 
+        data = {}
+
         if client:
             for connect in self.active_connections:
                 if connect['websocket'] == client:
-                    data = connect['history']
+                    history = connect['history']
+                    orders = history['orders']
+                    for order in orders:
+                        if order['o_id'] == o_id:
+                            data['o_id'] = order['o_id']
+                            data['status'] = order['status']
             await client.send_json(data)
             print(f'# Send To : {data}')
             return data
         else:
-            data = {"type": "update", "condition": "error"}
+            data = {"type": "update", "condition": "ERROR 'app client is not connected'"}
             return data
 
 

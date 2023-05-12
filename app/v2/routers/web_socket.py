@@ -189,14 +189,26 @@ class ConnectionManager:
             return data
 
 
-    async def send_create(self, s_ids : list[str]):
+    async def get_client_to_s_id(self, s_id : str):
+        for connect in self.active_connections:
+            if connect['s_id'] == s_id:
+                return connect['websocket']
+
+        return None
+    
+    async def send_create(self, s_ids : list[str], o_id : str):
+        
         for s_id in s_ids:    
             client = await self.get_client(s_id)
 
             if client:
-
-                await client.send_json({'client' : user_id, 'msg' : data})
+                data = {"o_id": o_id}
+                await client.send_json(data)
                 print(f"# Send To : {data}")
+                return data
+            else:
+                data = {"type": "update", "condition": "ERROR 'web client is not connected'"}
+                return data
 
 
     # 테스트 중 -> client 에서 보내면 server 는 응답
