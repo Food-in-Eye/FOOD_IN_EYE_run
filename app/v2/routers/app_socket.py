@@ -10,7 +10,6 @@ from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 import json
 
-from .web_socket import manager as web_websocket
 
 app_socket_router = APIRouter(prefix="/app_socket")
 
@@ -89,7 +88,9 @@ class CustomJSONEncoder(json.JSONEncoder):  # json.dumps() 변환 불가 시 ret
             return False
 
 class websocketClient:
+
     def __init__(self):
+        from .web_socket import manager as web_websocket
         self.websocket : WebSocket
     
     async def connect(self, websocket : WebSocket):
@@ -199,6 +200,7 @@ class ConnectionManager:
 
             for order in orders:
                 if order['o_id'] == o_id:
+                    del order['s_id']
                     order['status'] += 1
 
                     return connect['websocket']
