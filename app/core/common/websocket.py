@@ -34,6 +34,7 @@ class ConnectionManager:
         await websocket.accept()
 
         if check_client(s_id, h_id) == False:
+            await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
             raise WebSocketDisconnect(f'The connection is denied due to the wrong ID.')
         
         data = {"type": "connect", "condition": "connected"}
@@ -59,6 +60,7 @@ class ConnectionManager:
             self.app_connections.append(connection)
 
         else:
+            await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
             raise WebSocketDisconnect(f'The connection is denied.')
         self.printList()
 
