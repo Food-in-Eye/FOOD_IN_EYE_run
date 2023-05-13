@@ -9,8 +9,7 @@ from .src.util import Util
 
 from datetime import datetime, timedelta
 
-from .web_socket import manager as web_websocket
-from .app_socket import manager as app_websocket
+from .websocket import websocket_manager as websocket_manager
 
 order_router = APIRouter(prefix="/orders")
 
@@ -119,7 +118,7 @@ async def change_status(id: str):
             DB.update_field_by_id('order', id, 'status', s+1)
 
             # websocket에 전달하기
-            # await app_websocket.send_update(id)
+            await websocket_manager.send_update(id)
         else:
             raise Exception('status is already finish')
 
@@ -153,7 +152,6 @@ async def new_order(body:OrderModel):
         
         response_list = []
         order_id_list = []
-        # store_list = [] # websocket으로 전달할 store list
 
         for store_order in body.content:
             order = {
@@ -164,7 +162,7 @@ async def new_order(body:OrderModel):
                 "status": 0,
                 "f_list": store_order.f_list
             }
-            # store_list.append(store_order.s_id)  
+
             o_id =  str(DB.create('order', order))         
             order_id_list.append(o_id)
 
@@ -183,21 +181,11 @@ async def new_order(body:OrderModel):
         
         h_id = str(DB.create('history', history))
 
-        # # websocket에 전달하기
-        # store_id_List = []
-        # for store in store_list:
-        #     result = DB.read_all_by_feild('user', 's_id', store)
-        #     result = result[0]
-        #     result = result['_id']
-        #     store_id_List.append(result)
-            
-        # await web_websocket.send_json_to_users(store_id_List, 'created')
-
         return {
             'request': f'POST {PREFIX}/order',
             'status': 'OK',
-            'response': response_list,
-            'history_id': h_id
+            'h_id': h_id,
+            'response': response_list
         }
             
     except Exception as e:

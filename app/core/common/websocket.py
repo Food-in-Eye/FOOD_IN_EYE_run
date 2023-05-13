@@ -53,7 +53,6 @@ class ConnectionManager:
 
         else:
             raise WebSocketDisconnect(f'The connection is denied.')
-
         self.printList()
 
     async def disconnect(self, client:WebSocket):
@@ -158,12 +157,16 @@ class ConnectionManager:
 
 
     async def get_app_connection(self, o_id: str) -> dict:
-        """ o_id를 가지는 app의 websocket 리턴 """
+        """ o_id를 가지는 client(app)의 정보 리턴 
+            - input : o_id
+            - return 
+                - app이 연결되어 있는 경우 : client{h_id, o_id, status, h_websocket}
+                - app이 연결되지 않은 경우 : False
+        """
         client = {}
         for connect in self.app_connections:
             for order in connect['orders']:
                 if order['o_id'] == o_id:
-                    order['status'] += 1
 
                     client['h_id'] = connect['h_id']
                     client['o_id'] = order['o_id']
@@ -174,8 +177,13 @@ class ConnectionManager:
         return False
                    
     async def get_web_connection(self, h_id:str) -> list[dict]:
-        """ h_id로 저장된 s_id를 가지는 web의 websocket과 o_id 리턴"""
-        
+        """ web_connections에서 s_id를 찾아 web_connections에 저장된 client(web)의 정보를 리턴
+            - input : h_id
+            - return
+                - web이 연결되어 있는 경우 : client[{o_id, s_id, s_websocket}]
+                - 일부 web이 연결되어 있는 경우 : 연결되지 않은 web의 s_websocket은 빈 문자열
+                - 모든 web이 연결되지 않은 경우 : []
+        """
         clients = []
         if self.web_connections:
             app_order_list = []
@@ -243,11 +251,14 @@ class ConnectionManager:
         if client:
 
             data['o_id'] = client['o_id']
-            data['status'] = client['status']
-            await self.send_client_json(client['h_websocket'], data)
+            if client['status'] < 2:
+                client['status'] += 1
+                data['status'] = client['status']
+                await self.send_client_json(client['h_websocket'], data)
 
-            h_id = client['h_id']
-            print(f'# Send To ({h_id}): {data}')
+                h_id = client['h_id']
+                print(f'# Send To ({h_id}): {data}')
 
-            return {"type": "update_status", "result": "success"}
+                return {"type": "update_status", "result": "success"}
+            return {"type": "update_status", "result": "fail", "reason": "status is already finish"}
         return {"type": "update_status", "result": "fail", "reason": "app client is not connected"}
