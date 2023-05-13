@@ -156,7 +156,7 @@ async def websocket_endpoint(websocket: WebSocket, s_id:Optional[str] = None, h_
 
         while True:
             data = await websocket_manager.receive_client_json(websocket)
-            await websocket_manager.handle_message(websocket, data)
+            await websocket_manager.handle_message(websocket, data, h_id)
 
     except WebSocketDisconnect as d:
         websocket_manager.check_connections(websocket)

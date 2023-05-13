@@ -6,6 +6,7 @@ from core.common.mongo2 import MongodbController
 
 from fastapi import WebSocket, WebSocketDisconnect
 import json
+from typing import Optional
 
 DB = MongodbController('FIE_DB')
 
@@ -26,9 +27,15 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, s_id: str|None, h_id: str|None):
         """ websocket 연결을 허용하고 s_id, history 입력값에 따라 web, app을 구분하여 저장한다. 
             1. s_id 입력시, web_connections에 저장
+                - web_connections = [{websocket, s_id}]
             2. h_id 입력시, app_connections에 저장
+                - app_connections = [{websocket, h_id, orders}]
         """
         await websocket.accept()
+
+        if check_client(s_id, h_id) == False:
+            raise WebSocketDisconnect(f'The connection is denied due to the wrong ID.')
+        
         data = {"type": "connect", "condition": "connected"}
         await self.send_client_json(websocket, data)
 
@@ -68,9 +75,9 @@ class ConnectionManager:
         self.check_connections(client)
 
 
-    async def handle_message(self, client:WebSocket, data : json): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
+    async def handle_message(self, client:WebSocket, data:json, h_id:str): # 특수 문자열 체크, 이외의 문자열은 그대로 출력
         """ client(web or app)으로부터 받은 data에 따라 관리한다.
-            - parameter : WebSocket, json
+            - parameter : client, data, h_id
                 - 'type' : 'update state' -> web이 주문 상태 변경, 전송 결과를 web에게 출력
                 - 'type' : 'create order' -> app이 주문 접수, 전송 결과를 app에게 출력
                 - 'type' : 'connect' -> 연결 확인
@@ -81,13 +88,15 @@ class ConnectionManager:
 
         if data['type'] == 'update_state':
             data = await self.send_update(data['o_id'])
-            await self.send_client_json(client, data)                # 요청자에게 보내기
+            await self.send_client_json(client, data)          
         elif data['type'] == 'create_order':
             data = await self.send_create(data['h_id'])
-            await self.send_client_json(client, data)                # 요청자에게 보내기
+            await self.send_client_json(client, data)          
 
         elif data['type'] == 'connect':
             if data['condition'] == "close":
+                if h_id:
+                    await self.send_connect_alarm(h_id, data)
                 data['condition'] = 'closed'
                 await self.send_client_json(client, data)
                 await self.disconnect(client)
@@ -167,7 +176,6 @@ class ConnectionManager:
         for connect in self.app_connections:
             for order in connect['orders']:
                 if order['o_id'] == o_id:
-
                     client['h_id'] = connect['h_id']
                     client['o_id'] = order['o_id']
                     client['status'] = order['status']
@@ -202,6 +210,22 @@ class ConnectionManager:
                         client['s_websocket'] = web['websocket']
                 clients.append(client)
         return clients
+
+    async def send_connect_alarm(self, h_id:str, data:json):
+        """ app이 연결 해지 요청 시, web에게 연결을 끊어도 된다는 data를 전송한다.
+        
+        """
+        clients = await self.get_web_connection(h_id)
+
+        if clients:
+            for client in clients:
+                s_id = client['s_id']
+                data['condition'] = 'completion'
+
+                if client['s_websocket']:
+                    await self.send_client_json(client['s_websocket'], data)
+                    print(f'# Send To ({s_id}): {data}')
+
 
             
 
@@ -262,3 +286,20 @@ class ConnectionManager:
                 return {"type": "update_status", "result": "success"}
             return {"type": "update_status", "result": "fail", "reason": "status is already finish"}
         return {"type": "update_status", "result": "fail", "reason": "app client is not connected"}
+
+
+def check_client(s_id:str, h_id:str):
+    try:
+        if s_id:
+            if DB.read_by_id('store', s_id):
+                print(s_id)
+                return True
+        elif h_id:
+            if DB.read_by_id('history', h_id):
+                print(h_id)
+                return True
+        else:
+            False
+    except Exception:
+        pass
+    return False
