@@ -58,6 +58,9 @@ class ConnectionManager:
 
             connection = {"websocket": websocket, "h_id": history['_id'], "orders": orders_list}
             self.app_connections.append(connection)
+            
+            data = await self.send_create(connection['h_id'])
+            await self.send_client_json(websocket, data)  
 
         else:
             await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
@@ -278,7 +281,8 @@ class ConnectionManager:
 
             data['o_id'] = client['o_id']
             if client['status'] < 2:
-                client['status'] += 1
+                response = DB.read_by_id('order', client['o_id'])
+                client['status'] = response['status']
                 data['status'] = client['status']
                 await self.send_client_json(client['h_websocket'], data)
 
