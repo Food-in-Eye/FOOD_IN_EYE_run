@@ -125,8 +125,6 @@ async def change_status(id: str):
             if client:
                 result = await websocket_manager.send_update(id)
                 await websocket_manager.send_client_json(client, result)  
-            else:
-                raise Exception('store is not connected')
         else:
             raise Exception('status is already finish')
 
