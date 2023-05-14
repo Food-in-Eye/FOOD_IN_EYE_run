@@ -162,7 +162,22 @@ class ConnectionManager:
             if conn['websocket'] == check or conn['h_id'] == check:
                 del self.app_connections[i]
                 break
+    
+    async def send_connect_alarm(self, h_id:str, data:json):
+        """ app이 연결 해지 요청 시, web에게 연결을 끊어도 된다는 data를 전송한다.
+            - input : h_id, data
+            - return : X
+        """
+        clients = await self.get_web_connection(h_id)
 
+        if clients:
+            for client in clients:
+                s_id = client['s_id']
+                data['condition'] = 'completion'
+
+                if client['s_websocket']:
+                    await self.send_client_json(client['s_websocket'], data)
+                    print(f'# Send To ({s_id}): {data}')
 
 
     async def get_app_connection(self, o_id: str) -> dict:
@@ -212,24 +227,21 @@ class ConnectionManager:
                     client['s_websocket'] = web['websocket']
             clients.append(client)
         return clients
-
-    async def send_connect_alarm(self, h_id:str, data:json):
-        """ app이 연결 해지 요청 시, web에게 연결을 끊어도 된다는 data를 전송한다.
-            - input : h_id, data
-            - return : X
+                
+    async def get_web_websocket(self, s_id: str) -> str:
+        """ s_id의 websocket을 반환한다. (router/order.py 에서 store에게 전송 여부를 전송한다.)
+            - input : s_id
+            - return 
+                - web이 연결되지 않은 경우 : False
+                - web이 연결되어 있는 경우 : client{s_id, s_websocket}
         """
-        clients = await self.get_web_connection(h_id)
-
-        if clients:
-            for client in clients:
-                s_id = client['s_id']
-                data['condition'] = 'completion'
-
-                if client['s_websocket']:
-                    await self.send_client_json(client['s_websocket'], data)
-                    print(f'# Send To ({s_id}): {data}')
-
-
+        if self.web_connections == None:
+            return False
+        
+        for conn in self.web_connections:
+            if conn['s_id'] == s_id:
+                return conn['websocket']
+        
             
 
     async def send_create(self, h_id:str) -> list:

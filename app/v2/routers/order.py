@@ -113,12 +113,18 @@ async def change_status(id: str):
         Util.check_id(id)
         response = DB.read_by_id('order', id)
         s = response['status']
+
+        # websocket으로 전송 결과를 받기 위함 
+        s_id = response['s_id']
         
         if s < 2:
             DB.update_field_by_id('order', id, 'status', s+1)
 
             # websocket에 전달하기
-            await websocket_manager.send_update(id)
+            client = await websocket_manager.get_web_websocket(s_id)
+            result = await websocket_manager.send_update(id)
+            await websocket_manager.send_client_json(client, result)  
+
         else:
             raise Exception('status is already finish')
 
