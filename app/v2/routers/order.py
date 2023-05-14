@@ -125,13 +125,13 @@ async def change_status(id: str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'GET {PREFIX}/order?id={id}',
+            'request': f'PUT {PREFIX}/order?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'GET {PREFIX}/order?id={id}',
+        'request': f'PUT {PREFIX}/order?id={id}',
         'status': 'OK',
         'message': f'status is now {s+1}'
     }
