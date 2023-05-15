@@ -20,8 +20,8 @@ class ConnectionManager:
     """
 
     def __init__(self):
-        self.web_connections = {}
-        self.app_connections = {}
+        self.web_connections: list = []
+        self.app_connections: list[dict] = []
 
     async def connect(self, websocket: WebSocket, s_id: str|None, h_id: str|None):
         """ websocket 연결을 허용하고 s_id, history 입력값에 따라 web, app을 구분하여 저장한다. 
