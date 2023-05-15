@@ -121,11 +121,8 @@ async def change_status(id: str):
             DB.update_field_by_id('order', id, 'status', s+1)
 
             # websocket으로 전달하기
-            result = await websocket_manager.send_update(id)
-            client = await websocket_manager.get_web_websocket(s_id)
-            if client:
-                await websocket_manager.send_client_json(client, result)  
-                print('hi')
+            await websocket_manager.send_update(id)
+
         else:
             raise Exception('status is already finish')
 

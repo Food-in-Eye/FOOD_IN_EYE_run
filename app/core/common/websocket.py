@@ -60,9 +60,7 @@ class ConnectionManager:
             self.app_connections.append(connection)
             
             # app 연결 시, web에게 주문생성 전송
-            result = await self.send_create(connection['h_id'])
-            # app에게 주문생성 전송 결과 전송
-            await self.send_client_json(websocket, result)  
+            await self.send_create(connection['h_id'])  
 
         else:
             await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
@@ -91,10 +89,10 @@ class ConnectionManager:
 
         if data['type'] == 'update_state':
             result = await self.send_update(data['o_id'])
-            await self.send_client_json(client, result)          
+      
         elif data['type'] == 'create_order':
             result = await self.send_create(data['h_id'])
-            await self.send_client_json(client, result)          
+      
 
         elif data['type'] == 'connect':
             if data['condition'] == "close":
