@@ -4,6 +4,8 @@ const STORE_URL = "/api/v2/stores";
 const FOODS_URL = "/api/v2/foods";
 const ORDER_URL = "/api/v2/orders";
 
+const LOGIN_URL = "/api/v2/users";
+
 /** GET 메서드 */
 //가게 ID에 따라 URL을 동적으로 구성하는 getStore() 함수
 export const getStore = (s_id) => {
@@ -22,14 +24,15 @@ export const getFood = (f_id) => {
   return axios.get(requestUrl);
 };
 
-// export const getOrders = (today) => {
-//   const requestUrl = `${ORDER_URL}`;
-//   return axios.get(requestUrl);
-// };
-
 export const getOrders = (query) => {
   const requestUrl = `${ORDER_URL}${query}`;
   return axios.get(requestUrl);
+};
+
+//사용자 로그인 or 로그아웃 시 GET 요청보내는 함수
+export const getUser = (query) => {
+  const requestURL = `${LOGIN_URL}${query}`;
+  return axios.get(requestURL);
 };
 
 /** PUT 메서드 */
