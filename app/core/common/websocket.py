@@ -173,7 +173,7 @@ class ConnectionManager:
         if clients:
             for client in clients:
                 s_id = client['s_id']
-                data['condition'] = 'completion'
+                data['condition'] = 'complete'
 
                 if client['s_websocket']:
                     await self.send_client_json(client['s_websocket'], data)
