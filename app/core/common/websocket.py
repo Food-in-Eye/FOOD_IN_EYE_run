@@ -36,10 +36,10 @@ class ConnectionManager:
         await websocket.accept()
 
         if check_client(s_id, h_id) == False:
-            await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
+            await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
             raise WebSocketDisconnect(f'The connection is denied due to the wrong ID.')
         
-        data = {"type": "connect", "condition": "connected"}
+        data = {"type": "connect", "result": "connected"}
         await self.send_client_json(websocket, data)
 
         if s_id:
@@ -63,7 +63,7 @@ class ConnectionManager:
             await self.send_create(connection['h_id'])  
 
         else:
-            await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
+            await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
             raise WebSocketDisconnect(f'The connection is denied.')
         self.printList()
 
@@ -95,15 +95,15 @@ class ConnectionManager:
       
 
         elif data['type'] == 'connect':
-            if data['condition'] == "close":
+            if data['result'] == "close":
                 if h_id:
                     await self.send_connect_alarm(h_id, data)
-                data['condition'] = 'closed'
+                data['result'] = 'closed'
                 await self.send_client_json(client, data)
                 await self.disconnect(client)
                 raise WebSocketDisconnect(f'The client requested to close the connection.')
-            elif data['condition'] == "connect":
-                data['condition'] = 'connected'
+            elif data['result'] == "connect":
+                data['result'] = 'connected'
                 await self.send_client_json(client, data)
         else:
             await self.send_client_json(client, data)
@@ -171,7 +171,7 @@ class ConnectionManager:
         if clients:
             for client in clients:
                 s_id = client['s_id']
-                data['condition'] = 'complete'
+                data['result'] = 'complete'
 
                 if client['s_websocket']:
                     await self.send_client_json(client['s_websocket'], data)
