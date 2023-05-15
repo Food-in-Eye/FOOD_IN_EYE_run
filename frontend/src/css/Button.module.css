@@ -57,3 +57,22 @@
   font-family: "Akaya Telivigala";
   background-color: #2f365f;
 }
+
+.getOrder {
+  width: 100px;
+  height: 40px;
+  position: relative;
+  transform-origin: center;
+  transform: rotate(-16deg);
+  border: none;
+  background-color: rgba(255, 147, 69, 0.5);
+}
+
+.getOrder span {
+  white-space: nowrap;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  font-size: 20px;
+  transform: translate(-50%, -50%) rotate(16deg);
+}
