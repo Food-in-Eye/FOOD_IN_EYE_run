@@ -15,7 +15,8 @@ import {
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 function MenuManagePage() {
-  const sID = `641459134443f2168a32357b`; //일식가게 id
+  // const sID = `641459134443f2168a32357b`; //일식가게 id
+  const sID = `641458bd4443f2168a32357a`; //파스타가게 id
 
   /** api에서 불러올 menuList */
   const [menuList, setMenuList] = useState([]);
