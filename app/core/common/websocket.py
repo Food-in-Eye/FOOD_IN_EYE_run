@@ -89,10 +89,10 @@ class ConnectionManager:
         print(data)
         if data['type'] == 'update_state':
             result = await self.send_update(data['o_id'])
-            await self.send_client_json(client, result)          
+         
         elif data['type'] == 'create_order':
             result = await self.send_create(data['h_id'])
-            await self.send_client_json(client, result)          
+        
 
         elif data['type'] == 'connect':
             if data['result'] == "close":
