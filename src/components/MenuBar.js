@@ -2,6 +2,16 @@
 import style from "../css/MenuBar.module.css";
 
 function MenuBar() {
+  // const onLogout = (e, userID) => {
+  //   e.preventDefault();
+
+  //   const socket = new WebSocket(`${wsUrl}?id=${userID}`);
+
+  //   socket.onclose = () => {
+  //     socket.send(`close`);
+  //   };
+  // };
+
   return (
     <section className={style.header}>
       <h2>LOGO</h2>
@@ -55,7 +65,7 @@ function MenuBar() {
       <div className="logout">
         <ul className={style.util}>
           <li>
-            <a href="/">Logout</a>
+            <button>Logout</button>
           </li>
         </ul>
       </div>
