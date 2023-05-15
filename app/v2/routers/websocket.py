@@ -156,8 +156,8 @@ async def websocket_endpoint(websocket: WebSocket, s_id = None, h_id = None): # 
 
         while True:
             data = await websocket_manager.receive_client_json(websocket)
-            await websocket_manager.handle_message(websocket, data)
+            await websocket_manager.handle_message(websocket, s_id, h_id, data)
 
     except WebSocketDisconnect as d:
-        websocket_manager.check_connections(websocket)
+        await websocket_manager.delete_connections(s_id, h_id)
         print(f'Websocket : {d}')
