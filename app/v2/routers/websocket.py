@@ -150,14 +150,14 @@ async def client_get():
 
 
 @websocket_router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, s_id:Optional[str] = None, h_id:Optional[str] = None): # token 이 추가되어야 함
+async def websocket_endpoint(websocket: WebSocket, s_id = None, h_id = None): # token 이 추가되어야 함
     try:
         await websocket_manager.connect(websocket, s_id, h_id)
 
         while True:
             data = await websocket_manager.receive_client_json(websocket)
-            await websocket_manager.handle_message(websocket, data, h_id)
+            await websocket_manager.handle_message(websocket, data)
 
     except WebSocketDisconnect as d:
-        websocket_manager.check_connections(websocket)
+        await websocket_manager.delete_connections(websocket)
         print(f'Websocket : {d}')
