@@ -5,35 +5,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function LoginPage() {
-  const wsUrl = `ws://172.22.0.3:8000/api/v2/websockets/ws`;
+  const wsUrl = `ws://localhost/api/v2/websockets/ws`;
   const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
 
   const getTokenAndCheck = async (storeID) => {
-    console.log("try to connect websocket");
     try {
       const newSocket = new WebSocket(`${wsUrl}?s_id=${storeID}`);
-      // console.log(socket);
 
       newSocket.onopen = () => {
-        // socket.send(`connect`);
         console.log("WebSocket connection established");
+      };
+
+      // 웹소켓 연결 시 받는 메시지
+      newSocket.onmessage = (event) => {
+        console.log("Received response:", event.data);
       };
 
       // 웹소켓 연결 에러 발생 시
       newSocket.onerror = (e) => {
         console.log("WebSocket error:", e);
-      };
-
-      // 웹소켓 연결 닫힐 경우
-      newSocket.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-
-      // 웹소켓 연결 시 받는 메시지
-      newSocket.onmessage = (event) => {
-        // const response = JSON.parse(event.data);
-        console.log("Received response:", event.data);
       };
 
       setSocket(newSocket);
@@ -46,11 +37,10 @@ function LoginPage() {
     e.preventDefault();
 
     const storeID = document.querySelector("#storeID").value;
-    // console.log(storeID);
 
     await getTokenAndCheck(storeID);
 
-    // navigate(`/main`);
+    navigate(`/main`);
   };
 
   return (
