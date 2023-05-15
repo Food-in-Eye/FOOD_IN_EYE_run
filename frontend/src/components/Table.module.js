@@ -15,8 +15,12 @@ function OrderHistoryTable({ data }) {
         accessor: "menuCount",
       },
       {
-        Header: "메뉴 가격",
+        Header: "메뉴 단가",
         accessor: "menuPrice",
+      },
+      {
+        Header: "메뉴 총 가격",
+        accessor: "menuPrices",
       },
     ],
     []
@@ -62,7 +66,7 @@ function OrderHistoryTable({ data }) {
       </tbody>
       <tfoot>
         <tr>
-          <td colSpan="2" style={{ textAlign: "left" }}>
+          <td colSpan="3" style={{ textAlign: "left" }}>
             총합계:
           </td>
           <td style={{ textAlign: "right" }}>{total}</td>

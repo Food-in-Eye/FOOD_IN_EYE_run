@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Calendar from "react-calendar";
 import moment from "moment";
 import "react-calendar/dist/Calendar.css";
@@ -11,36 +10,150 @@ import Table from "../components/Table.module";
 import ShortCuts from "../components/ShortCutForPages.module";
 
 /**import images from ../images/* */
-import orderReceive from "../images/order_received.jpeg";
-import cooking from "../images/cooking.jpeg";
-import finishCook from "../images/finished_cooking.jpeg";
+import orderReceive from "../images/order_received.png";
+import activeOrderReceive from "../images/active_order_received.png";
+import cooking from "../images/cooking.png";
+import activeCooking from "../images/active_cooking.png";
+import serve from "../images/serve.png";
+import activeServe from "../images/active_serve.png";
 import arrow from "../images/right_arrow.jpeg";
 
-function MainPage() {
-  const [value, onChange] = useState(new Date());
+import {
+  getOrders,
+  getFoods,
+  getFood,
+  putOrderStatus,
+} from "../components/API.module";
+import { useState, useEffect, useRef } from "react";
 
-  const orderData = [
-    {
-      menuName: "더블치즈베이컨시그니처",
-      menuCount: 2,
-      menuPrice: 8000,
-    },
-    {
-      menuName: "감자튀김L",
-      menuCount: 1,
-      menuPrice: 4500,
-    },
-    {
-      menuName: "코카콜라L",
-      menuCount: 2,
-      menuPrice: 3000,
-    },
-    {
-      menuName: "치즈스틱",
-      menuCount: 2,
-      menuPrice: 3000,
-    },
-  ];
+function MainPage() {
+  // const sID = `641459134443f2168a32357b`; //일식가게 id
+  const sID = `641458bd4443f2168a32357a`; //파스타가게 id
+
+  const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
+  const [value, onChange] = useState(new Date());
+  const [orderList, setOrderList] = useState([]);
+  const [loading, setLoading] = useState(null);
+  const [orderData, setOrderData] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+
+    const orderLists = async () => {
+      try {
+        const ordersResponse = await getOrders(ordersQuery);
+        const orders = await ordersResponse.data.response;
+        const foodIds = orders.map((order) => order.f_list[0].f_id);
+        const foodsResponse = await Promise.all(
+          foodIds.map((fID) => getFood(fID))
+        );
+        const foods = await Promise.all(
+          foodsResponse.map((res) => res.data.response)
+        );
+
+        const orderListWithFoods = orders
+          .filter((order, index) => foods[index])
+          .map((order, index) => ({
+            ...order,
+            foodName: foods[index].name,
+          }));
+
+        setOrderList(orderListWithFoods);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      } finally {
+      }
+    };
+
+    orderLists();
+  }, []);
+
+  /**order 클릭 시 상세 페이지에 출력 */
+  const handleOrderClick = (order) => {
+    setOrderData([]);
+    console.log("status: ", order.status);
+
+    const promises = order.f_list.map((f) => getFoods(order.s_id));
+
+    Promise.all(promises)
+      .then((foodLists) => {
+        const data = order.f_list.map((f, index) => {
+          const foodItem = foodLists[index].data.response.find(
+            (item) => item._id === f.f_id
+          );
+          return {
+            menuName: foodItem.name,
+            menuCount: f.count,
+            menuPrice: foodItem.price,
+            menuPrices: foodItem.price * f.count,
+          };
+        });
+        setOrderData(data);
+        return order.status;
+      })
+      .then((status) => {
+        handleImgStyle(status);
+      });
+  };
+
+  /**order 진행 상황 버튼 클릭 이벤트 */
+  const handleOrderButtonClick = async (index) => {
+    const newOrders = [...orderList];
+
+    if (newOrders[index].status === 0) {
+      newOrders[index].status = 1;
+    } else if (newOrders[index].status === 1) {
+      newOrders[index].status = 2;
+    }
+    // 완료 시 더이상 버튼 못누르게 비활성화나 warning 메시지 띄우기
+
+    /**바뀐 진행 상황 PUT */
+    try {
+      await putOrderStatus(newOrders[index]._id, newOrders[index]);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setOrderList(newOrders);
+
+    // 업데이트가 완료된 후에 handleDivStyle 호출
+    setTimeout(() => {
+      handleImgStyle(newOrders[index].status);
+    }, 0);
+  };
+
+  const handleImgStyle = (status) => {
+    const sectionElement = document.getElementById("orderSeq");
+    const imgElements = Array.from(sectionElement.querySelectorAll("img"));
+
+    imgElements.forEach((imgElement, index) => {
+      if (index % 2 === 0) {
+        // 홀수 번째 이미지 (상태 이미지)
+        if (index / 2 === status) {
+          if (status === 0) {
+            imgElement.src = activeOrderReceive;
+          } else if (status === 1) {
+            imgElement.src = activeCooking;
+          } else if (status === 2) {
+            imgElement.src = activeServe;
+          }
+
+          imgElement.classList.add("active");
+        } else {
+          if (index === 0) {
+            imgElement.src = orderReceive;
+          } else if (index === 2) {
+            imgElement.src = cooking;
+          } else if (index === 4) {
+            imgElement.src = serve;
+          }
+
+          imgElement.classList.remove("active");
+        }
+      }
+    });
+  };
 
   return (
     <div>
@@ -68,27 +181,41 @@ function MainPage() {
           <div className={Main.orders}>
             <section className={Main.dashboardBackground} />
             <div className={Main.orderTodays}>
-              <h2>현재 주문 내역(오늘)</h2>
-              <div className={Bar.line}>
-                <div className={Bar.circle}></div>
+              <div className={Main.orderTodaysHeader}>
+                <h2>현재 주문 내역(오늘)</h2>
+                <div className={Bar.line}>
+                  <div className={Bar.circle}></div>
+                </div>
               </div>
               <ul>
                 <hr />
-                <li>1. --- </li>
-                <section className={Main.manageBtn}>
-                  <button className={Button.getOrder}>
-                    <span>주문 접수</span>
-                  </button>
-                </section>
-                <hr />
-                <li>2. --- </li>
-                <hr />
-                <li>3. --- </li>
-                <hr />
-                <li>4. --- </li>
-                <hr />
-                <li>5. --- </li>
-                <hr />
+                {orderList &&
+                  orderList.map((order, index) => (
+                    <div key={index}>
+                      <div>
+                        <li onClick={() => handleOrderClick(order)}>{`${
+                          orderList.length - index
+                        }. ${
+                          order.foodName.length > 8
+                            ? order.foodName.substring(0, 8) + "..."
+                            : order.foodName
+                        }`}</li>
+                        <section className={Main.manageBtn}>
+                          <button
+                            className={Button.getOrder}
+                            onClick={() => handleOrderButtonClick(index)}
+                          >
+                            <span>
+                              {order.status === 0 && "접수 대기"}
+                              {order.status === 1 && "조리 중"}
+                              {order.status === 2 && "완료"}
+                            </span>
+                          </button>
+                        </section>
+                      </div>
+                      <hr />
+                    </div>
+                  ))}
               </ul>
             </div>
           </div>
@@ -98,7 +225,7 @@ function MainPage() {
             <h2>주문 상세 페이지</h2>
           </section>
           <div className={Main.infoBody}>
-            <section className={Main.orderSeq}>
+            <section id="orderSeq" className={Main.orderSeq}>
               <div>
                 <img src={orderReceive} alt="주문 접수 이미지" />
                 <p>주문 접수</p>
@@ -106,12 +233,12 @@ function MainPage() {
               <img className={Main.arrow} src={arrow} alt="화살표" />
               <div>
                 <img src={cooking} alt="조리 시작 이미지" />
-                <p>조리 시작</p>
+                <p>조리 중</p>
               </div>
               <img className={Main.arrow} src={arrow} alt="화살표" />
               <div>
-                <img src={finishCook} alt="조리 완료 이미지" />
-                <p>조리 완료</p>
+                <img src={serve} alt="수령 대기 이미지" />
+                <p>수령 대기</p>
               </div>
             </section>
             <section className={Main.orderDetail}>
