@@ -76,7 +76,7 @@ class ConnectionManager:
         self.check_connections(client)
 
 
-    async def handle_message(self, client:WebSocket, data:json, h_id:str):
+    async def handle_message(self, client:WebSocket, data:json):
         """ client(web or app)으로부터 받은 data에 따라 관리한다.
             - input : client, data, h_id
                 - 'type' : 'update_state' -> web이 주문 상태 변경, 전송 결과를 web에게 출력
@@ -88,16 +88,15 @@ class ConnectionManager:
         data = json.loads(data)
 
         if data['type'] == 'update_state':
-            result = await self.send_update(data['o_id'])
+            await self.send_update(data['o_id'])
       
         elif data['type'] == 'create_order':
-            result = await self.send_create(data['h_id'])
+            await self.send_create(data['h_id'])
       
 
         elif data['type'] == 'connect':
             if data['result'] == "close":
-                if h_id:
-                    await self.send_connect_alarm(h_id, data)
+
                 data['result'] = 'closed'
                 await self.send_client_json(client, data)
                 await self.disconnect(client)

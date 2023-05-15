@@ -159,5 +159,5 @@ async def websocket_endpoint(websocket: WebSocket, s_id = None, h_id = None): # 
             await websocket_manager.handle_message(websocket, data)
 
     except WebSocketDisconnect as d:
-        await websocket_manager.delete_connections(websocket)
+        websocket_manager.check_connections(websocket)
         print(f'Websocket : {d}')
