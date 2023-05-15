@@ -13,6 +13,7 @@ DB = MongodbController('FIE_DB')
 
 class ConnectionManager:
     """ 연결된 Web, App Websocket들을 관리하는 클래스
+
         1. self.web_connections : Web 연결 정보 
             -> {websocket, s_id}
         2. self.app_connections : app 연결 정보 
@@ -20,32 +21,34 @@ class ConnectionManager:
     """
 
     def __init__(self):
-        self.web_connections: list = []
-        self.app_connections: list[dict] = []
+        self.web_connections: list[dict[str, any]] = []
+        self.app_connections: list[dict[str, any]] = []
 
     async def connect(self, websocket: WebSocket, s_id: str|None, h_id: str|None):
         """ websocket 연결을 허용하고 s_id, history 입력값에 따라 web, app을 구분하여 저장한다. 
             - input : websocket, s_id, h_id
             - return : X
             1. s_id 입력시, web_connections에 저장
-                - web_connections = {s_id : websocket}
+                - web_connections = [{websocket, s_id}]
             2. h_id 입력시, app_connections에 저장
-                - app_connections = {h_id : {websocket : {o_id : s_id}}}
+                - app_connections = [{websocket, h_id, {o_id, s_id}}}]
         """
         await websocket.accept()
 
         if check_client(s_id, h_id) == False:
-            await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
+            await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
             raise WebSocketDisconnect(f'The connection is denied due to the wrong ID.')
         
-        await self.send_client_json(websocket, {"type": "connect", "result": "connected"})
-        await self.check_connections(s_id, h_id)
-        print('hi')
+        data = {"type": "connect", "condition": "connected"}
+        await self.send_client_json(websocket, data)
+
         if s_id:
+            self.check_connections(s_id)
             connection = {"websocket": websocket, "s_id": s_id}
             self.web_connections.append(connection)
 
         elif h_id:
+            self.check_connections(h_id)
             history = DB.read_by_id('history', h_id)
 
             orders_list = []
@@ -57,26 +60,23 @@ class ConnectionManager:
             self.app_connections.append(connection)
             
             # app 연결 시, web에게 주문생성 전송
-            result = await self.send_create(connection['h_id'])
-            # app에게 주문생성 전송 결과 전송
-            await self.send_client_json(websocket, result)  
+            await self.send_create(connection['h_id'])  
 
         else:
-            await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
+            await self.send_client_json(websocket, {"type": "connect", "condition": "closed"})
             raise WebSocketDisconnect(f'The connection is denied.')
         self.printList()
 
-    async def disconnect(self, websocket:WebSocket):
+    async def disconnect(self, client:WebSocket):
         """ client(web or app)의 연결을 해지하고, connections list에서 해당 정보를 지운다.
             - input : client
             - return : X
         """
-        await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
-        await websocket.close()
-        await self.delete_connections(websocket)
+        await client.close()
+        self.check_connections(client)
 
 
-    async def handle_message(self, client:WebSocket, data:json):
+    async def handle_message(self, client:WebSocket, data:json, h_id:str):
         """ client(web or app)으로부터 받은 data에 따라 관리한다.
             - input : client, data, h_id
                 - 'type' : 'update_state' -> web이 주문 상태 변경, 전송 결과를 web에게 출력
@@ -86,22 +86,24 @@ class ConnectionManager:
             - return : X
         """
         data = json.loads(data)
-        print(data)
+
         if data['type'] == 'update_state':
             result = await self.send_update(data['o_id'])
-         
+      
         elif data['type'] == 'create_order':
             result = await self.send_create(data['h_id'])
-        
+      
 
         elif data['type'] == 'connect':
-            if data['result'] == "close":
-                data['result'] = 'closed'
+            if data['condition'] == "close":
+                if h_id:
+                    await self.send_connect_alarm(h_id, data)
+                data['condition'] = 'closed'
                 await self.send_client_json(client, data)
                 await self.disconnect(client)
                 raise WebSocketDisconnect(f'The client requested to close the connection.')
-            elif data['result'] == "connect":
-                data['result'] = 'connected'
+            elif data['condition'] == "connect":
+                data['condition'] = 'connected'
                 await self.send_client_json(client, data)
         else:
             await self.send_client_json(client, data)
@@ -143,36 +145,37 @@ class ConnectionManager:
         for i in range(0, len(self.app_connections)):
             print(f"App Connection : {i}, {self.app_connections[i]}")
 
-    async def check_connections(self, s_id, h_id):
-        """ web_connections, app_connections의 요소들을 검사하여 존재하는 경우 disconnect() 함수를 호출한다. 
-            - input : websocket, s_id, h_id
+    def check_connections(self, check:any):
+        """ web_connections, app_connections의 요소들을 검사한다. 
+            - input : check -> (websocket / s_id / h_id)
             - return : X
-        """
-        if s_id:
-            for conn in self.web_connections:
-                if conn['s_id'] == s_id:
-                    await self.disconnect(conn['websocket'])
-                break
-        if h_id:
-            for conn in self.app_connections:
-                if conn['h_id'] == h_id:
-                    await self.disconnect(conn['websocket'])
-                    break
-
-    async def delete_connections(self, websocket):
-        """ web_connections, app_connections의 요소들을 검사하여 해당하는 websocket 정보를 삭제한다.
-            - input : s_id, h_id
-            - return : X
+            1. self.connect()에서 호출되는 경우, 최신 연결만 남기고 삭제
+            2. self.disconnect()에서 호출되는 경우, 삭제
         """
         for i, conn in enumerate(self.web_connections):
-            if conn['websocket'] == websocket:
+            if conn['websocket'] == check or conn['s_id'] == check:
                 del self.web_connections[i]
                 break
         for i, conn in enumerate(self.app_connections):
-            if conn['websocket'] == websocket:
+            if conn['websocket'] == check or conn['h_id'] == check:
                 del self.app_connections[i]
                 break
+    
+    async def send_connect_alarm(self, h_id:str, data:json):
+        """ app이 연결 해지 요청 시, web에게 연결을 끊어도 된다는 data를 전송한다.
+            - input : h_id, data
+            - return : X
+        """
+        clients = await self.get_web_connection(h_id)
 
+        if clients:
+            for client in clients:
+                s_id = client['s_id']
+                data['condition'] = 'complete'
+
+                if client['s_websocket']:
+                    await self.send_client_json(client['s_websocket'], data)
+                    print(f'# Send To ({s_id}): {data}')
 
 
     async def get_app_connection(self, o_id: str) -> dict:
