@@ -35,20 +35,21 @@ class ConnectionManager:
         """
         await websocket.accept()
 
-        data = {"type": "connect", "result": "connected"}
+        connected_data = {"type": "connect", "result": "connected"}
+        closed_data = {"type": "connect", "result": "closed"}
         await self.check_connections(s_id, h_id)
 
         if s_id:
-            if check_web('store', s_id) == False:
-                await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
+            if check_client_in_db('store', s_id) == False:
+                await self.send_client_json(websocket, closed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             self.web_connections[s_id] = websocket
-            await self.send_client_json(websocket, data)
+            await self.send_client_json(websocket, connected_data)
 
         elif h_id:
-            if check_app('history', h_id) == False:
-                await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
+            if check_client_in_db('history', h_id) == False:
+                await self.send_client_json(websocket, closed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             history = DB.read_by_id('history', h_id)
@@ -58,7 +59,7 @@ class ConnectionManager:
                 order = DB.read_by_id('order', o_id)
                 self.app_connections[h_id][websocket][o_id] = order['s_id']
 
-            await self.send_client_json(websocket, data)
+            await self.send_client_json(websocket, connected_data)
             
             # app 연결 시, web에게 주문생성 전송
             await self.send_create(h_id)  
@@ -112,9 +113,8 @@ class ConnectionManager:
             - return : X
             - send_error : {"type": "send_client", "result": "ERROR"}
         """
-        if websocket:
-            await websocket.send_json(data)
-            print(f"# Send : {data}")
+        await websocket.send_json(data)
+        print(f"# Send : {data}")
 
     async def receive_client_json(self, websocket:WebSocket):
         """ client(web or app)로부터 data를 수신한다.
@@ -122,11 +122,10 @@ class ConnectionManager:
             - return : data
             - error_type : {"type": "recieve_client", "result": "ERROR"}
         """
-        if websocket:
-            data = await websocket.receive_text()
-            if json.dumps(data):
-                print(f'# Receive : {data}')
-                return data
+        data = await websocket.receive_text()
+        if json.dumps(data):
+            print(f'# Receive : {data}')
+            return data
 
 
 
@@ -234,7 +233,6 @@ class ConnectionManager:
             for o_id, o_id_value in web_clients.items():
                 for s_id, ws in o_id_value.items():
                     if ws != "":
-                        result["o_id"] = o_id
                         await self.send_client_json(ws, result)
                         print({"type": "create_order", "result": "success", "reason": s_id})
                     else:
@@ -269,20 +267,10 @@ class ConnectionManager:
             print({"type": "update_status", "result": "fail", "reason": "app client is not connected"})
 
 
-def check_web(db:str, s_id:str):
+def check_client_in_db(db:str, id:str):
     try:
-        if s_id:
-            if DB.read_by_id(db, s_id):
-                return True
-        False
-    except Exception:
-        pass
-    return False
-
-def check_app(db:str, h_id:str):
-    try:
-        if h_id:
-            if DB.read_by_id(db, h_id):
+        if id:
+            if DB.read_by_id(db, id):
                 return True
         False
     except Exception:
