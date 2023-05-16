@@ -240,7 +240,6 @@ function StoreManagePage() {
 
               {editNoti ? (
                 //show edit button when editing
-
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleNotiSaveClick}

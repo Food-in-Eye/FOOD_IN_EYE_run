@@ -42,7 +42,7 @@
 }
 
 .description h2 {
-  width: 300px;
+  width: auto;
   height: auto;
   display: flex;
   float: left;
