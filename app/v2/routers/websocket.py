@@ -40,6 +40,9 @@ html1 = """
             <input type="text" id="messageText" autocomplete="off"/>
             <button>Send</button>
         </form>
+        <label for="requestId">요청 ID:</label>
+        <input type="text" id="requestId" autocomplete="off">
+        <button onclick="sendPutRequest()">PUT</button>
         <ul id='messages'>
         </ul>
         <script>
@@ -74,9 +77,18 @@ html1 = """
                 input.value = '';
                 event.preventDefault();
             }
+
+            function sendPutRequest() {
+                const requestId = document.getElementById('requestId').value;
+                const xhr = new XMLHttpRequest();
+                const url = `http://127.0.0.1:8000/api/v2/orders/order/status?id=${requestId}`;
+                xhr.open('PUT', url, true);
+                xhr.send();
+            }
         </script>
     </body>
 </html>
+
 """
 html2 = """
 <html>
