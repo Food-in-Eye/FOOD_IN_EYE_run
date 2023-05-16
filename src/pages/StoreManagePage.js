@@ -6,10 +6,7 @@ import { getStore, putStore } from "../components/API.module";
 import { useState, useEffect } from "react";
 
 function StoreManagePage() {
-  // const sID = `641459134443f2168a32357b`; //하울 id;
-  // const sID = `641458bd4443f2168a32357a`; //파스타 id;
   const sID = localStorage.getItem("storeID");
-  console.log(sID);
 
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);

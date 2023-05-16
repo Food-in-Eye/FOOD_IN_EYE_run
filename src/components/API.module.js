@@ -29,12 +29,6 @@ export const getOrders = (query) => {
   return axios.get(requestUrl);
 };
 
-//사용자 로그인 or 로그아웃 시 GET 요청보내는 함수
-export const getUser = (query) => {
-  const requestURL = `${LOGIN_URL}${query}`;
-  return axios.get(requestURL);
-};
-
 /** PUT 메서드 */
 //가게 ID에 따라 URL을 동적으로 구성하는 putStore() 함수
 export const putStore = (s_id, data) => {
@@ -61,15 +55,10 @@ export const putFoods = (f_id, data) => {
 };
 
 // 주문 status 값 업데이트
-export const putOrderStatus = (o_id, data) => {
+export const putOrderStatus = (o_id) => {
   const requestUrl = `${ORDER_URL}/order/status?id=${o_id}`;
 
-  return axios.put(requestUrl, JSON.stringify(data), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    withCredentials: true,
-  });
+  return axios.put(requestUrl);
 };
 
 //특정 가게에 새로운 음식 추가하는 postFood() 함수

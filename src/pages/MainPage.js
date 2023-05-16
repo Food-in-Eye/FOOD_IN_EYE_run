@@ -24,12 +24,13 @@ import {
   getFood,
   putOrderStatus,
 } from "../components/API.module";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
+import { SocketContext } from "../components/SocketContext.module";
+import { SocketProvider } from "../components/SocketContext.module";
 
 function MainPage() {
-  // const sID = `641459134443f2168a32357b`; //일식가게 id
-  // const sID = `641458bd4443f2168a32357a`; //파스타가게 id
   const sID = localStorage.getItem("storeID");
+  const { socketResponse } = useContext(SocketContext);
 
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
   const [value, onChange] = useState(new Date());
@@ -38,6 +39,18 @@ function MainPage() {
   const [orderData, setOrderData] = useState([]);
 
   useEffect(() => {
+    if (socketResponse) {
+      if (
+        socketResponse.type === "create_order" &&
+        socketResponse.result === "success"
+      ) {
+        // 주문 현황을 처리하는 로직
+        getUpdateOrders();
+      }
+    }
+  }, [socketResponse]);
+
+  const getUpdateOrders = () => {
     setLoading(true);
 
     const orderLists = async () => {
@@ -68,7 +81,7 @@ function MainPage() {
     };
 
     orderLists();
-  }, []);
+  };
 
   /**order 클릭 시 상세 페이지에 출력 */
   const handleOrderClick = (order) => {
@@ -111,7 +124,7 @@ function MainPage() {
 
     /**바뀐 진행 상황 PUT */
     try {
-      await putOrderStatus(newOrders[index]._id, newOrders[index]);
+      await putOrderStatus(newOrders[index]._id);
     } catch (error) {
       console.log(error);
     }
@@ -157,101 +170,103 @@ function MainPage() {
   };
 
   return (
-    <div>
-      <section className="header">
-        <MenuBar />
-      </section>
-      <div className={Main.inner}>
-        <div className={Main.rest}>
-          <section className={Main.sales}>
-            <h3>(어제보다 오늘) +5%</h3>
-            <h2>2,000,000원</h2>
-            <p>오늘의 총 판매량</p>
-          </section>
-          <section className={Main.cal}>
-            <Calendar onChange={onChange} value={value} />
-            <div className="text-gray-500 mt-4">
-              {moment(value).format("YYYY년 MM월 DD일")}
-            </div>
-          </section>
-          <section className={Main.shortcut}>
-            <ShortCuts />
-          </section>
-        </div>
-        <div className={Main.orderDashboard}>
-          <div className={Main.orders}>
-            <section className={Main.dashboardBackground} />
-            <div className={Main.orderTodays}>
-              <div className={Main.orderTodaysHeader}>
-                <h2>현재 주문 내역(오늘)</h2>
-                <div className={Bar.line}>
-                  <div className={Bar.circle}></div>
-                </div>
+    <SocketProvider>
+      <div>
+        <section className="header">
+          <MenuBar />
+        </section>
+        <div className={Main.inner}>
+          <div className={Main.rest}>
+            <section className={Main.sales}>
+              <h3>(어제보다 오늘) +5%</h3>
+              <h2>2,000,000원</h2>
+              <p>오늘의 총 판매량</p>
+            </section>
+            <section className={Main.cal}>
+              <Calendar onChange={onChange} value={value} />
+              <div className="text-gray-500 mt-4">
+                {moment(value).format("YYYY년 MM월 DD일")}
               </div>
-              <ul>
-                <hr />
-                {orderList &&
-                  orderList.map((order, index) => (
-                    <div key={index}>
-                      <div>
-                        <li onClick={() => handleOrderClick(order)}>{`${
-                          orderList.length - index
-                        }. ${
-                          order.foodName.length > 8
-                            ? order.foodName.substring(0, 8) + "..."
-                            : order.foodName
-                        }`}</li>
-                        <section className={Main.manageBtn}>
-                          <button
-                            className={Button.getOrder}
-                            onClick={() => handleOrderButtonClick(index)}
-                          >
-                            <span>
-                              {order.status === 0 && "접수 대기"}
-                              {order.status === 1 && "조리 중"}
-                              {order.status === 2 && "완료"}
-                            </span>
-                          </button>
-                        </section>
+            </section>
+            <section className={Main.shortcut}>
+              <ShortCuts />
+            </section>
+          </div>
+          <div className={Main.orderDashboard}>
+            <div className={Main.orders}>
+              <section className={Main.dashboardBackground} />
+              <div className={Main.orderTodays}>
+                <div className={Main.orderTodaysHeader}>
+                  <h2>현재 주문 내역(오늘)</h2>
+                  <div className={Bar.line}>
+                    <div className={Bar.circle}></div>
+                  </div>
+                </div>
+                <ul>
+                  <hr />
+                  {orderList &&
+                    orderList.map((order, index) => (
+                      <div key={index}>
+                        <div>
+                          <li onClick={() => handleOrderClick(order)}>{`${
+                            orderList.length - index
+                          }. ${
+                            order.foodName.length > 8
+                              ? order.foodName.substring(0, 8) + "..."
+                              : order.foodName
+                          }`}</li>
+                          <section className={Main.manageBtn}>
+                            <button
+                              className={Button.getOrder}
+                              onClick={() => handleOrderButtonClick(index)}
+                            >
+                              <span>
+                                {order.status === 0 && "접수 대기"}
+                                {order.status === 1 && "조리 중"}
+                                {order.status === 2 && "완료"}
+                              </span>
+                            </button>
+                          </section>
+                        </div>
+                        <hr />
                       </div>
-                      <hr />
-                    </div>
-                  ))}
-              </ul>
+                    ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-        <div className={Main.orderInfo}>
-          <section className={Main.infoHeader}>
-            <h2>주문 상세 페이지</h2>
-          </section>
-          <div className={Main.infoBody}>
-            <section id="orderSeq" className={Main.orderSeq}>
-              <div>
-                <img src={orderReceive} alt="주문 접수 이미지" />
-                <p>주문 접수</p>
-              </div>
-              <img className={Main.arrow} src={arrow} alt="화살표" />
-              <div>
-                <img src={cooking} alt="조리 시작 이미지" />
-                <p>조리 중</p>
-              </div>
-              <img className={Main.arrow} src={arrow} alt="화살표" />
-              <div>
-                <img src={serve} alt="수령 대기 이미지" />
-                <p>수령 대기</p>
-              </div>
+          <div className={Main.orderInfo}>
+            <section className={Main.infoHeader}>
+              <h2>주문 상세 페이지</h2>
             </section>
-            <section className={Main.orderDetail}>
-              <h3>주문 내역</h3>
-              <div className={Main.orderContents}>
-                <Table data={orderData} />
-              </div>
-            </section>
+            <div className={Main.infoBody}>
+              <section id="orderSeq" className={Main.orderSeq}>
+                <div>
+                  <img src={orderReceive} alt="주문 접수 이미지" />
+                  <p>주문 접수</p>
+                </div>
+                <img className={Main.arrow} src={arrow} alt="화살표" />
+                <div>
+                  <img src={cooking} alt="조리 시작 이미지" />
+                  <p>조리 중</p>
+                </div>
+                <img className={Main.arrow} src={arrow} alt="화살표" />
+                <div>
+                  <img src={serve} alt="수령 대기 이미지" />
+                  <p>수령 대기</p>
+                </div>
+              </section>
+              <section className={Main.orderDetail}>
+                <h3>주문 내역</h3>
+                <div className={Main.orderContents}>
+                  <Table data={orderData} />
+                </div>
+              </section>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </SocketProvider>
   );
 }
 

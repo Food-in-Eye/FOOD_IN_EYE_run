@@ -2,11 +2,13 @@ import styles from "../css/Account.module.css";
 import Button from "../css/Button.module.css";
 
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { SocketContext } from "../components/SocketContext.module";
 
 function LoginPage() {
   const wsUrl = `ws://localhost/api/v2/websockets/ws`;
   const navigate = useNavigate();
+  const { setSocketResponse } = useContext(SocketContext);
   const [socket, setSocket] = useState(null);
 
   const getTokenAndCheck = async (storeID) => {
@@ -19,7 +21,12 @@ function LoginPage() {
 
       // 웹소켓 연결 시 받는 메시지
       newSocket.onmessage = (event) => {
-        console.log("Received response:", event.data);
+        const response = JSON.parse(event.data);
+        console.log("Received response:", response);
+        if (response.type === "create_order") {
+          // console.log(response);
+          setSocketResponse(response);
+        }
       };
 
       // 웹소켓 연결 에러 발생 시
