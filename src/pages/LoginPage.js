@@ -37,6 +37,8 @@ function LoginPage() {
     e.preventDefault();
 
     const storeID = document.querySelector("#storeID").value;
+    // storeID를 localStorage에 저장
+    localStorage.setItem("storeID", storeID);
 
     await getTokenAndCheck(storeID);
 
