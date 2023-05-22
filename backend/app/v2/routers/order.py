@@ -20,7 +20,7 @@ DB = MongodbController('FIE_DB')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-@order_router.get("/")
+@order_router.get("/q")
 async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: str=None, asc: bool=True):
     ''' 특정 조건을 만족하는 주문 내역 전체를 반환한다.
         - s_id: 주문을 받은 가게가 일치하는 주문내역만 가져온다.

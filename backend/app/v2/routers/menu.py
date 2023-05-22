@@ -19,7 +19,7 @@ DB = MongodbController('FIE_DB')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-@menu_router.get("/")
+@menu_router.get("/q")
 async def read_menus_of_store(s_id:str):
     """ 주어진 가게 아이디의 모든 메뉴판들을 불러온다. """
     print('hi')
