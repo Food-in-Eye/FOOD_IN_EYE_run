@@ -15,7 +15,7 @@ export const getStore = (s_id) => {
 
 //메뉴 ID에 따라 URL을 동적으로 구성하는 getFoods() 함수
 export const getFoods = (s_id) => {
-  const requestUrl = `${FOODS_URL}?s_id=${s_id}`;
+  const requestUrl = `${FOODS_URL}/q?s_id=${s_id}`;
   return axios.get(requestUrl);
 };
 
@@ -25,7 +25,7 @@ export const getFood = (f_id) => {
 };
 
 export const getOrders = (query) => {
-  const requestUrl = `${ORDER_URL}${query}`;
+  const requestUrl = `${ORDER_URL}/q${query}`;
   return axios.get(requestUrl);
 };
 
