@@ -36,12 +36,12 @@ class ConnectionManager:
         await websocket.accept()
 
         connected_data = {"type": "connect", "result": "connected"}
-        closed_data = {"type": "connect", "result": "closed"}
+        falied_data = {"type": "connect", "result": "falied"}
         await self.check_connections(s_id, h_id)
 
         if s_id:
             if check_client_in_db('store', s_id) == False:
-                await self.send_client_json(websocket, closed_data)
+                await self.send_client_json(websocket, falied_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             self.web_connections[s_id] = websocket
@@ -49,7 +49,7 @@ class ConnectionManager:
 
         elif h_id:
             if check_client_in_db('history', h_id) == False:
-                await self.send_client_json(websocket, closed_data)
+                await self.send_client_json(websocket, falied_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             history = DB.read_by_id('history', h_id)
