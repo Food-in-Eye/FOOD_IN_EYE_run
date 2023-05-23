@@ -77,7 +77,6 @@
 
 .orderDashboard .orders .orderTodays {
   width: 400px;
-
   position: relative;
   z-index: 2;
   border: none;
@@ -113,7 +112,7 @@
 
 .orderDashboard .orders .orderTodays ul {
   margin-top: 10%;
-  max-height: 70%;
+  max-height: 100%;
   overflow: scroll;
 }
 
@@ -139,37 +138,36 @@
 }
 
 .orderInfo .infoBody {
-  width: 100%;
+  width: auto;
   height: auto;
   display: flex;
+  justify-content: center;
 }
 
 .orderInfo .infoBody .orderSeq {
-  width: 35%;
+  box-sizing: border-box;
+  width: 30%;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 2%;
   position: absolute;
 }
 
 .orderInfo .infoBody .orderSeq .arrow {
   max-width: 8%;
   height: 5%;
-  position: relative;
-  margin-top: 5%;
-  margin-right: 2%;
+  margin-top: 2%;
 }
 
 .orderInfo .infoBody .orderSeq div img {
   max-width: 40%;
-  height: auto;
-  position: relative;
   top: 20%;
-  left: 27%;
 }
 
 .orderInfo .infoBody .orderSeq div p {
-  position: relative;
   top: 20%;
+  text-align: center;
   background: none;
 }
 
