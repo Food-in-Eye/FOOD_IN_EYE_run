@@ -52,18 +52,13 @@ function MainPage() {
       };
 
       // 웹소켓 연결 시 받는 메시지
-      if (newSocket.readyState === WebSocket.OPEN) {
-        newSocket.onmessage = (event) => {
-          const response = JSON.parse(event.data);
-          console.log("Received response:", response);
-          if (
-            response.type === "create_order" &&
-            response.result === "success"
-          ) {
-            orderLists();
-          }
-        };
-      }
+      newSocket.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        console.log("Received response:", response);
+        if (response.type === "create_order" && response.result === "success") {
+          orderLists();
+        }
+      };
 
       // 웹소켓 연결 에러 발생 시
       newSocket.onerror = (e) => {
@@ -111,7 +106,7 @@ function MainPage() {
     if (socket) {
       orderLists();
     }
-  }, [socket]);
+  }, [socket, orderLists]);
 
   useEffect(() => {
     connectWS(sID);
