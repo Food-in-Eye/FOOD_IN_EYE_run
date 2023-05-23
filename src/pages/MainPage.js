@@ -22,15 +22,16 @@ import {
   getOrders,
   getFoods,
   getFood,
+  getOrder,
   putOrderStatus,
 } from "../components/API.module";
-import { useState, useEffect, useContext } from "react";
-import { SocketContext } from "../components/SocketContext.module";
+import { useState, useEffect, useCallback } from "react";
 import { SocketProvider } from "../components/SocketContext.module";
 
 function MainPage() {
+  const wsUrl = `ws://localhost/api/v2/websockets/ws`;
   const sID = localStorage.getItem("storeID");
-  const { socketResponse } = useContext(SocketContext);
+  const [socket, setSocket] = useState(null);
 
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
   const [value, onChange] = useState(new Date());
@@ -39,49 +40,82 @@ function MainPage() {
   const [orderData, setOrderData] = useState([]);
 
   useEffect(() => {
-    if (socketResponse) {
-      if (
-        socketResponse.type === "create_order" &&
-        socketResponse.result === "success"
-      ) {
-        // 주문 현황을 처리하는 로직
-        getUpdateOrders();
+    connectWS(sID);
+  }, [sID]);
+
+  const connectWS = useCallback(async (storeID) => {
+    try {
+      const newSocket = new WebSocket(`${wsUrl}?s_id=${storeID}`);
+
+      newSocket.onopen = () => {
+        console.log("WebSocket connection established");
+      };
+
+      // 웹소켓 연결 시 받는 메시지
+      if (newSocket.readyState === WebSocket.OPEN) {
+        newSocket.onmessage = (event) => {
+          const response = JSON.parse(event.data);
+          console.log("Received response:", response);
+          if (
+            response.type === "create_order" &&
+            response.result === "success"
+          ) {
+            orderLists();
+          }
+        };
       }
+
+      // 웹소켓 연결 에러 발생 시
+      newSocket.onerror = (e) => {
+        console.log("WebSocket error:", e);
+      };
+
+      setSocket(newSocket);
+    } catch (error) {
+      console.log(error);
     }
-  }, [socketResponse]);
+  }, []);
 
-  const getUpdateOrders = () => {
-    setLoading(true);
+  const orderLists = useCallback(async () => {
+    try {
+      setLoading(true);
+      console.log(`orderLists 함수`);
 
-    const orderLists = async () => {
-      try {
-        const ordersResponse = await getOrders(ordersQuery);
-        const orders = await ordersResponse.data.response;
-        const foodIds = orders.map((order) => order.f_list[0].f_id);
-        const foodsResponse = await Promise.all(
-          foodIds.map((fID) => getFood(fID))
-        );
-        const foods = await Promise.all(
-          foodsResponse.map((res) => res.data.response)
-        );
+      const ordersResponse = await getOrders(ordersQuery);
+      const orders = ordersResponse.data.response;
+      console.log(orders);
+      const foodIds = orders.map((order) => order.f_list[0].f_id);
+      const foodsResponse = await Promise.all(
+        foodIds.map((fID) => getFood(fID))
+      );
+      const foods = await Promise.all(
+        foodsResponse.map((res) => res.data.response)
+      );
 
-        const orderListWithFoods = orders
-          .filter((order, index) => foods[index])
-          .map((order, index) => ({
-            ...order,
-            foodName: foods[index].name,
-          }));
+      const orderListWithFoods = orders
+        .filter((order, index) => foods[index])
+        .map((order, index) => ({
+          ...order,
+          foodName: foods[index].name,
+        }));
 
-        setOrderList(orderListWithFoods);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-      } finally {
-      }
-    };
+      setOrderList(orderListWithFoods);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  }, [ordersQuery]);
 
-    orderLists();
-  };
+  useEffect(() => {
+    if (socket) {
+      orderLists();
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    connectWS(sID);
+  }, [sID]);
 
   /**order 클릭 시 상세 페이지에 출력 */
   const handleOrderClick = (order) => {
