@@ -192,7 +192,6 @@ class ConnectionManager:
         if input_h_id in self.app_connections:
             for o_id, s_id in self.app_connections[input_h_id]["order"].items():
                 clients[o_id] = {s_id : ""}
-                print(clients)
         
         for o_id, o_value in clients.items():
             for s_id in o_value:
