@@ -6,7 +6,6 @@ from core.common.mongo2 import MongodbController
 
 from fastapi import WebSocket, WebSocketDisconnect
 import json
-from typing import Optional
 
 DB = MongodbController('FIE_DB')
 
@@ -31,12 +30,15 @@ class ConnectionManager:
             1. s_id 입력시, web_connections에 저장
                 - web_connections = {s_id : websocket}
             2. h_id 입력시, app_connections에 저장
-                - app_connections = {h_id : {websocket : {o_id : s_id}}}
+                - app_connections = {h_id : {"ws" : websocket,
+                                             "order" : {o_id : s_id, ... }
+                                            } }
         """
         await websocket.accept()
 
         connected_data = {"type": "connect", "result": "connected"}
         falied_data = {"type": "connect", "result": "falied"}
+
         await self.check_connections(s_id, h_id)
 
         if s_id:
@@ -53,11 +55,13 @@ class ConnectionManager:
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             history = DB.read_by_id('history', h_id)
-            self.app_connections = {h_id : {websocket : {}}}
-            
+            self.app_connections[h_id] = {
+                                            "ws": websocket,
+                                            "order": {}
+                                         }
             for o_id in history['orders']:
                 order = DB.read_by_id('order', o_id)
-                self.app_connections[h_id][websocket][o_id] = order['s_id']
+                self.app_connections[h_id]["order"][o_id] = order['s_id']
 
             await self.send_client_json(websocket, connected_data)
             
@@ -76,7 +80,7 @@ class ConnectionManager:
         """
         await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
         await websocket.close()
-        await self.delete_connections(s_id, h_id)
+        await self.delete_connections(websocket, s_id, h_id)
 
 
     async def handle_message(self, websocket:WebSocket, s_id:str, h_id:str, data:json):
@@ -144,21 +148,22 @@ class ConnectionManager:
         if s_id in self.web_connections:
             await self.disconnect(self.web_connections[s_id], s_id, h_id)
         if h_id in self.app_connections:
-            await self.disconnect(list(self.app_connections[h_id].keys())[0], s_id, h_id)
+            print(self.app_connections[h_id]["ws"])
+            await self.disconnect(self.app_connections[h_id]["ws"], s_id, h_id)
 
-    async def delete_connections(self, s_id:str, h_id:str):
+    async def delete_connections(self, websocket:WebSocket, s_id:str, h_id:str):
         """ web_connections, app_connections의 요소들을 검사하여 해당하는 websocket 정보를 삭제한다.
             - input : s_id, h_id
             - return : X
         """
-        if s_id in self.web_connections:
+        if s_id in self.web_connections and self.web_connections[s_id] == websocket:
             del self.web_connections[s_id]
-        if h_id in self.app_connections:
+        if h_id in self.app_connections and self.app_connections[h_id]["ws"] == websocket:
             del self.app_connections[h_id]
-            
 
 
-    async def get_app_connection(self, input_o_id: str) -> WebSocket:
+
+    async def get_app_websocekt(self, input_o_id: str) -> WebSocket:
         """ o_id를 가지는 websocket(app)를 반환한다.
             - input : o_id
             - return 
@@ -169,31 +174,25 @@ class ConnectionManager:
             return False
         
         for h_value in self.app_connections.values():
-            for ws, ws_value in h_value.items():
-                for o_id in ws_value.keys():
-                    if o_id == input_o_id:
-                        return ws
+            if input_o_id in h_value["order"]:
+                return h_value["ws"]
         return False
                    
-    async def get_web_connection(self, input_h_id:str) -> dict:
+    async def get_web_websockets(self, input_h_id:str) -> dict:
         """ app_connections에서 h_id로 저장된 s_id를 찾아 web_connections에서 websocket(web)를 반환한다.
             - input : h_id
             - return
-                - web이 연결되어 있는 경우 : websocket
-                - 일부 web이 연결되어 있는 경우 : 연결되지 않은 web의 websocket 빈 문자열
-                - 모든 web이 연결되지 않은 경우 : []
+                - web이 연결되어 있는 경우 : {o_id : {s_id : websocket}}
+                - web이 연결되지 않은 경우 : {o_id : {s_id : websocket}}
         """
         clients = {}
         if self.web_connections == None:
             return clients
         
         if input_h_id in self.app_connections:
-            for h_value in self.app_connections.values():
-                for ws_value in h_value.values():
-                    for o_id, s_id in ws_value.items():
-                        clients[o_id] = {}
-                        clients[o_id][s_id] = ""
-                        print(clients)
+            for o_id, s_id in self.app_connections[input_h_id]["order"].items():
+                clients[o_id] = {s_id : ""}
+                print(clients)
         
         for o_id, o_value in clients.items():
             for s_id in o_value:
@@ -220,18 +219,16 @@ class ConnectionManager:
         """ (POST order) app이 web에게 주문 생성을 알린다.
             - input : h_id
             - 전송 성공 
-                - web : {"type": "create_order", "result": "success", "o_id" : o_id}
+                - web : {"type": "create_order", "result": "success"}
                 - app : result = {"type": "create_order", "result": "success"}
-            - 전송 실패 
-                - app : result = {"type": "create_order", "result": "fail"}
             - return : result(전송 여부 list)
         """
         result = {"type": "create_order", "result": "success"}
-        web_clients = await self.get_web_connection(h_id)
+        web_clients = await self.get_web_websockets(h_id)
 
         if web_clients:
-            for o_id, o_id_value in web_clients.items():
-                for s_id, ws in o_id_value.items():
+            for o_value in web_clients.values():
+                for s_id, ws in o_value.items():
                     if ws != "":
                         await self.send_client_json(ws, result)
                         print({"type": "create_order", "result": "success", "reason": s_id})
@@ -252,7 +249,7 @@ class ConnectionManager:
             - return : data(전송 여부)
         """
         result = {"type": "update_status", "result": "success", "o_id" : o_id}
-        app_client = await self.get_app_connection(o_id)
+        app_client = await self.get_app_websocekt(o_id)
 
         if app_client:
             response = DB.read_by_id('order', o_id)
