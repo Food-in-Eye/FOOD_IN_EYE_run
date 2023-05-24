@@ -29,11 +29,6 @@ export const getOrders = (query) => {
   return axios.get(requestUrl);
 };
 
-export const getOrder = (o_id) => {
-  const requestUrl = `${ORDER_URL}/order?id=${o_id}&detail=true`;
-  return axios.get(requestUrl);
-};
-
 /** PUT 메서드 */
 //가게 ID에 따라 URL을 동적으로 구성하는 putStore() 함수
 export const putStore = (s_id, data) => {

@@ -22,7 +22,6 @@ import {
   getOrders,
   getFoods,
   getFood,
-  getOrder,
   putOrderStatus,
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
