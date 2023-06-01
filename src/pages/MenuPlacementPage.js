@@ -1,5 +1,5 @@
 import MenuBar from "../components/MenuBar";
-import Rec from "../css/MenuPosRec.module.css";
+import MPlace from "../css/MenuPlacement.module.css";
 
 function MenuPlacementPage() {
   return (
@@ -7,7 +7,7 @@ function MenuPlacementPage() {
       <section className="header">
         <MenuBar />
       </section>
-      <div className={Rec.inner}>
+      <div className={MPlace.inner}>
         <p>메뉴판 배치 추천 페이지</p>
       </div>
     </div>
