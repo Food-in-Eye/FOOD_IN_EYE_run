@@ -1,7 +1,16 @@
-// import Main from "../css/Main.module.css";
 import style from "../css/MenuBar.module.css";
+import { useNavigate } from "react-router-dom";
 
 function MenuBar() {
+  const navigate = useNavigate();
+
+  const onLogout = (e, userID) => {
+    e.preventDefault();
+
+    localStorage.removeItem("storeID");
+    navigate(`/`);
+  };
+
   return (
     <section className={style.header}>
       <h2>LOGO</h2>
@@ -55,7 +64,7 @@ function MenuBar() {
       <div className="logout">
         <ul className={style.util}>
           <li>
-            <a href="/">Logout</a>
+            <button onClick={onLogout}>Logout</button>
           </li>
         </ul>
       </div>

@@ -6,8 +6,7 @@ import { getStore, putStore } from "../components/API.module";
 import { useState, useEffect } from "react";
 
 function StoreManagePage() {
-  const sID = `641459134443f2168a32357b`; //하울-파스타 id;
-  // const sID = `6440fe9bd85a73634c457a32`; //일식가게 id;
+  const sID = localStorage.getItem("storeID");
 
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
@@ -62,7 +61,7 @@ function StoreManagePage() {
   };
 
   const handleDescAndScheduleSaveClick = () => {
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       desc: descValue,
       schedule: scheduleValue,
@@ -81,7 +80,7 @@ function StoreManagePage() {
   };
 
   const handleNotiSaveClick = () => {
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       notice: notiValue,
     })
@@ -100,7 +99,7 @@ function StoreManagePage() {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
 
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       status: 1,
     })
@@ -117,7 +116,7 @@ function StoreManagePage() {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
 
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       status: 2,
     })
@@ -238,7 +237,6 @@ function StoreManagePage() {
 
               {editNoti ? (
                 //show edit button when editing
-
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleNotiSaveClick}

@@ -1,11 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
 import styles from "../css/Account.module.css";
 import Button from "../css/Button.module.css";
 
+import { Link, useNavigate } from "react-router-dom";
+
 function LoginPage() {
   const navigate = useNavigate();
-  const onLogin = (e) => {
+  const onLogin = async (e) => {
     e.preventDefault();
+
+    const storeID = document.querySelector("#storeID").value;
+    // storeID를 localStorage에 저장
+    localStorage.setItem("storeID", storeID);
+
     navigate(`/main`);
   };
 
@@ -16,7 +22,7 @@ function LoginPage() {
         <section className="login-screen">
           <div className={styles.align}>
             <p>ID</p>
-            <input type="text" name="id" placeholder="이메일" />
+            <input id="storeID" type="text" name="id" placeholder="이메일" />
             <p>Password</p>
             <input type="password" name="password" placeholder="비밀번호" />
             <br />
