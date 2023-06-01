@@ -1,7 +1,7 @@
 import MenuBar from "../components/MenuBar";
 import Rec from "../css/MenuPosRec.module.css";
 
-function DetailAnalysisPage() {
+function MenuPlacementPage() {
   return (
     <div>
       <section className="header">
@@ -14,4 +14,4 @@ function DetailAnalysisPage() {
   );
 }
 
-export default DetailAnalysisPage;
+export default MenuPlacementPage;
