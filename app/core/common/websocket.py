@@ -9,7 +9,7 @@ import json
 
 DB = MongodbController('FIE_DB')
 
-
+### 그냥 나의 작은 바람. 리턴하는 값을 'data'라고 칭할건지, 'json'이라고 칭할건지, 'msg'라 할건지.. 통일하면 가독성 측면에서 더 좋지 않을까?
 class ConnectionManager:
     """ 연결된 Web, App Websocket들을 관리하는 클래스
 
@@ -34,6 +34,8 @@ class ConnectionManager:
                                              "order" : {o_id : s_id, ... }
                                             } }
         """
+        ### s_id만 있는지, h_id만 있는지 확인하는 함수 필요(s_id와 h_id가 모두 있을 경우는?)
+
         await websocket.accept()
 
         connected_data = {"type": "connect", "result": "connected"}
@@ -46,7 +48,7 @@ class ConnectionManager:
                 await self.send_client_json(websocket, falied_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
-            self.web_connections[s_id] = websocket
+            self.web_connections[s_id] = websocket 
             await self.send_client_json(websocket, connected_data)
 
         elif h_id:
@@ -62,6 +64,9 @@ class ConnectionManager:
             for o_id in history['orders']:
                 order = DB.read_by_id('order', o_id)
                 self.app_connections[h_id]["order"][o_id] = order['s_id']
+            
+            ## 위에 이거 순서 바꾸면 깔끔하지 않을까? 그리고 왜 order를 딕셔너리로 만들어놓고 나중에 리스트를 할당하는건지???
+            ## order_list 라는 애를 따로 만들고 나중에 order: order_list 와 같이 하면 될것같아요
 
             await self.send_client_json(websocket, connected_data)
             
@@ -141,8 +146,8 @@ class ConnectionManager:
 
 
     async def check_connections(self, s_id, h_id):
-        """ web_connections, app_connections의 요소들을 검사하여 존재하는 경우 disconnect() 함수를 호출한다. 
-            - input : websocket, s_id, h_id
+        """ web_connections, app_connections의 요소들을 검사하여 존재하는 경우 disconnect() 함수를 호출한다.
+            - input : websocket, s_id, h_id 
             - return : X
         """
         if s_id in self.web_connections:
@@ -150,7 +155,7 @@ class ConnectionManager:
         if h_id in self.app_connections:
             print(self.app_connections[h_id]["ws"])
             await self.disconnect(self.app_connections[h_id]["ws"], s_id, h_id)
-
+    
     async def delete_connections(self, websocket:WebSocket, s_id:str, h_id:str):
         """ web_connections, app_connections의 요소들을 검사하여 해당하는 websocket 정보를 삭제한다.
             - input : s_id, h_id
@@ -160,8 +165,6 @@ class ConnectionManager:
             del self.web_connections[s_id]
         if h_id in self.app_connections and self.app_connections[h_id]["ws"] == websocket:
             del self.app_connections[h_id]
-
-
 
     async def get_app_websocekt(self, input_o_id: str) -> WebSocket:
         """ o_id를 가지는 websocket(app)를 반환한다.
@@ -213,7 +216,7 @@ class ConnectionManager:
             False
         
             
-
+    # app이 알리는게 아니죠.. 서버가 알리는거니까. 괜히 헷갈릴 듯 해서 'app이'는 삭제하는 게??
     async def send_create(self, h_id:str):
         """ (POST order) app이 web에게 주문 생성을 알린다.
             - input : h_id
@@ -237,6 +240,7 @@ class ConnectionManager:
             print({"type": "create_order", "result": "fali", "reason": f'all web client is not connected'})
 
     
+    # 마찬가지 굳이 따지면 우리가 알려주는거라서, web이 변경한 상태를 app에 알린다. 정도가 맞지 않을까?
     async def send_update(self, o_id : str):
         """ (PUT order) web이 app에게 주문 상태 변경을 알린다.
             - input : o_id
@@ -265,7 +269,7 @@ class ConnectionManager:
 
 def check_client_in_db(db:str, id:str):
     try:
-        if id:
+        if id: # if id는 왜 하는 거죠?? 차라리 맨 위에 assert 문을 추가한다던지? 아니면 그냥 없어도 될듯 한데
             if DB.read_by_id(db, id):
                 return True
         False
