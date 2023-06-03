@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 function MenuPlacementPage() {
   const sID = localStorage.getItem("storeID");
   const [menuList, setMenuList] = useState([]);
+  const [isEditMode, setIsEditMode] = useState(false);
   const menuItemsPerPage = 8;
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,6 +26,14 @@ function MenuPlacementPage() {
     } catch (error) {
       console.log(`GET foods error:`, error);
     }
+  };
+
+  const handleEditBtnClick = () => {
+    setIsEditMode(true);
+  };
+
+  const handleSaveBtnClick = () => {
+    setIsEditMode(false);
   };
 
   const handleNextPage = () => {
@@ -86,8 +95,16 @@ function MenuPlacementPage() {
         </div>
         <div className={MPlace.theMenu}>
           <h2>메뉴판</h2>
-          <TheMenus />
-          <button className={Button.modifyMenu}>수정하기</button>
+          <TheMenus isEditMode={isEditMode} />
+          {isEditMode ? (
+            <button className={Button.saveMenu} onClick={handleSaveBtnClick}>
+              저장하기
+            </button>
+          ) : (
+            <button className={Button.modifyMenu} onClick={handleEditBtnClick}>
+              수정하기
+            </button>
+          )}
         </div>
       </div>
     </div>
