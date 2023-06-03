@@ -23,7 +23,7 @@ async def hello():
 websocket_manager = ConnectionManager()
 
 @websocket_router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, s_id = None, h_id = None): # token 이 추가되어야 함
+async def websocket_endpoint(websocket: WebSocket, s_id = None, h_id = None): 
     try:
         await websocket_manager.connect(websocket, s_id, h_id)
 

@@ -41,8 +41,8 @@ class ConnectionManager:
 
         await self.check_connections(s_id, h_id)
 
-        if s_id:
-            h_id = None
+        if s_id != None and h_id == None:
+
             if check_client_in_db('store', s_id) == False:
                 await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
@@ -50,8 +50,8 @@ class ConnectionManager:
             self.web_connections[s_id] = websocket 
             await self.send_client_data(websocket, connected_data)
 
-        elif h_id:
-            s_id = None
+        elif  h_id != None and s_id == None:
+            
             if check_client_in_db('history', h_id) == False:
                 await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
