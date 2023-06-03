@@ -240,7 +240,6 @@ class ConnectionManager:
             print({"type": "create_order", "result": "fali", "reason": f'all web client is not connected'})
 
     
-    # 마찬가지 굳이 따지면 우리가 알려주는거라서, web이 변경한 상태를 app에 알린다. 정도가 맞지 않을까?
     async def send_update(self, o_id : str):
         """ (PUT order) web이 변경한 상태를 app에게 알린다.
             - input : o_id
