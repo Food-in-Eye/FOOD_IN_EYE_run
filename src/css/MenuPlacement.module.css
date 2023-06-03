@@ -2,7 +2,7 @@
   box-sizing: border-box;
   display: flex;
   flex-flow: row nowrap;
-  height: 700px;
+  height: auto;
   margin: 0px;
   padding: 0px;
 }
@@ -17,6 +17,7 @@
 
 .menus {
   width: 40%;
+  height: auto;
   margin-left: 2%;
   margin-bottom: 2%;
   box-shadow: 2px 5px 8px #686868;
@@ -39,21 +40,33 @@
 .menus ul {
   width: 100%;
   height: auto;
-  margin-top: 5%;
+  margin-top: 10%;
 }
 
 .menus ul li {
   width: 90%;
-  margin: 2% auto 2% 5%;
+  margin: 5% auto 5% 5%;
   padding: 2% 0 2% 5%;
   border: 1px solid #000;
   border-radius: 20px;
   font-size: 25px;
 }
 
+.buttons {
+  display: flex;
+  flex: row nowrap;
+  margin-bottom: 5%;
+}
+
+.buttons button {
+  width: 50px;
+  height: 30px;
+  margin: 0 10% 0 10%;
+  font-size: 20px;
+}
+
 .middle {
   width: 30%;
-  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -71,7 +84,19 @@
 }
 
 .theMenu {
-  width: 50%;
+  width: 60%;
+  height: auto;
   margin-right: 2%;
   margin-bottom: 2%;
+  border-radius: 20px;
+  background-color: #04275a;
+}
+
+.theMenu h2 {
+  padding: 2%;
+  color: #fff;
+}
+
+.theMenu button {
+  margin-top: 3%;
 }

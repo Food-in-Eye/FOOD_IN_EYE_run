@@ -1,0 +1,39 @@
+.menuContainer {
+  width: 90%;
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background-color: #fff;
+}
+
+.menuItem {
+  display: flex;
+  place-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: 2%;
+  border: 1px solid black;
+}
+
+.menuItemImg {
+  width: 80%;
+  max-height: 150px;
+  margin: 2%;
+  object-fit: cover;
+}
+
+.menuItemDetails {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.menuItemName,
+.menuItemPrice {
+  white-space: nowrap;
+  font-size: 15px;
+}

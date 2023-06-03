@@ -3,8 +3,7 @@ import axios from "axios";
 const STORE_URL = "/api/v2/stores";
 const FOODS_URL = "/api/v2/foods";
 const ORDER_URL = "/api/v2/orders";
-
-const LOGIN_URL = "/api/v2/users";
+const MENUS_URL = "/api/v2/menus";
 
 /** GET 메서드 */
 //가게 ID에 따라 URL을 동적으로 구성하는 getStore() 함수
@@ -26,6 +25,11 @@ export const getFood = (f_id) => {
 
 export const getOrders = (query) => {
   const requestUrl = `${ORDER_URL}/q${query}`;
+  return axios.get(requestUrl);
+};
+
+export const getMenus = (query) => {
+  const requestUrl = `${MENUS_URL}${query}`;
   return axios.get(requestUrl);
 };
 
