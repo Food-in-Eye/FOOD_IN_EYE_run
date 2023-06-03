@@ -1,13 +1,77 @@
 .inner {
   box-sizing: border-box;
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: row nowrap;
   height: 700px;
   margin: 0px;
   padding: 0px;
 }
 
-.inner p {
-  margin: auto;
-  display: block;
+.menus,
+.middle,
+.theMenu {
+  margin-top: 30px;
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.menus {
+  width: 40%;
+  margin-left: 2%;
+  margin-bottom: 2%;
+  box-shadow: 2px 5px 8px #686868;
+}
+
+.menus h2 {
+  padding-left: 2%;
+  padding-right: 2%;
+  transform-origin: center;
+  transform: rotate(-16deg);
+  border: none;
+  background-color: rgba(255, 147, 69, 0.5);
+}
+
+.menus h2 span {
+  display: inline-block;
+  transform: rotate(16deg);
+}
+
+.menus ul {
+  width: 100%;
+  height: auto;
+  margin-top: 5%;
+}
+
+.menus ul li {
+  width: 90%;
+  margin: 2% auto 2% 5%;
+  padding: 2% 0 2% 5%;
+  border: 1px solid #000;
+  border-radius: 20px;
+  font-size: 25px;
+}
+
+.middle {
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.middle p {
+  white-space: nowrap;
+  background: none;
+}
+
+.middle img {
+  margin-top: 5%;
+  width: 50px;
+  height: 50px;
+}
+
+.theMenu {
+  width: 50%;
+  margin-right: 2%;
+  margin-bottom: 2%;
 }
