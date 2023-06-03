@@ -20,7 +20,7 @@ storage = Storage('foodineye')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-@food_router.get("/")
+@food_router.get("/q")
 async def read_all_food(s_id:str): 
     """ 주어진 가게에 속하는 음식 정보를 모두 받아온다. """
 

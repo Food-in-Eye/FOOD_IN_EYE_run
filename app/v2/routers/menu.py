@@ -19,7 +19,7 @@ DB = MongodbController('FIE_DB')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-@menu_router.get("/")
+@menu_router.get("/q")
 async def read_menus_of_store(s_id:str):
     """ 주어진 가게 아이디의 모든 메뉴판들을 불러온다. """
     print('hi')
@@ -114,10 +114,10 @@ async def read_menu_with_foods(id:str):
         food_ids = [food['f_id'] for food in response['f_list']]
         food_list = []
 
-        for id in food_ids:
-            food = DB.read_by_id('food', id)
+        for f_id in food_ids:
+            food = DB.read_by_id('food', f_id)
             food_list.append({
-                "f_id": id,
+                "f_id": f_id,
                 "name": food['name'],
                 "price": food['price'],
                 "img_key" : food['img_key'],
