@@ -9,7 +9,6 @@ import json
 
 DB = MongodbController('FIE_DB')
 
-### 그냥 나의 작은 바람. 리턴하는 값을 'data'라고 칭할건지, 'json'이라고 칭할건지, 'msg'라 할건지.. 통일하면 가독성 측면에서 더 좋지 않을까?
 class ConnectionManager:
     """ 연결된 Web, App Websocket들을 관리하는 클래스
 
@@ -34,47 +33,48 @@ class ConnectionManager:
                                              "order" : {o_id : s_id, ... }
                                             } }
         """
-        ### s_id만 있는지, h_id만 있는지 확인하는 함수 필요(s_id와 h_id가 모두 있을 경우는?)
 
         await websocket.accept()
 
         connected_data = {"type": "connect", "result": "connected"}
-        falied_data = {"type": "connect", "result": "falied"}
+        failed_data = {"type": "connect", "result": "falied"}
 
         await self.check_connections(s_id, h_id)
 
         if s_id:
+            h_id = None
             if check_client_in_db('store', s_id) == False:
-                await self.send_client_json(websocket, falied_data)
+                await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             self.web_connections[s_id] = websocket 
-            await self.send_client_json(websocket, connected_data)
+            await self.send_client_data(websocket, connected_data)
 
         elif h_id:
+            s_id = None
             if check_client_in_db('history', h_id) == False:
-                await self.send_client_json(websocket, falied_data)
+                await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
+            order_dict = {}
             history = DB.read_by_id('history', h_id)
-            self.app_connections[h_id] = {
-                                            "ws": websocket,
-                                            "order": {}
-                                         }
+            
             for o_id in history['orders']:
                 order = DB.read_by_id('order', o_id)
-                self.app_connections[h_id]["order"][o_id] = order['s_id']
-            
-            ## 위에 이거 순서 바꾸면 깔끔하지 않을까? 그리고 왜 order를 딕셔너리로 만들어놓고 나중에 리스트를 할당하는건지???
-            ## order_list 라는 애를 따로 만들고 나중에 order: order_list 와 같이 하면 될것같아요
+                order_dict[o_id] = order['s_id']
 
-            await self.send_client_json(websocket, connected_data)
+            self.app_connections[h_id] = {
+                                            "ws": websocket,
+                                            "order": order_dict
+                                         }
+
+            await self.send_client_data(websocket, connected_data)
             
             # app 연결 시, web에게 주문생성 전송
             await self.send_create(h_id)  
 
         else:
-            await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
+            await self.send_client_data(websocket, {"type": "connect", "result": "closed"})
             raise WebSocketDisconnect(f'The connection is denied.')
         self.printList()
 
@@ -83,14 +83,14 @@ class ConnectionManager:
             - input : client
             - return : X
         """
-        await self.send_client_json(websocket, {"type": "connect", "result": "closed"})
+        await self.send_client_data(websocket, {"type": "connect", "result": "closed"})
         await websocket.close()
         await self.delete_connections(websocket, s_id, h_id)
 
 
     async def handle_message(self, websocket:WebSocket, s_id:str, h_id:str, data:json):
-        """ client(web or app)으로부터 받은 data에 따라 관리한다.
-            - input : client, data, h_id
+        """ client(web or app)으로부터 받은 msg에 따라 동작한다.
+            - input : client, s_id, h_id, msg
                 - 'type' : 'update_state' -> web이 주문 상태 변경, 전송 결과를 web에게 출력
                 - 'type' : 'create_order' -> app이 주문 접수, 전송 결과를 app에게 출력
                 - 'type' : 'connect' -> 연결 해지 또는 연결 확인
@@ -112,11 +112,11 @@ class ConnectionManager:
                 raise WebSocketDisconnect(f'The client requested to close the connection.')
             elif data['result'] == "connect":
                 data['result'] = 'connected'
-                await self.send_client_json(websocket, data)
+                await self.send_client_data(websocket, data)
         else:
-            await self.send_client_json(websocket, data)
+            await self.send_client_data(websocket, data)
 
-    async def send_client_json(self, websocket:WebSocket, data:json):
+    async def send_client_data(self, websocket:WebSocket, data:json):
         """ client(web or app)에게 data를 전송한다.
             - input : client, data
             - return : X
@@ -125,7 +125,7 @@ class ConnectionManager:
         await websocket.send_json(data)
         print(f"# Send : {data}")
 
-    async def receive_client_json(self, websocket:WebSocket):
+    async def receive_client_data(self, websocket:WebSocket):
         """ client(web or app)로부터 data를 수신한다.
             - input : client
             - return : data
@@ -216,9 +216,9 @@ class ConnectionManager:
             False
         
             
-    # app이 알리는게 아니죠.. 서버가 알리는거니까. 괜히 헷갈릴 듯 해서 'app이'는 삭제하는 게??
+
     async def send_create(self, h_id:str):
-        """ (POST order) app이 web에게 주문 생성을 알린다.
+        """ (POST order) app 생성한 주문을 web에게 알린다.
             - input : h_id
             - 전송 성공 
                 - web : {"type": "create_order", "result": "success"}
@@ -232,7 +232,7 @@ class ConnectionManager:
             for o_value in web_clients.values():
                 for s_id, ws in o_value.items():
                     if ws != "":
-                        await self.send_client_json(ws, result)
+                        await self.send_client_data(ws, result)
                         print({"type": "create_order", "result": "success", "reason": s_id})
                     else:
                         print({"type": "create_order", "result": "fali", "reason": f'web client({s_id}) is not connected'})
@@ -242,7 +242,7 @@ class ConnectionManager:
     
     # 마찬가지 굳이 따지면 우리가 알려주는거라서, web이 변경한 상태를 app에 알린다. 정도가 맞지 않을까?
     async def send_update(self, o_id : str):
-        """ (PUT order) web이 app에게 주문 상태 변경을 알린다.
+        """ (PUT order) web이 변경한 상태를 app에게 알린다.
             - input : o_id
             - 전송 성공 
                 - app : {"type": "update_status", "result": "success", "o_id" : o_id, "status" : int}
@@ -259,7 +259,7 @@ class ConnectionManager:
             status = response['status']
             if status < 3:
                 result['status'] = status
-                await self.send_client_json(app_client, result)
+                await self.send_client_data(app_client, result)
                 print({"type": "update_status", "result": "success"})
             else:
                 print({"type": "update_status", "result": "fail", "reason": "status is already finish"})
