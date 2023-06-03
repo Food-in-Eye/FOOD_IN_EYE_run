@@ -268,9 +268,8 @@ class ConnectionManager:
 
 def check_client_in_db(db:str, id:str):
     try:
-        if id: # if id는 왜 하는 거죠?? 차라리 맨 위에 assert 문을 추가한다던지? 아니면 그냥 없어도 될듯 한데
-            if DB.read_by_id(db, id):
-                return True
+        if DB.read_by_id(db, id):
+            return True
         False
     except Exception:
         pass
