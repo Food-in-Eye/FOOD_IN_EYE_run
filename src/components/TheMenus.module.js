@@ -6,6 +6,8 @@ import { getMenus } from "./API.module";
 function TheMenus() {
   const sID = localStorage.getItem("storeID");
   const [menuItems, setMenuItems] = useState([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   useEffect(() => {
     getMenuItems();
@@ -23,10 +25,56 @@ function TheMenus() {
     }
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const data = e.dataTransfer.getData("text/plain");
+    const draggedMenuItem = JSON.parse(data);
+    console.log(draggedMenuItem);
+    const targetIndex = hoveredIndex;
+    console.log(targetIndex);
+
+    setMenuItems((prevMenuItems) => {
+      const updatedMenuItems = [...prevMenuItems];
+      updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
+
+      return updatedMenuItems;
+    });
+  };
+
+  const handleMouseOver = (index) => {
+    if (isDragOver) {
+      setHoveredIndex(index);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragOver) {
+      setHoveredIndex(null);
+    }
+  };
+
   return (
-    <div className={TM.menuContainer}>
+    <div
+      className={TM.menuContainer}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       {menuItems.map((item, index) => (
-        <div key={index} className={TM.menuItem}>
+        <div
+          key={index}
+          className={`${TM.menuItem} ${
+            hoveredIndex === index ? TM.gridHovered : ""
+          }`}
+          onMouseOver={() => handleMouseOver(index)}
+          onMouseLeave={handleMouseLeave}
+        >
           <img
             src={`https://foodineye.s3.ap-northeast-2.amazonaws.com/${item.img_key}`}
             alt="이미지 없음"

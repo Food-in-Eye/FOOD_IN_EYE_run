@@ -37,3 +37,7 @@
   white-space: nowrap;
   font-size: 15px;
 }
+
+.gridHovered {
+  border: 2px dashed #ff9345;
+}

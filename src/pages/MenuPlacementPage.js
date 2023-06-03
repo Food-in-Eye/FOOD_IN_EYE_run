@@ -55,6 +55,10 @@ function MenuPlacementPage() {
   const canPrevPage = currentPage > 1;
   const canNextPage = endIndex < menuList.length;
 
+  const handleDragStart = (e, menuItem) => {
+    e.dataTransfer.setData("text/plain", JSON.stringify(menuItem));
+  };
+
   return (
     <div>
       <section className="header">
@@ -67,7 +71,11 @@ function MenuPlacementPage() {
           </h2>
           <ul>
             {currentMenuItems.map((menuItem, index) => (
-              <li key={index}>
+              <li
+                key={index}
+                draggable={true}
+                onDragStart={(e) => handleDragStart(e, menuItem)}
+              >
                 {(currentPage - 1) * menuItemsPerPage +
                   index +
                   1 +
