@@ -77,7 +77,7 @@ async def create_food(s_id:str, food:FoodModel):
 
     try:
         food_list = DB.read_all_by_feild('food', 's_id', s_id)
-        if not food_list: # store 최초 등록
+        if not food_list: # s_id에 해당하는 food 최초 등록
             data['num'] = 1
         else:
             max_num = max(store['num'] for store in food_list)
