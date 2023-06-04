@@ -3,9 +3,13 @@ order_router
 """
 
 from fastapi import APIRouter
-from core.models import OrderModel
+from core.models import OrderModel, RawGazeModel
 from core.common.mongo2 import MongodbController
+from core.common.s3 import Storage
 from .src.util import Util
+
+import requests
+import asyncio
 
 from datetime import datetime, timedelta
 
@@ -15,6 +19,8 @@ order_router = APIRouter(prefix="/orders")
 
 PREFIX = 'api/v2/orders'
 DB = MongodbController('FIE_DB')
+
+storage = Storage('foodineye')
 
 @order_router.get("/hello")
 async def hello():
@@ -199,3 +205,41 @@ async def new_order(body:OrderModel):
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
+
+@order_router.post("/order/gaze")
+async def new_order(h_id: str, body: list[RawGazeModel]):
+
+    gaze_data = []
+    for page in body:
+        gaze_data.append(page.dict())
+
+    try:
+        Util.check_id(h_id)
+        key = storage.upload(gaze_data, 'json', 'test')
+
+        if DB.update_field_by_id('history', h_id, 'gaze_path', key):
+            print(key, h_id)
+            asyncio.create_task(preprocess_and_update(key, h_id))
+            print('after')
+            return {
+            'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
+            'status': 'OK'
+            }
+
+        raise Exception()
+        return {"??": "?"}
+        
+    except:
+        return {'success': False}
+
+async def preprocess_and_update(raw_data_key:str, h_id:str):
+    print('in preprocess function')
+    url = "http://localhost:2000/anlz/v1/filter/execute"
+    payload = {
+        "raw_data_key": raw_data_key
+    }
+    headers = {"Content-Type": "application/json"}
+
+    response: requests.Response = requests.post(url, json=payload, headers=headers)
+    data = response.json()
+    DB.update_field_by_id('history', h_id, 'fixation_path', data["fixation_key"])
