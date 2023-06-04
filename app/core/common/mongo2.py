@@ -72,8 +72,8 @@ class MongodbController:
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\' to set \'{field}:{value}\'')
         
-        if result.modified_count != 1:
-            return False
+        # if result.modified_count != 1:
+        #     return False
         
         return True
 
