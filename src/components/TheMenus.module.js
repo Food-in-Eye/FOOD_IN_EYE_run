@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import TM from "../css/TheMenus.module.css";
 import { getMenus } from "./API.module";
 
-function TheMenus() {
+function TheMenus({ isEditMode }) {
   const sID = localStorage.getItem("storeID");
   const [menuItems, setMenuItems] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -37,7 +37,7 @@ function TheMenus() {
     const data = e.dataTransfer.getData("text/plain");
     const draggedMenuItem = JSON.parse(data);
     console.log(draggedMenuItem);
-    const targetIndex = index; //null로 뜸
+    const targetIndex = index;
     console.log(targetIndex);
 
     setMenuItems((prevMenuItems) => {
@@ -49,13 +49,13 @@ function TheMenus() {
   };
 
   const handleMouseOver = (index) => {
-    if (isDragOver) {
+    if (isDragOver && isEditMode) {
       setHoveredIndex(index);
     }
   };
 
   const handleMouseLeave = () => {
-    if (isDragOver) {
+    if (isDragOver && isEditMode) {
       setHoveredIndex(null);
     }
   };
@@ -70,10 +70,12 @@ function TheMenus() {
         <div
           key={index}
           className={`${TM.menuItem} ${
-            hoveredIndex === index ? TM.gridHovered : ""
+            isEditMode && hoveredIndex === index ? TM.gridHovered : ""
           }`}
           onMouseOver={() => handleMouseOver(index)}
           onMouseLeave={handleMouseLeave}
+          onDragEnter={() => setHoveredIndex(index)}
+          onDragLeave={() => setHoveredIndex(null)}
           onDrop={(e) => handleDrop(e, index)}
         >
           <img
