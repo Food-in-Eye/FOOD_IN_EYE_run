@@ -30,14 +30,14 @@ function TheMenus() {
     setIsDragOver(true);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e, index) => {
     e.preventDefault();
     setIsDragOver(false);
 
     const data = e.dataTransfer.getData("text/plain");
     const draggedMenuItem = JSON.parse(data);
     console.log(draggedMenuItem);
-    const targetIndex = hoveredIndex;
+    const targetIndex = index; //null로 뜸
     console.log(targetIndex);
 
     setMenuItems((prevMenuItems) => {
@@ -64,7 +64,7 @@ function TheMenus() {
     <div
       className={TM.menuContainer}
       onDragOver={handleDragOver}
-      onDrop={handleDrop}
+      onMouseLeave={handleMouseLeave}
     >
       {menuItems.map((item, index) => (
         <div
@@ -74,6 +74,7 @@ function TheMenus() {
           }`}
           onMouseOver={() => handleMouseOver(index)}
           onMouseLeave={handleMouseLeave}
+          onDrop={(e) => handleDrop(e, index)}
         >
           <img
             src={`https://foodineye.s3.ap-northeast-2.amazonaws.com/${item.img_key}`}
