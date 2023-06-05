@@ -5,7 +5,7 @@ import MPlace from "../css/MenuPlacement.module.css";
 import arrow from "../images/right_arrow.jpeg";
 
 import { getFoods } from "../components/API.module";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 function MenuPlacementPage() {
   const sID = localStorage.getItem("storeID");
@@ -15,18 +15,18 @@ function MenuPlacementPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    getMenuLists();
-  });
-
-  const getMenuLists = async () => {
+  const getMenuLists = useCallback(async () => {
     try {
       const res = await getFoods(sID);
       setMenuList(res.data.response);
     } catch (error) {
       console.log(`GET foods error:`, error);
     }
-  };
+  }, [sID]);
+
+  useEffect(() => {
+    getMenuLists();
+  }, [getMenuLists]);
 
   const handleEditBtnClick = () => {
     setIsEditMode(true);
