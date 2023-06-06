@@ -1,180 +1,205 @@
-* {
+.inner {
   box-sizing: border-box;
-  margin: 0px;
+  height: auto;
+  display: flex;
+  flex-flow: row nowrap;
+  margin-top: 5%;
   padding: 0px;
 }
 
-.inner {
-  margin: 0px auto;
+.rest {
+  width: 20%;
+  height: 100%;
+
+  margin-left: 2%;
 }
 
-.saleAndCal {
-  width: 350px;
-  height: 600px;
-  margin: 40px;
+.orderDashboard {
+  width: 45%;
+  height: 100%;
 }
 
-.sale {
-  box-sizing: border-box;
-  width: 350px;
-  height: 200px;
-  display: flex;
-  flex-flow: column wrap;
-  justify-content: space-evenly;
-  padding: 30px;
-  margin: auto;
-  margin-top: 30px;
-  border-radius: 20px;
-  background-color: #2f365f;
-}
-
-.saleAndCal p {
-  box-sizing: border-box;
-  width: 350px;
-  height: 200px;
-  padding: 20px;
-  margin: auto;
-  margin-top: 30px;
-  font: bold 30px/1 "arial";
-  border-radius: 30px;
+.orderInfo {
+  width: 35%;
+  height: 100%;
+  margin-right: 2%;
+  border-radius: 40px 40px 0 20px;
   background-color: #fff;
+  box-shadow: 2px 5px 10px #686868;
 }
 
-.sales {
-  top: 30px;
-  left: 10px;
-  flex-flow: row wrap;
-  font: bold, 15px/1 "arial";
-  color: #fff;
+.rest .cal {
+  width: 100%;
+  margin-top: 15%;
 }
 
-.sub_page {
-  height: 800px;
+.rest .shortcut {
+  margin-top: 10%;
+}
+
+.rest .sales {
+  width: 100%;
   display: flex;
-  flex-flow: row wrap;
+  flex-direction: column;
+  padding: 10%;
+  white-space: nowrap;
+  border-width: 2px 0 2px 0;
+  border-color: #000;
+  border-style: solid;
 }
 
-.order {
-  box-sizing: border-box;
-  width: 500px;
-  height: 650px;
-  margin: 30px;
-  padding: 50px;
-  background-color: #fff;
+.rest .sales h3 {
+  margin: 0 0 5% auto;
+  color: #ff9345;
 }
 
-.order h2 {
+.rest .sales h2,
+.rest .sales p {
+  margin-left: -5px;
+  background: none;
+}
+
+.rest .sales h2 {
+  font-size: 30px;
+}
+
+.rest .sales p {
+  font-size: 20px;
+  color: #337db1;
+}
+
+.orderDashboard .orders {
+  max-height: 1000px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin-bottom: 15px;
-  font: bold 30px/1 "arial";
+  align-content: center;
 }
 
-.mList {
-  padding: 15px;
-}
-
-.mList li {
-  box-sizing: border-box;
-  height: 80px;
+.orderDashboard .orders .orderTodays {
+  width: 400px;
   position: relative;
-  padding: 25px;
-  margin-bottom: 10px;
-  font: normal 20px "arial";
-  background-color: #fff;
-  border: 2px solid #2f365f;
-  border-radius: 10px;
+  z-index: 2;
+  border: none;
+  padding: 0 1% 0 1%;
 }
 
-.mList li button {
+.orderDashboard .orders .dashboardBackground {
+  width: 30%;
+  height: 90%;
+  position: absolute;
+  z-index: 1;
+  margin-top: 2%;
+  border: 2px solid #000;
+  box-shadow: inset 0 0 10px #686868;
+}
+
+.orderDashboard .orders .orderTodays .orderTodaysHeader {
+  background-color: #fff;
+}
+
+.orderDashboard .orders h2 {
+  margin-left: 17%;
+  white-space: nowrap;
+  font-size: 30px;
+}
+
+.orderDashboard .orders .orderTodays hr {
+  width: 95%;
+  margin-top: 10%;
+  margin-left: 0;
+  border: 1px solid #b8b3b3;
+}
+
+.orderDashboard .orders .orderTodays ul {
+  margin-top: 10%;
+  max-height: 100%;
+  overflow: scroll;
+}
+
+.orderDashboard .orders .orderTodays li {
+  margin: 10% 0 0 0;
+  font-size: 20px;
+}
+
+.orderDashboard .orders .orderTodays .manageBtn {
   float: right;
-  display: flex;
-  margin-left: auto;
-  padding: 7px;
-  font: normal 15px "arial";
+  margin-top: -10%;
 }
 
-.vertical {
-  width: 1px;
-  height: 800px;
-  margin-top: 40px;
-  background-color: #999;
+.orderInfo .infoHeader {
+  padding: 2%;
+  text-align: center;
+  border-radius: 40px 40px 0 0;
+  background-color: #ff9345;
 }
 
-.Btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
+.orderInfo .infoHeader h2 {
+  font-size: 30px;
 }
 
-.mBtnByCol {
+.orderInfo .infoBody {
+  width: auto;
+  height: auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
 }
 
-.mBtn {
-  width: 100px;
-  height: 200px;
-}
-
-.mBtn,
-.aBtnTotal {
-  background-color: #d3d2d6;
-  border: 0px;
-  border-radius: 10px;
-}
-
-.mBtnMenu,
-.aBtnDetail {
-  background-color: #3d5a5b;
-  border: 0px;
-  border-radius: 10px;
-  color: #fff;
-}
-
-.mBtnMenuLoc {
-  background-color: #2f365f;
-  border: 0px;
-  border-radius: 10px;
-  color: #fff;
-}
-
-.mBtnOrder {
-  background-color: #febeb0;
-  border: 0px;
-  border-radius: 10px;
-}
-
-.mBtnByCol button {
-  width: 100px;
-  height: 50px;
-  margin: 10px;
-}
-
-.aBtnByCol {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.aBtnByCol button {
-  width: 250px;
-  height: 70px;
-  margin: 10px;
-}
-
-.manage,
-.analysis {
+.orderInfo .infoBody .orderSeq {
   box-sizing: border-box;
-  width: 350px;
-  height: 310px;
-  margin: 30px;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-top: 2%;
+  position: absolute;
+}
+
+.orderInfo .infoBody .orderSeq .arrow {
+  max-width: 8%;
+  height: 5%;
+  margin-top: 2%;
+}
+
+.orderInfo .infoBody .orderSeq div img {
+  max-width: 40%;
+  top: 20%;
+}
+
+.orderInfo .infoBody .orderSeq div p {
+  top: 20%;
+  text-align: center;
+  background: none;
+}
+
+.orderInfo .infoBody .orderDetail {
+  width: 90%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column;
+  margin-top: 30%;
+}
+
+.orderInfo .infoBody .orderDetail h3 {
+  margin-left: 0;
+  padding: 10px;
+  border-radius: 5px 5px 0 0;
+  color: #fff;
+  background-color: #000926;
+}
+
+.orderInfo .infoBody .orderDetail .orderContents {
+  width: 100%;
+  /* box-sizing: border-box; */
+  display: flex;
+  justify-content: center;
   padding: 50px;
-  background-color: #fff;
+  margin-bottom: 5%;
+  white-space: nowrap;
+  border: 2px solid #000926;
+}
+
+.orderInfo .infoBody .orderDetail .orderContents Table {
+  margin: 0 auto;
 }

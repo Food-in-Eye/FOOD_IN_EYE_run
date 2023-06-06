@@ -42,7 +42,7 @@
 }
 
 .description h2 {
-  width: 300px;
+  width: auto;
   height: auto;
   display: flex;
   float: left;
@@ -55,7 +55,7 @@
 
 .desc {
   width: 93%;
-  height: 300px;
+  height: auto;
   box-sizing: border-box;
   display: flex;
   flex-flow: column;

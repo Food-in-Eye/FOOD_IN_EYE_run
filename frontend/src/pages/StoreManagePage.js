@@ -6,6 +6,8 @@ import { getStore, putStore } from "../components/API.module";
 import { useState, useEffect } from "react";
 
 function StoreManagePage() {
+  const sID = localStorage.getItem("storeID");
+
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
@@ -26,7 +28,7 @@ function StoreManagePage() {
         //loading 상태는 true로 세팅
         setLoading(true);
 
-        const request = await getStore("641458bd4443f2168a32357a");
+        const request = await getStore(sID);
         setStore(request.data.response);
 
         if (request.data.response.status === 1) {
@@ -59,7 +61,7 @@ function StoreManagePage() {
   };
 
   const handleDescAndScheduleSaveClick = () => {
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       desc: descValue,
       schedule: scheduleValue,
@@ -78,7 +80,7 @@ function StoreManagePage() {
   };
 
   const handleNotiSaveClick = () => {
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       notice: notiValue,
     })
@@ -97,7 +99,7 @@ function StoreManagePage() {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
 
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       status: 1,
     })
@@ -114,7 +116,7 @@ function StoreManagePage() {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
 
-    putStore("641458bd4443f2168a32357a", {
+    putStore(sID, {
       ...store,
       status: 2,
     })
@@ -235,7 +237,6 @@ function StoreManagePage() {
 
               {editNoti ? (
                 //show edit button when editing
-
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleNotiSaveClick}

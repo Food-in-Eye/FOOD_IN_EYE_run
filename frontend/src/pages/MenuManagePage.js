@@ -6,11 +6,16 @@ import axios from "axios";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 
-import { getMenu, getMenus, putMenus } from "../components/API.module";
+import {
+  getFood,
+  getFoods,
+  putFoods,
+  postFood,
+} from "../components/API.module";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 function MenuManagePage() {
-  const sID = `641459134443f2168a32357b`;
+  const sID = localStorage.getItem("storeID");
 
   /** api에서 불러올 menuList */
   const [menuList, setMenuList] = useState([]);
@@ -30,14 +35,14 @@ function MenuManagePage() {
     setError(null);
     setLoading(true);
 
-    getMenus(sID)
+    getFoods(sID)
       .then((res) => setMenuList(res.data.response))
       .catch((e) => setError(e))
       .finally(() => setLoading(false));
   }, []);
 
   const memorizedGetMenu = useMemo(
-    () => getMenu(selectedMenuIdRef.current),
+    () => getFood(selectedMenuIdRef.current),
     [selectedMenuIdRef.current]
   );
 
@@ -50,7 +55,7 @@ function MenuManagePage() {
       setSelectedMenuImgURL(``);
       selectedMenuIdRef.current = menuId;
 
-      getMenu(selectedMenuIdRef.current)
+      getFood(selectedMenuIdRef.current)
         .then((res) => {
           setSelectedMenu(res.data.response);
           if (res.data.response.img_key) {
@@ -82,27 +87,18 @@ function MenuManagePage() {
     e.preventDefault();
 
     // POST 메서드를 통해 메뉴 최초 생성
-    axios
-      .post(
-        `/api/v1/admin/foods`,
-        {
-          s_id: sID,
-          name: "new Menu",
-          price: 0,
-          img_key: null,
-          desc: "메뉴에 대한 설명을 입력하세요",
-          allergy: "메뉴에 대한 알러지 정보를 입력하세요",
-          origin: "메뉴에 대한 원산지 정보를 입력하세요",
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((res) => {
-        const newMenu = res.data;
-        setMenuList([...menuList, newMenu]);
+    postFood(sID, {
+      s_id: sID,
+      name: "new Menu",
+      price: 0,
+      img_key: null,
+      desc: "메뉴에 대한 설명을 입력하세요",
+      allergy: "메뉴에 대한 알러지 정보를 입력하세요",
+      origin: "메뉴에 대한 원산지 정보를 입력하세요",
+    })
+      .then(async (res) => {
+        const newMenu = await getFood(res.data.document_id);
+        setMenuList([...menuList, newMenu.data.response]);
       })
       .catch((e) => {
         setError(e);
@@ -116,6 +112,7 @@ function MenuManagePage() {
     if (selectedMenu && selectedMenu._id) {
       setMenuName(selectedMenu.name);
       setMenuDesc(selectedMenu.desc);
+      setMenuImg(selectedMenuImgURL);
       setMenuAllergy(selectedMenu.allergy);
       setOriginItems(selectedMenu.origin);
       setMenuPrice(selectedMenu.price);
@@ -127,7 +124,7 @@ function MenuManagePage() {
   const handleSaveMenuClick = useCallback(async (e) => {
     e.preventDefault();
 
-    putMenus(selectedMenu._id, {
+    putFoods(selectedMenu._id, {
       ...selectedMenu,
       name: menuName,
       price: menuPrice,
@@ -187,13 +184,12 @@ function MenuManagePage() {
 
     const formData = new FormData();
 
-    //이미지 리사이징
     try {
       if (croppedImage.length !== 0) {
         formData.append("file", croppedImage); // key, value 추가
 
         axios
-          .put(`/api/v1/admin/foods/image/${selectedMenu._id}`, formData, {
+          .put(`/api/v2/foods/food/image?id=${selectedMenu._id}`, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -270,7 +266,6 @@ function MenuManagePage() {
                 {menuList.map((menu) => (
                   <li
                     key={menu._id}
-                    data-hammer
                     className={Menu.list}
                     onClick={(e) => handleMenuClick(e, menu._id)}
                   >

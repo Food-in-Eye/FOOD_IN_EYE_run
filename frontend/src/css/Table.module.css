@@ -1,0 +1,28 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 10%;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  border-bottom: 1px solid #ddd;
+}
+
+td {
+  padding-left: 40px;
+  padding-right: 20px;
+}
+
+tfoot {
+  border-top: 1px solid #ddd;
+}
+
+tfoot td:first-child {
+  font-weight: bold;
+}

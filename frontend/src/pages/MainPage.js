@@ -1,117 +1,300 @@
-import { useNavigate } from "react-router-dom";
+import Calendar from "react-calendar";
+import moment from "moment";
+import "react-calendar/dist/Calendar.css";
+
 import Main from "../css/Main.module.css";
+import Bar from "../css/UnderBar.module.css";
+import Button from "../css/Button.module.css";
 import MenuBar from "../components/MenuBar";
+import Table from "../components/Table.module";
+import ShortCuts from "../components/ShortCutForPages.module";
+
+/**import images from ../images/* */
+import orderReceive from "../images/order_received.png";
+import activeOrderReceive from "../images/active_order_received.png";
+import cooking from "../images/cooking.png";
+import activeCooking from "../images/active_cooking.png";
+import serve from "../images/serve.png";
+import activeServe from "../images/active_serve.png";
+import arrow from "../images/right_arrow.jpeg";
+
+import {
+  getOrders,
+  getFoods,
+  getFood,
+  putOrderStatus,
+} from "../components/API.module";
+import { useState, useEffect, useCallback } from "react";
+import { SocketProvider } from "../components/SocketContext.module";
 
 function MainPage() {
-  const navigate = useNavigate();
+  const wsUrl = `ws://localhost/api/v2/websockets/ws`;
+  const sID = localStorage.getItem("storeID");
+  const [socket, setSocket] = useState(null);
 
-  const onClickToAdminManagePage = (e) => {
-    e.preventDefault();
-    navigate(`/store-manage`);
-  };
-  const onClickToMenuManagePage = (e) => {
-    e.preventDefault();
-    navigate(`/menu-manage`);
+  const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
+  const [value, onChange] = useState(new Date());
+  const [orderList, setOrderList] = useState([]);
+  const [loading, setLoading] = useState(null);
+  const [orderData, setOrderData] = useState([]);
+
+  useEffect(() => {
+    connectWS(sID);
+  }, [sID]);
+
+  const connectWS = useCallback(async (storeID) => {
+    try {
+      const newSocket = new WebSocket(`${wsUrl}?s_id=${storeID}`);
+
+      newSocket.onopen = () => {
+        console.log("WebSocket connection established");
+      };
+
+      // 웹소켓 연결 시 받는 메시지
+      newSocket.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        console.log("Received response:", response);
+        if (response.type === "create_order" && response.result === "success") {
+          orderLists();
+        }
+      };
+
+      // 웹소켓 연결 에러 발생 시
+      newSocket.onerror = (e) => {
+        console.log("WebSocket error:", e);
+      };
+
+      setSocket(newSocket);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const orderLists = useCallback(async () => {
+    try {
+      setLoading(true);
+      console.log(`orderLists 함수`);
+
+      const ordersResponse = await getOrders(ordersQuery);
+      const orders = ordersResponse.data.response;
+      console.log(orders);
+      const foodIds = orders.map((order) => order.f_list[0].f_id);
+      const foodsResponse = await Promise.all(
+        foodIds.map((fID) => getFood(fID))
+      );
+      const foods = await Promise.all(
+        foodsResponse.map((res) => res.data.response)
+      );
+
+      const orderListWithFoods = orders
+        .filter((order, index) => foods[index])
+        .map((order, index) => ({
+          ...order,
+          foodName: foods[index].name,
+        }));
+
+      setOrderList(orderListWithFoods);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  }, [ordersQuery]);
+
+  useEffect(() => {
+    if (socket) {
+      orderLists();
+    }
+  }, [socket, orderLists]);
+
+  useEffect(() => {
+    connectWS(sID);
+  }, [sID]);
+
+  /**order 클릭 시 상세 페이지에 출력 */
+  const handleOrderClick = (order) => {
+    setOrderData([]);
+    console.log("status: ", order.status);
+
+    const promises = order.f_list.map((f) => getFoods(order.s_id));
+
+    Promise.all(promises)
+      .then((foodLists) => {
+        const data = order.f_list.map((f, index) => {
+          const foodItem = foodLists[index].data.response.find(
+            (item) => item._id === f.f_id
+          );
+          return {
+            menuName: foodItem.name,
+            menuCount: f.count,
+            menuPrice: foodItem.price,
+            menuPrices: foodItem.price * f.count,
+          };
+        });
+        setOrderData(data);
+        return order.status;
+      })
+      .then((status) => {
+        handleImgStyle(status);
+      });
   };
 
-  const onClickToMenuPosRecPage = (e) => {
-    e.preventDefault();
-    navigate(`/menu-position`);
+  /**order 진행 상황 버튼 클릭 이벤트 */
+  const handleOrderButtonClick = async (index) => {
+    const newOrders = [...orderList];
+
+    if (newOrders[index].status === 0) {
+      newOrders[index].status = 1;
+    } else if (newOrders[index].status === 1) {
+      newOrders[index].status = 2;
+    }
+    // 완료 시 더이상 버튼 못누르게 비활성화나 warning 메시지 띄우기
+
+    /**바뀐 진행 상황 PUT */
+    try {
+      await putOrderStatus(newOrders[index]._id);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setOrderList(newOrders);
+
+    // 업데이트가 완료된 후에 handleDivStyle 호출
+    setTimeout(() => {
+      handleImgStyle(newOrders[index].status);
+    }, 0);
   };
 
-  const onClickToOrderManagePage = (e) => {
-    e.preventDefault();
-    navigate(`/order-manage`);
-  };
+  const handleImgStyle = (status) => {
+    const sectionElement = document.getElementById("orderSeq");
+    const imgElements = Array.from(sectionElement.querySelectorAll("img"));
 
-  const onClickToAnalysisPage = (e) => {
-    e.preventDefault();
-    navigate(`/analysis`);
-  };
-  const onClickToDetailAnalysisPage = (e) => {
-    e.preventDefault();
-    navigate(`/analysis-detail`);
+    imgElements.forEach((imgElement, index) => {
+      if (index % 2 === 0) {
+        // 홀수 번째 이미지 (상태 이미지)
+        if (index / 2 === status) {
+          if (status === 0) {
+            imgElement.src = activeOrderReceive;
+          } else if (status === 1) {
+            imgElement.src = activeCooking;
+          } else if (status === 2) {
+            imgElement.src = activeServe;
+          }
+
+          imgElement.classList.add("active");
+        } else {
+          if (index === 0) {
+            imgElement.src = orderReceive;
+          } else if (index === 2) {
+            imgElement.src = cooking;
+          } else if (index === 4) {
+            imgElement.src = serve;
+          }
+
+          imgElement.classList.remove("active");
+        }
+      }
+    });
   };
 
   return (
-    <div className={Main.inner}>
-      <MenuBar />
-      <section className={Main.sub_page}>
-        <div className={Main.saleAndCal}>
-          <div className={Main.sale}>
-            <div className={Main.sales}>
-              <h2>3,000,000원</h2>
-              <h3 className="saleAmount">오늘의 총 판매량</h3>
-            </div>
-            <h3 className="saleTrend">+5%(판매량 추이)</h3>
+    <SocketProvider>
+      <div>
+        <section className="header">
+          <MenuBar />
+        </section>
+        <div className={Main.inner}>
+          <div className={Main.rest}>
+            <section className={Main.sales}>
+              <h3>(어제보다 오늘) +5%</h3>
+              <h2>2,000,000원</h2>
+              <p>오늘의 총 판매량</p>
+            </section>
+            <section className={Main.cal}>
+              <Calendar onChange={onChange} value={value} />
+              <div className="text-gray-500 mt-4">
+                {moment(value).format("YYYY년 MM월 DD일")}
+              </div>
+            </section>
+            <section className={Main.shortcut}>
+              <ShortCuts />
+            </section>
           </div>
-          <p>
-            캘린더 <br />- 오늘 날짜 알려주기
-          </p>
-        </div>
-
-        <div className={Main.order}>
-          <h2>현재 주문 현황</h2>
-          <hr />
-          <ul className={Main.mList}>
-            <li>
-              쉬림프와사비버거 <button>주문 접수중</button>
-            </li>
-            <li>
-              더블치즈베이컨버거<button>조리완료 및 수령대기</button>
-            </li>
-          </ul>
-        </div>
-        <hr className={Main.vertical} />
-        <div className={Main.pages}>
-          <div className={Main.manage}>
-            <h2>관리 페이지</h2>
-            <div className={Main.Btn}>
-              <button onClick={onClickToAdminManagePage} className={Main.mBtn}>
-                가게 관리
-              </button>
-              <div className={Main.mBtnByCol}>
-                <button
-                  onClick={onClickToMenuManagePage}
-                  className={Main.mBtnMenu}
-                >
-                  메뉴 관리
-                </button>
-                <button
-                  onClick={onClickToMenuPosRecPage}
-                  className={Main.mBtnMenuLoc}
-                >
-                  메뉴판 배치
-                </button>
-                <button
-                  onClick={onClickToOrderManagePage}
-                  className={Main.mBtnOrder}
-                >
-                  주문 관리
-                </button>
+          <div className={Main.orderDashboard}>
+            <div className={Main.orders}>
+              <section className={Main.dashboardBackground} />
+              <div className={Main.orderTodays}>
+                <div className={Main.orderTodaysHeader}>
+                  <h2>현재 주문 내역(오늘)</h2>
+                  <div className={Bar.line}>
+                    <div className={Bar.circle}></div>
+                  </div>
+                </div>
+                <ul>
+                  <hr />
+                  {orderList &&
+                    orderList.map((order, index) => (
+                      <div key={index}>
+                        <div>
+                          <li onClick={() => handleOrderClick(order)}>{`${
+                            orderList.length - index
+                          }. ${
+                            order.foodName.length > 8
+                              ? order.foodName.substring(0, 8) + "..."
+                              : order.foodName
+                          }`}</li>
+                          <section className={Main.manageBtn}>
+                            <button
+                              className={Button.getOrder}
+                              onClick={() => handleOrderButtonClick(index)}
+                            >
+                              <span>
+                                {order.status === 0 && "접수 대기"}
+                                {order.status === 1 && "조리 중"}
+                                {order.status === 2 && "완료"}
+                              </span>
+                            </button>
+                          </section>
+                        </div>
+                        <hr />
+                      </div>
+                    ))}
+                </ul>
               </div>
             </div>
           </div>
-          <div className={Main.analysis}>
-            <h2>분석 페이지</h2>
-            <div className={Main.aBtnByCol}>
-              <button
-                onClick={onClickToAnalysisPage}
-                className={Main.aBtnTotal}
-              >
-                전체 메뉴분석
-              </button>
-              <button
-                onClick={onClickToDetailAnalysisPage}
-                className={Main.aBtnDetail}
-              >
-                메뉴별 분석
-              </button>
+          <div className={Main.orderInfo}>
+            <section className={Main.infoHeader}>
+              <h2>주문 상세 페이지</h2>
+            </section>
+            <div className={Main.infoBody}>
+              <section id="orderSeq" className={Main.orderSeq}>
+                <div>
+                  <img src={orderReceive} alt="주문 접수 이미지" />
+                  <p>주문 접수</p>
+                </div>
+                <img className={Main.arrow} src={arrow} alt="화살표" />
+                <div>
+                  <img src={cooking} alt="조리 시작 이미지" />
+                  <p>조리 중</p>
+                </div>
+                <img className={Main.arrow} src={arrow} alt="화살표" />
+                <div>
+                  <img src={serve} alt="수령 대기 이미지" />
+                  <p>수령 대기</p>
+                </div>
+              </section>
+              <section className={Main.orderDetail}>
+                <h3>주문 내역</h3>
+                <div className={Main.orderContents}>
+                  <Table data={orderData} />
+                </div>
+              </section>
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </SocketProvider>
   );
 }
 
