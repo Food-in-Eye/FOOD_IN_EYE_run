@@ -17,9 +17,9 @@
 
 .menus {
   width: 40%;
-  height: auto;
+  height: 1000px;
   margin-left: 2%;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
   box-shadow: 2px 5px 8px #686868;
 }
 
@@ -39,8 +39,11 @@
 
 .menus ul {
   width: 100%;
-  height: auto;
+  max-height: 100%;
   margin-top: 10%;
+  margin-bottom: 5%;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .menus ul li {
@@ -52,9 +55,10 @@
   font-size: 25px;
 }
 
-.buttons {
+/* .buttons {
   display: flex;
   flex: row nowrap;
+  margin-top: auto;
   margin-bottom: 5%;
 }
 
@@ -63,7 +67,7 @@
   height: 30px;
   margin: 0 10% 0 10%;
   font-size: 20px;
-}
+} */
 
 .middle {
   width: 30%;
@@ -86,6 +90,8 @@
 .theMenu {
   width: 60%;
   height: auto;
+  display: flex;
+  flex-direction: column;
   margin-right: 2%;
   margin-bottom: 2%;
   border-radius: 20px;
@@ -97,7 +103,13 @@
   color: #fff;
 }
 
+.theMenus {
+  height: 100%;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
 .theMenu button {
-  margin-top: 3%;
+  margin-top: auto;
   margin-bottom: 3%;
 }

@@ -1,6 +1,6 @@
 .menuContainer {
-  width: 90%;
-  height: auto;
+  width: 60%;
+  height: 80%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
@@ -8,6 +8,7 @@
 }
 
 .menuItem {
+  height: 200px;
   display: flex;
   place-items: center;
   flex-direction: column;
@@ -20,6 +21,7 @@
 
 .menuItemImg {
   width: 80%;
+  max-width: 150px;
   max-height: 150px;
   margin: 2%;
   object-fit: cover;
