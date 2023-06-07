@@ -11,9 +11,9 @@ function MenuPlacementPage() {
   const sID = localStorage.getItem("storeID");
   const [menuList, setMenuList] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
-  const menuItemsPerPage = 8;
+  // const menuItemsPerPage = 8;
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
 
   const getMenuLists = useCallback(async () => {
     try {
@@ -36,24 +36,25 @@ function MenuPlacementPage() {
     setIsEditMode(false);
   };
 
-  const handleNextPage = () => {
-    if (canNextPage) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
+  /** 리스트 -> 페이지 이동 */
+  // const handleNextPage = () => {
+  //   if (canNextPage) {
+  //     setCurrentPage((prevPage) => prevPage + 1);
+  //   }
+  // };
 
-  const handlePrevPage = () => {
-    if (canPrevPage) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
+  // const handlePrevPage = () => {
+  //   if (canPrevPage) {
+  //     setCurrentPage((prevPage) => prevPage - 1);
+  //   }
+  // };
 
-  const startIndex = (currentPage - 1) * menuItemsPerPage;
-  const endIndex = startIndex + menuItemsPerPage;
-  const currentMenuItems = menuList.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * menuItemsPerPage;
+  // const endIndex = startIndex + menuItemsPerPage;
+  // const currentMenuItems = menuList.slice(startIndex, endIndex);
 
-  const canPrevPage = currentPage > 1;
-  const canNextPage = endIndex < menuList.length;
+  // const canPrevPage = currentPage > 1;
+  // const canNextPage = endIndex < menuList.length;
 
   const handleDragStart = (e, menuItem) => {
     e.dataTransfer.setData("text/plain", JSON.stringify(menuItem));
@@ -70,28 +71,24 @@ function MenuPlacementPage() {
             <span>메뉴 리스트</span>
           </h2>
           <ul>
-            {currentMenuItems.map((menuItem, index) => (
+            {menuList.map((menu, index) => (
               <li
-                key={index}
+                key={menu._id}
                 draggable={true}
-                onDragStart={(e) => handleDragStart(e, menuItem)}
+                onDragStart={(e) => handleDragStart(e, menu)}
               >
-                {(currentPage - 1) * menuItemsPerPage +
-                  index +
-                  1 +
-                  ". " +
-                  menuItem.name}
+                {`${index + 1}. ${menu.name}`}
               </li>
             ))}
           </ul>
-          <div className={MPlace.buttons}>
+          {/* <div className={MPlace.buttons}>
             <button onClick={handlePrevPage} disabled={!canPrevPage}>
               {"<"}
             </button>
             <button onClick={handleNextPage} disabled={!canNextPage}>
               {">"}
             </button>
-          </div>
+          </div> */}
         </div>
         <div className={MPlace.middle}>
           <p>
