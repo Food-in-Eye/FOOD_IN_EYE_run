@@ -221,6 +221,10 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
             print(key, h_id)
             asyncio.create_task(preprocess_and_update(key, h_id))
             print('after')
+
+            # websocket으로 gaze 요청 그만 보내기
+            websocket_manager.app_gaze_collections[h_id] = True
+
             return {
             'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
             'status': 'OK'
