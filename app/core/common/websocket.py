@@ -23,7 +23,6 @@ class ConnectionManager:
     def __init__(self):
         self.web_connections = {}
         self.app_connections = {}
-        self.app_gaze_collections = {}
 
     async def connect(self, websocket: WebSocket, s_id: str|None, h_id: str|None):
         """ websocket 연결을 허용하고 s_id, history 입력값에 따라 web, app을 구분하여 저장한다. 
@@ -33,9 +32,9 @@ class ConnectionManager:
                 - web_connections = {s_id : websocket}
             2. h_id 입력시, app_connections에 저장
                 - app_connections = {h_id : {"ws" : websocket,
-                                             "order" : {o_id : s_id, ... }
+                                             "order" : {o_id : s_id, ... },
+                                             "gaze" : bool
                                             } }
-                - app_app_gaze_collections = {h_id : bool}
         """
 
         await websocket.accept()
@@ -69,9 +68,9 @@ class ConnectionManager:
 
             self.app_connections[h_id] = {
                                             "ws": websocket,
-                                            "order": order_dict
+                                            "order": order_dict,
+                                            "gaze": False
                                          }
-            self.app_gaze_collections[h_id] = False
 
             await self.send_client_data(websocket, connected_data)
             
@@ -79,7 +78,7 @@ class ConnectionManager:
             await self.send_create(h_id)  
             # app 연결 시, app에게 gaze 요청
             await self.send_alarm_gaze(websocket, h_id)
-
+            
         else:
             await self.send_client_data(websocket, {"type": "connect", "result": "closed"})
             raise WebSocketDisconnect(f'The connection is denied.')
@@ -160,7 +159,6 @@ class ConnectionManager:
         if s_id in self.web_connections:
             await self.disconnect(self.web_connections[s_id], s_id, h_id)
         if h_id in self.app_connections:
-            print(self.app_connections[h_id]["ws"])
             await self.disconnect(self.app_connections[h_id]["ws"], s_id, h_id)
     
     async def delete_connections(self, websocket:WebSocket, s_id:str, h_id:str):
@@ -172,7 +170,6 @@ class ConnectionManager:
             del self.web_connections[s_id]
         if h_id in self.app_connections and self.app_connections[h_id]["ws"] == websocket:
             del self.app_connections[h_id]
-            del self.app_gaze_collections[h_id]
 
     async def get_app_websocekt(self, input_o_id: str) -> WebSocket:
         """ o_id를 가지는 websocket(app)를 반환한다.
@@ -281,9 +278,9 @@ class ConnectionManager:
         """
         result = {"type": "request", "result": "gaze_omission"}
         history = DB.read_by_id('history', h_id)
-
+        
         if history['gaze_path'] == None:
-            while self.app_gaze_collections[h_id] != True:
+            while self.app_connections[h_id]['gaze'] != True:
                 await asyncio.sleep(3)
                 await self.send_client_data(websocekt, result)
                 print(result)
