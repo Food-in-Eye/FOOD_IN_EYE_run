@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import TM from "../css/TheMenus.module.css";
 import { getMenus } from "./API.module";
@@ -30,7 +30,7 @@ function TheMenus({ isEditMode }) {
     setIsDragOver(true);
   };
 
-  const handleDrop = (e, index) => {
+  const handleDrop = useCallback((e, index) => {
     e.preventDefault();
     setIsDragOver(false);
 
@@ -46,7 +46,7 @@ function TheMenus({ isEditMode }) {
 
       return updatedMenuItems;
     });
-  };
+  }, []);
 
   const handleMouseOver = (index) => {
     if (isDragOver && isEditMode) {
@@ -61,35 +61,53 @@ function TheMenus({ isEditMode }) {
   };
 
   return (
-    <div
-      className={TM.menuContainer}
+    <table
+      className={TM.menuTable}
       onDragOver={handleDragOver}
       onMouseLeave={handleMouseLeave}
     >
-      {menuItems.map((item, index) => (
-        <div
-          key={index}
-          className={`${TM.menuItem} ${
-            isEditMode && hoveredIndex === index ? TM.gridHovered : ""
-          }`}
-          onMouseOver={() => handleMouseOver(index)}
-          onMouseLeave={handleMouseLeave}
-          onDragEnter={() => setHoveredIndex(index)}
-          onDragLeave={() => setHoveredIndex(null)}
-          onDrop={(e) => handleDrop(e, index)}
-        >
-          <img
-            src={`https://foodineye.s3.ap-northeast-2.amazonaws.com/${item.img_key}`}
-            alt="이미지 없음"
-            className={TM.menuItemImg}
-          />
-          <div className={TM.menuItemDetails}>
-            <div className={TM.menuItemName}>{item.name}</div>
-            <div className={TM.menuItemPrice}>{item.price}</div>
-          </div>
-        </div>
-      ))}
-    </div>
+      <tbody>
+        {menuItems.map((item, index) => {
+          if (index % 3 === 0) {
+            const group = menuItems.slice(index, index + 3);
+
+            return (
+              <tr key={index}>
+                {group.map((menuItem, i) => (
+                  <td
+                    key={i}
+                    className={`${TM.menuItem} ${
+                      isEditMode && hoveredIndex === index + i
+                        ? TM.gridHovered
+                        : ""
+                    }`}
+                    onMouseOver={() => handleMouseOver(index + i)}
+                    onMouseLeave={handleMouseLeave}
+                    onDragEnter={() => setHoveredIndex(index + i)}
+                    onDragLeave={() => setHoveredIndex(null)}
+                    onDrop={(e) => handleDrop(e, index + i)}
+                  >
+                    <img
+                      src={`https://foodineye.s3.ap-northeast-2.amazonaws.com/${menuItem.img_key}`}
+                      alt="이미지 없음"
+                      className={TM.menuItemImg}
+                    />
+                    <div className={TM.menuItemDetails}>
+                      <div className={TM.menuItemName}>{menuItem.name}</div>
+                      <div className={TM.menuItemPrice}>{menuItem.price}</div>
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            );
+          }
+          // column에 맞지 않는 요소는 빈 셀로 채우기
+          if (index % 3 !== 0) {
+            return null;
+          }
+        })}
+      </tbody>
+    </table>
   );
 }
 

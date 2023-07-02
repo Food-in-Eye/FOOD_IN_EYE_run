@@ -100,16 +100,21 @@ function MenuPlacementPage() {
         </div>
         <div className={MPlace.theMenu}>
           <h2>메뉴판</h2>
-          <TheMenus isEditMode={isEditMode} />
-          {isEditMode ? (
-            <button className={Button.saveMenu} onClick={handleSaveBtnClick}>
-              저장하기
-            </button>
-          ) : (
-            <button className={Button.modifyMenu} onClick={handleEditBtnClick}>
-              수정하기
-            </button>
-          )}
+          <div className={MPlace.borderOfTheMenu}>
+            <TheMenus isEditMode={isEditMode} />
+            {isEditMode ? (
+              <button className={Button.saveMenu} onClick={handleSaveBtnClick}>
+                저장하기
+              </button>
+            ) : (
+              <button
+                className={Button.modifyMenu}
+                onClick={handleEditBtnClick}
+              >
+                수정하기
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
