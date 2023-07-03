@@ -53,7 +53,7 @@ function MenuManagePage() {
           setSelectedMenu(res.data.response);
           if (res.data.response.img_key) {
             setSelectedMenuImgURL(
-              `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
+              `https://foodineye2.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
             );
           }
         })

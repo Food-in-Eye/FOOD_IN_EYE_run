@@ -88,7 +88,7 @@ function TheMenus({ isEditMode }) {
                     onDrop={(e) => handleDrop(e, index + i)}
                   >
                     <img
-                      src={`https://foodineye.s3.ap-northeast-2.amazonaws.com/${menuItem.img_key}`}
+                      src={`https://foodineye2.s3.ap-northeast-2.amazonaws.com/${menuItem.img_key}`}
                       alt="이미지 없음"
                       className={TM.menuItemImg}
                     />
