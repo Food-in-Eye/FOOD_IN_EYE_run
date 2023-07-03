@@ -9,7 +9,6 @@ import MenuBar from "../components/MenuBar";
 import Table from "../components/Table.module";
 import ShortCuts from "../components/ShortCutForPages.module";
 
-/**import images from ../images/* */
 import orderReceive from "../images/order_received.png";
 import activeOrderReceive from "../images/active_order_received.png";
 import cooking from "../images/cooking.png";

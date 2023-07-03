@@ -99,9 +99,8 @@ function MenuPlacementPage() {
           <img src={arrow} alt="화살표 이미지" />
         </div>
         <div className={MPlace.theMenu}>
-          <h2>메뉴판</h2>
-          <div className={MPlace.borderOfTheMenu}>
-            <TheMenus isEditMode={isEditMode} />
+          <div className={MPlace.headOfTheMenu}>
+            <h2>메뉴판</h2>
             {isEditMode ? (
               <button className={Button.saveMenu} onClick={handleSaveBtnClick}>
                 저장하기
@@ -114,6 +113,9 @@ function MenuPlacementPage() {
                 수정하기
               </button>
             )}
+          </div>
+          <div className={MPlace.contentsOfTheMenu}>
+            <TheMenus isEditMode={isEditMode} />
           </div>
         </div>
       </div>
