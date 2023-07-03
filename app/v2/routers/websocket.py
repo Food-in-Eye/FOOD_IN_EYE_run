@@ -13,7 +13,7 @@ from typing import Optional
 websocket_router = APIRouter(prefix="/websockets")
 
 PREFIX = 'api/v2/websockets'
-DB = MongodbController('FIE_DB')
+DB = MongodbController('FIE_DB2')
 
 @websocket_router.get("/hello")
 async def hello():
