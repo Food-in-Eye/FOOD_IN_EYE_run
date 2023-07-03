@@ -27,6 +27,7 @@ class FoodModel(BaseModel):
 class FoodPos(BaseModel):
     pos: int = Field(title="position of food")
     f_id: str = Field(title="Food identifier")
+    f_num: int = Field(title="number of food")
 
 class MenuModel(BaseModel):
     # s_id: str = Field(title="Restaurant identifier for this menu")

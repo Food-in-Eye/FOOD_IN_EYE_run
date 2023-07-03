@@ -77,6 +77,13 @@ async def create_store(store:StoreModel):
     data['status'] = data['status'].value
 
     try:
+        store_list = DB.read_all('store')
+        if not store_list: # menu 최초 등록
+            data['num'] = 1
+        else:
+            max_num = max(store["num"] for store in store_list)
+            data['num'] = max_num + 1
+
         id = str(DB.create('store', data))
 
     except Exception as e:
