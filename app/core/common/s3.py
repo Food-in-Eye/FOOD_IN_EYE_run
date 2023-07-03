@@ -1,6 +1,7 @@
 import os
 import boto3
 import uuid
+import json
 from dotenv import load_dotenv
 
 class Storage:
@@ -23,9 +24,17 @@ class Storage:
             key = uuid.uuid4()
         key = path + '/' + str(key) + '.' + form
 
+        if form == "json":
+            file_data = json.dumps(file_data)
+
         self.s3.put_object(Bucket=self.bucket, Key=key, Body=file_data)
 
-        return key
+        return str(key)
+    
+    def get_json(self, key:str) -> dict:
+        response = self.s3.get_object(Bucket=self.bucket, Key=key)
+        data = response['Body'].read().decode('utf-8')
+        return json.loads(data)
         
     def delete(self, key:str) -> None:
         self.s3.delete_object(Bucket=self.bucket, Key=key)

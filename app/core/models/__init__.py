@@ -1,5 +1,4 @@
 from .aoi import *
-from .fixation import *
-from .gaze_point import *
+from .gaze import RawGazeModel
 from .store import *
 from .order import *
