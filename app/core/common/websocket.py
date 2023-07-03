@@ -295,7 +295,6 @@ def check_client_in_db(db:str, id:str):
     try:
         if DB.read_by_id(db, id):
             return True
-        False
     except Exception:
         pass
     return False
