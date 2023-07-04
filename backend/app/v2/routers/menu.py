@@ -13,7 +13,7 @@ from .src.util import Util
 menu_router = APIRouter(prefix="/menus")
 
 PREFIX = 'api/v2/menus'
-DB = MongodbController('FIE_DB')
+DB = MongodbController('FIE_DB2')
 
 @menu_router.get("/hello")
 async def hello():

@@ -10,7 +10,7 @@ from .src.util import Util
 store_router = APIRouter(prefix="/stores")
 
 PREFIX = 'api/v2/stores'
-DB = MongodbController('FIE_DB')
+DB = MongodbController('FIE_DB2')
 
 @store_router.get("/hello")
 async def hello():
