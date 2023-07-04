@@ -74,9 +74,16 @@ async def create_food(s_id:str, food:FoodModel):
     # todo: 실제 존재하는 가게의 id인지 확인하면 좋을 듯 함.(사고 방지)
     data['s_id'] = s_id
     data['img_key'] = None
+
     try:
+        food_list = DB.read_all_by_feild('food', 's_id', s_id)
+        if not food_list: # s_id에 해당하는 food 최초 등록
+            data['num'] = 1
+        else:
+            max_num = max(store['num'] for store in food_list)
+            data['num'] = max_num + 1
+
         id = str(DB.create('food', data))
-        print(data)
 
     except Exception as e:
         print('ERROR', e)

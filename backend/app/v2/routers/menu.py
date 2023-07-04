@@ -123,7 +123,8 @@ async def read_menu_with_foods(id:str):
                 "img_key" : food['img_key'],
                 "desc" : food['desc'],
                 "allergy" : food['allergy'],
-                "origin" : food['origin']
+                "origin" : food['origin'],
+                "num": food['num']
             })
         response['f_list'] = food_list
 

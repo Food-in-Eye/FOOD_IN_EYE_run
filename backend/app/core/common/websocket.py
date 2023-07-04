@@ -7,6 +7,8 @@ from core.common.mongo2 import MongodbController
 from fastapi import WebSocket, WebSocketDisconnect
 import json
 
+import asyncio
+
 DB = MongodbController('FIE_DB')
 
 class ConnectionManager:
@@ -30,7 +32,8 @@ class ConnectionManager:
                 - web_connections = {s_id : websocket}
             2. h_id 입력시, app_connections에 저장
                 - app_connections = {h_id : {"ws" : websocket,
-                                             "order" : {o_id : s_id, ... }
+                                             "order" : {o_id : s_id, ... },
+                                             "gaze" : bool
                                             } }
         """
 
@@ -65,14 +68,17 @@ class ConnectionManager:
 
             self.app_connections[h_id] = {
                                             "ws": websocket,
-                                            "order": order_dict
+                                            "order": order_dict,
+                                            "gaze": False
                                          }
 
             await self.send_client_data(websocket, connected_data)
             
             # app 연결 시, web에게 주문생성 전송
             await self.send_create(h_id)  
-
+            # app 연결 시, app에게 gaze 요청
+            await self.send_alarm_gaze(websocket, h_id)
+            
         else:
             await self.send_client_data(websocket, {"type": "connect", "result": "closed"})
             raise WebSocketDisconnect(f'The connection is denied.')
@@ -153,7 +159,6 @@ class ConnectionManager:
         if s_id in self.web_connections:
             await self.disconnect(self.web_connections[s_id], s_id, h_id)
         if h_id in self.app_connections:
-            print(self.app_connections[h_id]["ws"])
             await self.disconnect(self.app_connections[h_id]["ws"], s_id, h_id)
     
     async def delete_connections(self, websocket:WebSocket, s_id:str, h_id:str):
@@ -266,11 +271,30 @@ class ConnectionManager:
             print({"type": "update_status", "result": "fail", "reason": "app client is not connected"})
 
 
+    async def send_alarm_gaze(self, websocekt : WebSocket, h_id : str):
+        """ (POST order/gaze) app에게 gaze를 보내라고 알린다.
+            - input : websocekt, websocekt
+            - return : X
+        """
+        result = {"type": "request", "result": "gaze_omission"}
+        history = DB.read_by_id('history', h_id)
+        
+        if history['gaze_path'] == None:
+            while self.app_connections[h_id]['gaze'] != True:
+                await asyncio.sleep(3)
+                await self.send_client_data(websocekt, result)
+                print(result)
+
+        result["result"] = "gaze_success"
+        await self.send_client_data(websocekt, result)
+        print(result)
+
+
+
 def check_client_in_db(db:str, id:str):
     try:
         if DB.read_by_id(db, id):
             return True
-        False
     except Exception:
         pass
     return False
