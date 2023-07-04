@@ -188,13 +188,13 @@ function MenuManagePage() {
             setCroppedImage(null);
           })
           .catch((e) => {
-            for (let key of formData.keys()) {
-              console.log(key, ":", formData.get(key));
-            }
+            // for (let key of formData.keys()) {
+            //   console.log(key, ":", formData.get(key));
+            // }
 
-            for (let value of formData.values()) {
-              console.log(value);
-            }
+            // for (let value of formData.values()) {
+            //   console.log(value);
+            // }
 
             console.log("put에러: ", e);
           });
