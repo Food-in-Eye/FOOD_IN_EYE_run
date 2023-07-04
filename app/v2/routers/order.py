@@ -18,9 +18,9 @@ from .websocket import websocket_manager as websocket_manager
 order_router = APIRouter(prefix="/orders")
 
 PREFIX = 'api/v2/orders'
-DB = MongodbController('FIE_DB')
+DB = MongodbController('FIE_DB2')
 
-storage = Storage('foodineye')
+storage = Storage('foodineye2')
 
 @order_router.get("/hello")
 async def hello():
