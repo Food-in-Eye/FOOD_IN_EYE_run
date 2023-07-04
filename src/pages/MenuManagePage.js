@@ -12,7 +12,7 @@ import {
   putFoods,
   postFood,
 } from "../components/API.module";
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 function MenuManagePage() {
   const sID = localStorage.getItem("storeID");
@@ -30,7 +30,6 @@ function MenuManagePage() {
 
   const selectedMenuIdRef = useRef();
 
-  /** GET 메서드 */
   useEffect(() => {
     setError(null);
     setLoading(true);
@@ -41,12 +40,6 @@ function MenuManagePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const memorizedGetMenu = useMemo(
-    () => getFood(selectedMenuIdRef.current),
-    [selectedMenuIdRef.current]
-  );
-
-  /** 선택한 menu -> menuId에 따라 get */
   const handleMenuClick = useCallback(
     async (e, menuId) => {
       e.preventDefault();
@@ -60,7 +53,7 @@ function MenuManagePage() {
           setSelectedMenu(res.data.response);
           if (res.data.response.img_key) {
             setSelectedMenuImgURL(
-              `https://foodineye.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
+              `https://foodineye2.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
             );
           }
         })
@@ -69,24 +62,20 @@ function MenuManagePage() {
     [selectedMenuIdRef]
   );
 
-  /** edit descriptions of menu when click modify button */
   const [menuName, setMenuName] = useState(selectedMenu.name);
   const [menuDesc, setMenuDesc] = useState(selectedMenu.desc);
   const [menuAllergy, setMenuAllergy] = useState(selectedMenu.allergy);
   const [originItems, setOriginItems] = useState(selectedMenu.origin);
   const [menuPrice, setMenuPrice] = useState(selectedMenu.price);
 
-  /** 로컬에서 선택한 이미지로 메뉴 이미지 수정 */
   const [menuImg, setMenuImg] = useState(selectedMenu.img_key);
   const cropperRef = useRef(null);
   const [inputImage, setInputImage] = useState(null);
   const [croppedImage, setCroppedImage] = useState(null);
 
-  /**새로운 메뉴 추가 */
   const handleAddNewMenu = (e) => {
     e.preventDefault();
 
-    // POST 메서드를 통해 메뉴 최초 생성
     postFood(sID, {
       s_id: sID,
       name: "new Menu",
@@ -105,7 +94,6 @@ function MenuManagePage() {
       });
   };
 
-  /** 메뉴 세부내용 수정 */
   const handleEditMenuClick = (e) => {
     e.preventDefault();
 
@@ -120,7 +108,6 @@ function MenuManagePage() {
     }
   };
 
-  /** 메뉴 정보 - 수정 내용 저장 */
   const handleSaveMenuClick = useCallback(async (e) => {
     e.preventDefault();
 
@@ -143,7 +130,6 @@ function MenuManagePage() {
         });
         setEditMenu(false);
 
-        //menuList 상태 업데이트
         const menuIndex = menuList.findIndex(
           (menu) => menu._id === selectedMenuIdRef.current
         );
@@ -178,7 +164,6 @@ function MenuManagePage() {
     });
   };
 
-  //메뉴 이미지 업데이트
   const handleSaveImgClick = async (e) => {
     e.preventDefault();
 
@@ -186,7 +171,7 @@ function MenuManagePage() {
 
     try {
       if (croppedImage.length !== 0) {
-        formData.append("file", croppedImage); // key, value 추가
+        formData.append("file", croppedImage);
 
         axios
           .put(`/api/v2/foods/food/image?id=${selectedMenu._id}`, formData, {
@@ -195,21 +180,21 @@ function MenuManagePage() {
             },
           })
           .then((res) => {
-            console.log(res.data);
-            console.log(res.data.img_url);
+            // console.log(res.data);
+            // console.log(res.data.img_url);
             setSelectedMenuImgURL(res.data.img_url);
             setEditMenuImg(false);
             setInputImage(null);
             setCroppedImage(null);
           })
           .catch((e) => {
-            for (let key of formData.keys()) {
-              console.log(key, ":", formData.get(key));
-            }
+            // for (let key of formData.keys()) {
+            //   console.log(key, ":", formData.get(key));
+            // }
 
-            for (let value of formData.values()) {
-              console.log(value);
-            }
+            // for (let value of formData.values()) {
+            //   console.log(value);
+            // }
 
             console.log("put에러: ", e);
           });

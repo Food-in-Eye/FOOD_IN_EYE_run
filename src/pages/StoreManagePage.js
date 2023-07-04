@@ -10,7 +10,6 @@ function StoreManagePage() {
 
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
-  const [error, setError] = useState(null);
 
   const [editDescAndSchedule, setEditDescAndSchedule] = useState(false);
   const [editNoti, setEditNoti] = useState(false);
@@ -19,13 +18,9 @@ function StoreManagePage() {
   const [isCloseButtonClicked, setIsCloseButtonClicked] = useState(false);
 
   useEffect(() => {
-    //GET 요청을 보내서 데이터 반영
     const fetchStore = async () => {
       try {
-        /**요청 시작 시 error과 store 초기화*/
-        setError(null);
         setStore([]);
-        //loading 상태는 true로 세팅
         setLoading(true);
 
         const request = await getStore(sID);
@@ -36,8 +31,8 @@ function StoreManagePage() {
         } else if (request.data.response.status === 2) {
           setIsCloseButtonClicked(true);
         }
-      } catch (e) {
-        setError(e);
+      } catch (error) {
+        console.log(error);
       }
       setLoading(false);
     };
@@ -94,7 +89,6 @@ function StoreManagePage() {
       });
   };
 
-  //open 버튼 클릭 시
   const handleOpenBtnClick = () => {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
@@ -111,7 +105,6 @@ function StoreManagePage() {
       });
   };
 
-  //close 버튼 클릭 시
   const handleCloseBtnClick = () => {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
@@ -199,7 +192,6 @@ function StoreManagePage() {
               </div>
 
               {editDescAndSchedule ? (
-                //show edit button when editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleDescAndScheduleSaveClick}
@@ -207,7 +199,6 @@ function StoreManagePage() {
                   저장
                 </button>
               ) : (
-                //show modify button when not editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleEditDescAndScheduleClick}
@@ -236,7 +227,6 @@ function StoreManagePage() {
               </div>
 
               {editNoti ? (
-                //show edit button when editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleNotiSaveClick}
@@ -244,7 +234,6 @@ function StoreManagePage() {
                   저장
                 </button>
               ) : (
-                //show modify button when not editing
                 <button
                   className={`${Button.modify} ${Store.modifyBtn}`}
                   onClick={handleEditNotiClick}

@@ -30,7 +30,7 @@ function ShortCutForPages() {
   const onClickToMenuPosRecPage = (e) => {
     e.preventDefault();
 
-    navigate(`/menu-position`);
+    navigate(`/menu-placement`);
   };
   const onClickToAnalysisPage = (e) => {
     e.preventDefault();
