@@ -1,0 +1,35 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 10%;
+}
+
+td {
+  width: 200px;
+  height: 200px;
+  padding: 10px;
+  text-align: center;
+  align-items: center;
+  border: 1px solid #000;
+}
+
+.menuItemImg {
+  width: 100%;
+  height: 80%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.menuItemName,
+.menuItemPrice {
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.gridHovered {
+  border: 5px dashed #ff9345;
+}
+
+.emptyCell {
+  visibility: hidden;
+}

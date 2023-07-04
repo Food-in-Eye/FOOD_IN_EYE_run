@@ -9,7 +9,6 @@ import MenuBar from "../components/MenuBar";
 import Table from "../components/Table.module";
 import ShortCuts from "../components/ShortCutForPages.module";
 
-/**import images from ../images/* */
 import orderReceive from "../images/order_received.png";
 import activeOrderReceive from "../images/active_order_received.png";
 import cooking from "../images/cooking.png";
@@ -50,7 +49,6 @@ function MainPage() {
         console.log("WebSocket connection established");
       };
 
-      // 웹소켓 연결 시 받는 메시지
       newSocket.onmessage = (event) => {
         const response = JSON.parse(event.data);
         console.log("Received response:", response);
@@ -59,7 +57,6 @@ function MainPage() {
         }
       };
 
-      // 웹소켓 연결 에러 발생 시
       newSocket.onerror = (e) => {
         console.log("WebSocket error:", e);
       };
@@ -73,11 +70,9 @@ function MainPage() {
   const orderLists = useCallback(async () => {
     try {
       setLoading(true);
-      console.log(`orderLists 함수`);
 
       const ordersResponse = await getOrders(ordersQuery);
       const orders = ordersResponse.data.response;
-      console.log(orders);
       const foodIds = orders.map((order) => order.f_list[0].f_id);
       const foodsResponse = await Promise.all(
         foodIds.map((fID) => getFood(fID))
@@ -111,11 +106,8 @@ function MainPage() {
     connectWS(sID);
   }, [sID]);
 
-  /**order 클릭 시 상세 페이지에 출력 */
   const handleOrderClick = (order) => {
     setOrderData([]);
-    console.log("status: ", order.status);
-
     const promises = order.f_list.map((f) => getFoods(order.s_id));
 
     Promise.all(promises)
@@ -139,7 +131,6 @@ function MainPage() {
       });
   };
 
-  /**order 진행 상황 버튼 클릭 이벤트 */
   const handleOrderButtonClick = async (index) => {
     const newOrders = [...orderList];
 
@@ -150,7 +141,6 @@ function MainPage() {
     }
     // 완료 시 더이상 버튼 못누르게 비활성화나 warning 메시지 띄우기
 
-    /**바뀐 진행 상황 PUT */
     try {
       await putOrderStatus(newOrders[index]._id);
     } catch (error) {
@@ -159,7 +149,6 @@ function MainPage() {
 
     setOrderList(newOrders);
 
-    // 업데이트가 완료된 후에 handleDivStyle 호출
     setTimeout(() => {
       handleImgStyle(newOrders[index].status);
     }, 0);
@@ -171,7 +160,6 @@ function MainPage() {
 
     imgElements.forEach((imgElement, index) => {
       if (index % 2 === 0) {
-        // 홀수 번째 이미지 (상태 이미지)
         if (index / 2 === status) {
           if (status === 0) {
             imgElement.src = activeOrderReceive;

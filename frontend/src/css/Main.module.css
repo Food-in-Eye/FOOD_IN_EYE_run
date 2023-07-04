@@ -113,7 +113,7 @@
 .orderDashboard .orders .orderTodays ul {
   margin-top: 10%;
   max-height: 100%;
-  overflow: scroll;
+  overflow-y: auto;
 }
 
 .orderDashboard .orders .orderTodays li {
