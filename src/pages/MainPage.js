@@ -70,11 +70,9 @@ function MainPage() {
   const orderLists = useCallback(async () => {
     try {
       setLoading(true);
-      console.log(`orderLists 함수`);
 
       const ordersResponse = await getOrders(ordersQuery);
       const orders = ordersResponse.data.response;
-      console.log(orders);
       const foodIds = orders.map((order) => order.f_list[0].f_id);
       const foodsResponse = await Promise.all(
         foodIds.map((fID) => getFood(fID))
@@ -110,8 +108,6 @@ function MainPage() {
 
   const handleOrderClick = (order) => {
     setOrderData([]);
-    console.log("status: ", order.status);
-
     const promises = order.f_list.map((f) => getFoods(order.s_id));
 
     Promise.all(promises)

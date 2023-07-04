@@ -180,8 +180,8 @@ function MenuManagePage() {
             },
           })
           .then((res) => {
-            console.log(res.data);
-            console.log(res.data.img_url);
+            // console.log(res.data);
+            // console.log(res.data.img_url);
             setSelectedMenuImgURL(res.data.img_url);
             setEditMenuImg(false);
             setInputImage(null);
