@@ -76,3 +76,14 @@ export const postFood = (s_id, data) => {
     withCredentials: true,
   });
 };
+
+export const postMenu = (s_id, data) => {
+  const requestUrl = `${MENUS_URL}/menu?s_id=${s_id}`;
+
+  return axios.post(requestUrl, JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+};
