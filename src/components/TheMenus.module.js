@@ -3,18 +3,14 @@ import { useCallback, useEffect, useState } from "react";
 import TM from "../css/TheMenus.module.css";
 import { getMenus, getFoods } from "./API.module";
 
-function TheMenus({ isEditMode }) {
+function TheMenus({ isEditMode, menuItems, setMenuItems }) {
   const sID = localStorage.getItem("storeID");
-  const [menuItems, setMenuItems] = useState([]);
+  // const [menuItems, setMenuItems] = useState([]);
   const [foodCount, setFoodCount] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
-  useEffect(() => {
-    getMenuItems();
-  }, []);
-
-  const getMenuItems = async () => {
+  const getMenuItems = useCallback(async () => {
     try {
       const res = await getMenus(`/q?s_id=${sID}`);
       const mID = res.data.response[0]._id;
@@ -27,30 +23,39 @@ function TheMenus({ isEditMode }) {
     } catch (error) {
       console.error(`menu-items GET error:`, error);
     }
-  };
+  }, [sID, setMenuItems]);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      getMenuItems();
+    }
+  }, [isEditMode, getMenuItems]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragOver(true);
   };
 
-  const handleDrop = useCallback((e, index) => {
-    e.preventDefault();
-    setIsDragOver(false);
+  const handleDrop = useCallback(
+    (e, index) => {
+      e.preventDefault();
+      setIsDragOver(false);
 
-    const data = e.dataTransfer.getData("text/plain");
-    const draggedMenuItem = JSON.parse(data);
-    console.log(draggedMenuItem);
-    const targetIndex = index;
-    console.log(targetIndex);
+      const data = e.dataTransfer.getData("text/plain");
+      const draggedMenuItem = JSON.parse(data);
+      console.log(draggedMenuItem);
+      const targetIndex = index;
+      console.log(targetIndex);
 
-    setMenuItems((prevMenuItems) => {
-      const updatedMenuItems = [...prevMenuItems];
-      updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
+      setMenuItems((prevMenuItems) => {
+        const updatedMenuItems = [...prevMenuItems];
+        updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
 
-      return updatedMenuItems;
-    });
-  }, []);
+        return updatedMenuItems;
+      });
+    },
+    [setMenuItems]
+  );
 
   const handleMouseOver = (index) => {
     if (isDragOver && isEditMode) {
