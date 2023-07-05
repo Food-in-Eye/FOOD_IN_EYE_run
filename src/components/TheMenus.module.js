@@ -13,12 +13,24 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
   const getMenuItems = useCallback(async () => {
     try {
       const res = await getMenus(`/q?s_id=${sID}`);
-      const mID = res.data.response[0]._id;
+      const mID =
+        res.data.response.length > 0 ? res.data.response[0]._id : null;
       const resMenu = await getMenus(`/menu/foods?id=${mID}`);
 
       const resFood = await getFoods(sID);
 
-      setMenuItems(resMenu.data.response.f_list || []);
+      if (
+        resMenu &&
+        resMenu.data &&
+        resMenu.data.response &&
+        resMenu.data.response.f_list
+      ) {
+        setMenuItems(resMenu.data.response.f_list);
+      } else {
+        setMenuItems([]);
+      }
+
+      // setMenuItems(resMenu.data.response.f_list || []);
       setFoodCount(resFood.data.response.length);
     } catch (error) {
       console.error(`menu-items GET error: ${error}`);

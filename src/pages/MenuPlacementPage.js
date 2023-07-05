@@ -40,7 +40,7 @@ function MenuPlacementPage() {
     const data = {
       f_list: menuItems.map((menuItem, index) => ({
         pos: index + 1,
-        f_id: menuItem.f_id,
+        f_id: menuItem._id,
         f_num: menuItem.num,
       })),
     };
@@ -48,8 +48,7 @@ function MenuPlacementPage() {
     console.log(data);
 
     try {
-      const response = await postMenu(sID, data);
-      console.log(response.data.response);
+      await postMenu(sID, data);
     } catch (error) {
       console.log(error);
     }
