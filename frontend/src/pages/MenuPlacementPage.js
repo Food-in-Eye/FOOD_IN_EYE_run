@@ -4,12 +4,13 @@ import Button from "../css/Button.module.css";
 import MPlace from "../css/MenuPlacement.module.css";
 import arrow from "../images/right_arrow.jpeg";
 
-import { getFoods } from "../components/API.module";
+import { getFoods, postMenu } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
 
 function MenuPlacementPage() {
   const sID = localStorage.getItem("storeID");
   const [menuList, setMenuList] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
   // const menuItemsPerPage = 8;
 
@@ -32,8 +33,26 @@ function MenuPlacementPage() {
     setIsEditMode(true);
   };
 
-  const handleSaveBtnClick = () => {
+  const handleSaveBtnClick = async (e) => {
     setIsEditMode(false);
+    console.log(menuItems);
+
+    const data = {
+      f_list: menuItems.map((menuItem, index) => ({
+        pos: index + 1,
+        f_id: menuItem.f_id,
+        f_num: menuItem.num,
+      })),
+    };
+
+    console.log(data);
+
+    try {
+      const response = await postMenu(sID, data);
+      console.log(response.data.response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /** 리스트 -> 페이지 이동 */
@@ -115,7 +134,11 @@ function MenuPlacementPage() {
             )}
           </div>
           <div className={MPlace.contentsOfTheMenu}>
-            <TheMenus isEditMode={isEditMode} />
+            <TheMenus
+              isEditMode={isEditMode}
+              menuItems={menuItems}
+              setMenuItems={setMenuItems}
+            />
           </div>
         </div>
       </div>
