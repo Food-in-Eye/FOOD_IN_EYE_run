@@ -51,6 +51,12 @@ function MenuBar() {
               <li>
                 <a href="./analysis-detail">메뉴별 분석</a>
               </li>
+              <li>
+                <a href="./gaze-visualize">Gaze 시각화</a>
+              </li>
+              <li>
+                <a href="./fixation-visualize">Fixation 시각화</a>
+              </li>
             </ul>
           </li>
           <li>
