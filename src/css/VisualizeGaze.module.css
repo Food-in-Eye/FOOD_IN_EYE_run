@@ -1,3 +1,26 @@
-div canvas {
-  background-color: beige;
+.gazePoint {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background-color: red;
+}
+
+.gazePlot {
+  position: relative;
+  width: 643.2px;
+  height: auto;
+  border: 1px solid black;
+  margin: 20px;
+}
+
+.gazePlotRow {
+  display: flex;
+  /* justify-content: space-between; */
+  /* flex-flow: wrap; */
+  margin-bottom: 20px;
+}
+
+.screens {
+  display: flex;
+  flex-flow: row nowrap;
 }
