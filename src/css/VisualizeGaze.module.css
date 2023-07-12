@@ -5,6 +5,12 @@
   background-color: red;
 }
 
+.fixCircle {
+  position: absolute;
+  fill: red;
+  opacity: 0.5;
+}
+
 .gazePlot {
   position: relative;
   width: 643.2px;
@@ -15,6 +21,7 @@
 
 .gazePlotRow {
   display: flex;
+
   margin-bottom: 20px;
 }
 
@@ -30,5 +37,6 @@
 
 .screens {
   display: flex;
-  flex-flow: row nowrap;
+  justify-content: space-between;
+  flex-flow: row wrap;
 }
