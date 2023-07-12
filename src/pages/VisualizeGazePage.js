@@ -8,7 +8,6 @@ import { useRef, useState, useEffect } from "react";
 function VisualizeGazePage() {
   const [divHeights, setDivHeights] = useState([]);
   const pages = ["store_list", "store_menu", "menu_detail", "cart"];
-  //   const [points, setPoints] = useState([]);
 
   useEffect(() => {
     const heights = pages.map((page) => {
@@ -52,13 +51,16 @@ function VisualizeGazePage() {
                 className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
                 style={{ height: divHeight }}
               >
+                <div className={VisualizeGaze.gazeScreenName}>
+                  {pages[index]}
+                </div>
                 {filteredGazeData.map((point, idx) => (
                   <div
                     key={`${idx}`}
                     className={VisualizeGaze.gazePoint}
                     style={{
-                      left: point.x,
-                      top: point.y,
+                      left: `${(point.x / 643.2) * 100}%`,
+                      top: `${(point.y / divHeight) * 100}%`,
                     }}
                     title={pages[index]}
                   ></div>
