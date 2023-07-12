@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from "react";
 
 function VisualizeGazePage() {
   const [divHeights, setDivHeights] = useState([]);
-  const pages = ["store_list", "store_menu", "menu_detail", "cart"];
+  const pages = ["store_list", "store_menu", "menu_detail", "cart", "order"];
 
   useEffect(() => {
     const heights = pages.map((page) => {
