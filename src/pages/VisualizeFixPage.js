@@ -1,5 +1,6 @@
 import MenuBar from "../components/MenuBar";
 import VisualizeGaze from "../css/VisualizeGaze.module.css";
+import CalculateHeight from "../components/CalculateScreensHeight.module";
 import fixData from "../data/fixation data.json";
 import heatmap from "heatmap.js";
 
@@ -13,28 +14,14 @@ function VisualizeFixPage() {
     const heights = pages.map((page) => {
       const filteredData = fixData.filter((item) => item.page === page);
       return filteredData.length > 0
-        ? calculateHeight(filteredData[0].fixations)
+        ? CalculateHeight(
+            filteredData[0].fixations.flatMap((fixation) => fixation.gp)
+          )
         : 0;
     });
 
     setDivHeights(heights);
   }, []);
-
-  const calculateHeight = (data) => {
-    if (!data || data.length === 0) return 0;
-
-    const minY = Math.min(
-      ...data.flatMap((fixation) => fixation.gp.map((point) => point.y))
-    );
-    const maxY = Math.max(
-      ...data.flatMap((fixation) => fixation.gp.map((point) => point.y))
-    );
-    const distance = maxY - minY;
-    const padding = distance * 0.2; // 20% 여백 추가
-    const calculatedHeight = distance + padding;
-
-    return calculatedHeight;
-  };
 
   return (
     <div>

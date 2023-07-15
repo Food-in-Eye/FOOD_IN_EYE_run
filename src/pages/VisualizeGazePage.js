@@ -1,5 +1,6 @@
 import MenuBar from "../components/MenuBar";
 import VisualizeGaze from "../css/VisualizeGaze.module.css";
+import CalculateHeight from "../components/CalculateScreensHeight.module";
 import gazeData from "../data/gaze_data.json";
 import fixData from "../data/fixation data.json";
 import heatmap from "heatmap.js";
@@ -21,9 +22,11 @@ function VisualizeGazePage() {
         : [];
 
       return filteredData.length > 0 && showDataFromGaze
-        ? calculateHeight(filteredData[0].gaze)
+        ? CalculateHeight(filteredData[0].gaze)
         : filteredData.length > 0 && showDataFromFix
-        ? calculateHeight(filteredData[0].fixations)
+        ? CalculateHeight(
+            filteredData[0].fixations.flatMap((fixation) => fixation.gp)
+          )
         : 0;
     });
 
@@ -39,32 +42,6 @@ function VisualizeGazePage() {
     setShowDataFromFix(true);
     setShowDataFromGaze(false);
   };
-
-  const calculateHeight = (data) => {
-    if (!data || data.length === 0) return 0;
-
-    const minY = showDataFromGaze
-      ? Math.min(...data.map((point) => point.y))
-      : showDataFromFix
-      ? Math.min(
-          ...data.flatMap((fixation) => fixation.gp.map((point) => point.y))
-        )
-      : 0;
-    const maxY = showDataFromGaze
-      ? Math.max(...data.map((point) => point.y))
-      : showDataFromFix
-      ? Math.max(
-          ...data.flatMap((fixation) => fixation.gp.map((point) => point.y))
-        )
-      : 0;
-    const distance = maxY - minY;
-    const padding = distance * 0.2; // 20% 여백 추가
-    const calculatedHeight = distance + padding;
-
-    return calculatedHeight;
-  };
-
-  console.log(divHeights);
 
   return (
     <div>
@@ -85,25 +62,23 @@ function VisualizeGazePage() {
         {showDataFromGaze || showDataFromFix ? (
           <section className={VisualizeGaze.screens}>
             {divHeights.map((divHeight, index) => {
-              const filteredGazeData = showDataFromGaze
+              const filteredData = showDataFromGaze
                 ? gazeData
-                    .filter((item) => item.page === pages[index])
-                    .flatMap((item) =>
-                      item.gaze.filter(
-                        (point) => point.x >= 0 && point.x <= 643.2
-                      )
-                    )
                 : showDataFromFix
                 ? fixData
-                    .filter((item) => item.page === pages[index])
-                    .flatMap((item) =>
-                      item.fixations.flatMap((item) =>
-                        item.gp.filter(
-                          (point) => point.x >= 0 && point.x <= 643.2
-                        )
+                : [];
+
+              const filteredGazeData = filteredData
+                .filter((item) => item.page === pages[index])
+                .flatMap((item) =>
+                  item.gaze
+                    ? item.gaze.filter(
+                        (point) => point.x >= 0 && point.x <= 643.2
                       )
-                    )
-                : null;
+                    : item.fixations
+                        .flatMap((item) => item.gp)
+                        .filter((point) => point.x >= 0 && point.x <= 643.2)
+                );
 
               return (
                 <div
