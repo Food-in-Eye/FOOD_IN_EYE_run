@@ -42,11 +42,13 @@ class Storage:
     def get_list(self, prefix, extension=None):
         objects = self.s3.list_objects(Bucket=self.bucket, Prefix=prefix)
         result = []
-        for content in objects['Contents']:
-            key = content['Key']
-            if extension is None:
-                result.append(key)
-            elif key.endswith('.json'):
-                result.append(key)
-
-        return result
+        try:
+            for content in objects['Contents']:
+                key = content['Key']
+                if extension is None:
+                    result.append(key)
+                elif key.endswith('.json'):
+                    result.append(key)
+            return result
+        except:
+            return "ERROR"
