@@ -16,3 +16,11 @@ v2_router.include_router(websocket_router)
 @v2_router.get("/")
 async def hello():
     return {"message": "Hello 'api/v2'"}
+
+from core.common.s3 import Storage
+
+@v2_router.get("/s3/keys")
+async def get_keys(prefix:str='/', extension:str=None):
+    storage = Storage('foodineye')
+
+    return storage.get_list(prefix, extension)
