@@ -7,7 +7,9 @@ from core.models import OrderModel, RawGazeModel
 from core.common.mongo2 import MongodbController
 from core.common.s3 import Storage
 from .src.util import Util
+from dotenv import load_dotenv
 
+import os
 import requests
 import asyncio
 
@@ -215,35 +217,40 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
 
     try:
         Util.check_id(h_id)
-        key = storage.upload(gaze_data, 'json', 'test')
+        key = storage.upload(gaze_data, 'json', 'C_0714')
 
         if DB.update_field_by_id('history', h_id, 'gaze_path', key):
-            print(key, h_id)
-            asyncio.create_task(preprocess_and_update(key, h_id))
-            print('after')
+            # 임시로 비활성화
+            # asyncio.create_task(preprocess_and_update(key, h_id))
 
             # websocket으로 gaze 요청 그만 보내기
             websocket_manager.app_connections[h_id]['gaze'] = True
-
+            
             return {
             'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
             'status': 'OK'
             }
 
-        raise Exception()
-        return {"??": "?"}
+        return {'success': 'call the admin'}
         
     except:
         return {'success': False}
 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     print('in preprocess function')
-    url = "http://localhost:2000/anlz/v1/filter/execute"
+    load_dotenv()
+    filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
+    aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/aoi"
     payload = {
         "raw_data_key": raw_data_key
     }
     headers = {"Content-Type": "application/json"}
-
-    response: requests.Response = requests.post(url, json=payload, headers=headers)
+    response: requests.Response = requests.post(filter_url, json=payload, headers=headers)
     data = response.json()
-    DB.update_field_by_id('history', h_id, 'fixation_path', data["fixation_key"])
+    fix_key = data["fixation_key"]
+    DB.update_field_by_id('history', h_id, 'fixation_path', fix_key)
+    print()
+
+    response: requests.Response = requests.get(aoi_url + "?key="+ fix_key, headers=headers)
+    data = response.json()
+    DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])

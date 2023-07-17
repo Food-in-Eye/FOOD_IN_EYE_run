@@ -39,3 +39,14 @@ class Storage:
     def delete(self, key:str) -> None:
         self.s3.delete_object(Bucket=self.bucket, Key=key)
 
+    def get_list(self, prefix, extension=None):
+        objects = self.s3.list_objects(Bucket=self.bucket, Prefix=prefix)
+        result = []
+        for content in objects['Contents']:
+            key = content['Key']
+            if extension is None:
+                result.append(key)
+            elif key.endswith('.json'):
+                result.append(key)
+
+        return result
