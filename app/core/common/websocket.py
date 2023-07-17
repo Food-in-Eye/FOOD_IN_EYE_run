@@ -9,7 +9,7 @@ import json
 
 import asyncio
 
-DB = MongodbController('FIE_DB')
+DB = MongodbController('FIE_DB2')
 
 class ConnectionManager:
     """ 연결된 Web, App Websocket들을 관리하는 클래스

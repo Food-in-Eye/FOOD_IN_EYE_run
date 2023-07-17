@@ -13,8 +13,8 @@ from .src.util import Util
 food_router = APIRouter(prefix="/foods")
 
 PREFIX = 'api/v2/foods'
-DB = MongodbController('FIE_DB')
-storage = Storage('foodineye')
+DB = MongodbController('FIE_DB2')
+storage = Storage('foodineye2')
 
 @food_router.get("/hello")
 async def hello():
