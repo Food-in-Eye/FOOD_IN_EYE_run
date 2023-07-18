@@ -21,6 +21,22 @@ from core.common.s3 import Storage
 
 @v2_router.get("/s3/keys")
 async def get_keys(prefix:str='/', extension:str=None):
-    storage = Storage('foodineye')
+    try:
+        storage = Storage('foodineye2')
 
-    return storage.get_list(prefix, extension)
+        return storage.get_list(prefix, extension)
+    
+    except:
+
+        return "ERROR"
+
+
+@v2_router.get("/s3/keys/gaze")
+async def get_keys(prefix:str, key: str):
+    try:
+        storage = Storage('foodineye2')
+        return storage.get_json(prefix + '/' + key)
+
+    except:
+
+        return "ERROR"
