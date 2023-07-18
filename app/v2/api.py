@@ -31,13 +31,11 @@ async def get_keys(prefix:str='/', extension:str=None):
         return "ERROR"
 
 
-@v2_router.get("/s3/keys")
-async def get_keys(key: str):
+@v2_router.get("/s3/keys/gaze")
+async def get_keys(prefix:str, key: str):
     try:
-
         storage = Storage('foodineye2')
-
-        return storage.get_json(key)
+        return storage.get_json(prefix + '/' + key)
 
     except:
 
