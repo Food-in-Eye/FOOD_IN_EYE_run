@@ -8,7 +8,7 @@ import { useRef, useState, useEffect } from "react";
 
 function VisualizeFixPage() {
   const [divHeights, setDivHeights] = useState([]);
-  const pages = ["store_list", "store_menu", "menu_detail", "cart", "order"];
+  const pages = ["store_list", "store_menu", "menu_detail"];
 
   useEffect(() => {
     const heights = pages.map((page) => {

@@ -4,44 +4,75 @@ import CalculateHeight from "../components/CalculateScreensHeight.module";
 import gazeData from "../data/gaze_data.json";
 import fixData from "../data/fixation data.json";
 import heatmap from "heatmap.js";
+import axios from "axios";
 
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { getFilteredGaze } from "../components/API.module";
+import { getGaze } from "../components/API.module";
 
 function VisualizeGazePage() {
+  const pages = ["store_list", "store_menu", "menu_detail"];
+  const [fileList, setFileList] = useState([]);
   const [divHeights, setDivHeights] = useState([]);
-  const [showDataFromGaze, setShowDataFromGaze] = useState(false);
-  const [showDataFromFix, setShowDataFromFix] = useState(false);
-  const pages = ["store_list", "store_menu", "menu_detail", "cart", "order"];
+  const [gazeData, setGazeData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  useEffect(() => {
+    const getJsonFiles = async () => {
+      try {
+        const response = await getGaze(`?prefix=C_0714&extension=.json`);
+        console.log(response.data);
+        setFileList(response.data);
+      } catch (error) {
+        console.error("Error getting file names from api: ", error);
+      }
+    };
+
+    getJsonFiles();
+  }, []);
+
+  const handleInputValues = async (event) => {
+    event.preventDefault();
+
+    const key = document.getElementById("key").value;
+    const winSize = document.getElementById("winSize").value;
+    const fixDist = document.getElementById("fixDist").value;
+
+    try {
+      await getFilteredGaze(
+        `?key=${key}&win_size=${winSize}&fix_dist=${fixDist}`
+      ).then((res) => {
+        setFilteredData(res);
+      });
+    } catch (error) {
+      console.error("Error getting data from anlyz:", error);
+    }
+
+    try {
+      await getGaze(`/gaze?key=${key}`).then((res) =>
+        setGazeData(res.data.response)
+      );
+    } catch (error) {
+      console.error("Error fetching data from S3:", error);
+    }
+  };
+
+  /**TODO: gazeData 형식 확인 후 다시 체크 */
 
   useEffect(() => {
     const heights = pages.map((page) => {
-      const filteredData = showDataFromFix
-        ? fixData.filter((item) => item.page === page)
-        : showDataFromGaze
-        ? gazeData.filter((item) => item.page === page)
-        : [];
-
-      return filteredData.length > 0 && showDataFromGaze
-        ? CalculateHeight(filteredData[0].gaze)
-        : filteredData.length > 0 && showDataFromFix
-        ? CalculateHeight(
-            filteredData[0].fixations.flatMap((fixation) => fixation.gp)
-          )
-        : 0;
+      const pageFilteredData = gazeData.filter((item) => item.page === page);
+      if (pageFilteredData && pageFilteredData.length > 0) {
+        const calculatedHeight = CalculateHeight(pageFilteredData);
+        // console.log(calculatedHeight);
+        return calculatedHeight;
+      } else {
+        return 0;
+      }
     });
 
     setDivHeights(heights);
-  }, [showDataFromGaze, showDataFromFix]);
-
-  const handleGazeDataFromGaze = () => {
-    setShowDataFromGaze(true);
-    setShowDataFromFix(false);
-  };
-
-  const handleGazeDataFromFix = () => {
-    setShowDataFromFix(true);
-    setShowDataFromGaze(false);
-  };
+  }, [gazeData]);
 
   return (
     <div>
@@ -49,64 +80,67 @@ function VisualizeGazePage() {
       <div>
         <section className={VisualizeGaze.head}>
           <h1>화면별 gaze-plot</h1>
-          <div className={VisualizeGaze.buttons}>
-            <button onClick={handleGazeDataFromGaze}>
-              show from gaze-data
-            </button>
-            <button onClick={handleGazeDataFromFix}>
-              show from fixation-data
+          <div className={VisualizeGaze.inputs}>
+            <label>
+              key: <input id="key" type="text" name="key" required />
+            </label>
+            <label>
+              window-size:{" "}
+              <input id="winSize" type="text" name="window-size" required />
+            </label>
+            <label>
+              fixation-distance:{" "}
+              <input
+                id="fixDist"
+                type="text"
+                name="fixation-distance"
+                required
+              />
+            </label>
+            <button id="submit" onClick={handleInputValues}>
+              Submit
             </button>
           </div>
         </section>
 
-        {showDataFromGaze || showDataFromFix ? (
-          <section className={VisualizeGaze.screens}>
-            {divHeights.map((divHeight, index) => {
-              const filteredData = showDataFromGaze
-                ? gazeData
-                : showDataFromFix
-                ? fixData
-                : [];
-
-              const filteredGazeData = filteredData
-                .filter((item) => item.page === pages[index])
-                .flatMap((item) =>
-                  item.gaze
-                    ? item.gaze.filter(
-                        (point) => point.x >= 0 && point.x <= 643.2
-                      )
-                    : item.fixations
-                        .flatMap((item) => item.gp)
-                        .filter((point) => point.x >= 0 && point.x <= 643.2)
-                );
-
-              return (
-                <div
-                  key={index}
-                  className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
-                  style={{ height: divHeight }}
-                >
-                  <div className={VisualizeGaze.gazeScreenName}>
-                    {pages[index]}
-                  </div>
-                  {filteredGazeData.map((point, idx) => (
-                    <div
-                      key={`${idx}`}
-                      className={VisualizeGaze.gazePoint}
-                      style={{
-                        left: `${(point.x / 643.2) * 100}%`,
-                        top: `${(point.y / divHeight) * 100}%`,
-                      }}
-                      title={pages[index]}
-                    ></div>
-                  ))}
-                </div>
+        <section className={VisualizeGaze.screensBeforeFilter}>
+          {divHeights.map((divHeight, index) => {
+            const filteredGazeData = gazeData
+              .filter((item) => item.page === pages[index])
+              .flatMap((item) =>
+                item.gaze.filter(
+                  (point) =>
+                    point.x >= 0 &&
+                    point.x <= 643.2 &&
+                    point.y >= 0 &&
+                    point.y <= divHeight
+                )
               );
-            })}
-          </section>
-        ) : (
-          <p className={VisualizeGaze.noClickBtn}>버튼을 클릭하세요.</p>
-        )}
+
+            return (
+              <div
+                key={index}
+                className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
+                style={{ height: divHeight }}
+              >
+                <div className={VisualizeGaze.gazeScreenName}>
+                  {pages[index]}
+                </div>
+                {filteredGazeData.map((point, idx) => (
+                  <div
+                    key={`${idx}`}
+                    className={VisualizeGaze.gazePoint}
+                    style={{
+                      left: `${(point.x / 643.2) * 100}%`,
+                      top: `${(point.y / divHeight) * 100}%`,
+                    }}
+                    title={pages[index]}
+                  ></div>
+                ))}
+              </div>
+            );
+          })}
+        </section>
       </div>
     </div>
   );

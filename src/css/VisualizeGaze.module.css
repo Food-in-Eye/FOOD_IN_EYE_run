@@ -36,10 +36,15 @@
   color: #008b3c;
 }
 
-.screens {
+/* .screens {
   display: flex;
   justify-content: space-between;
   flex-flow: row wrap;
+} */
+
+.screensBeforeFilter {
+  display: flex;
+  flex-direction: column;
 }
 
 .head {
@@ -52,24 +57,14 @@ h1 {
   margin: 0 auto 0 20px;
 }
 
-.buttons {
-  margin: 10px 10px 10px auto;
+.inputs {
+  margin: 0 10px 0 auto;
 }
 
-.head button {
-  padding: 1.125rem;
-  margin: 0 5px;
-  font-size: 1em;
-  color: #f5f6f7;
-  background-color: #5a5878;
-  border: none;
-  border-radius: 10px;
+input {
+  margin: 20px 5px 0 5px;
 }
 
-.noClickBtn {
-  background: none;
-  text-align: center;
-  margin: 20% auto;
-  font-size: 40px;
-  font-style: bold;
+#input {
+  padding: 5px;
 }
