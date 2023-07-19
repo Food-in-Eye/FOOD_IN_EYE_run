@@ -87,6 +87,23 @@ class MongodbController:
             raise Exception(f'Failed to READ document with id \'{id}\'')
         
         return dictToStr(result)
+
+    def read_all_by_id(self, collection:str, id_list:list) -> dict:
+        """ id 리스트를 받아, 모든 문서들을 받아온다. """
+        assert collection and id is not None
+        coll = self.get_collection(collection)
+
+        result = coll.find({'_id': {'$in': id_list}})
+        # print("in MONGO:", end=" ")
+        # print(list(result))
+        if result is None:
+            raise Exception(f'Failed to READ document with id \'{id}\'')
+        
+        response = []
+        for r in result:
+            response.append(dictToStr(r))
+        
+        return response 
     
     def read_all(self, collection:str) -> list:
         """ collection의 모든 document를 읽어온다. """

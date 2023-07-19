@@ -52,7 +52,8 @@ class Item(BaseModel):
 # async def set_meta(body: Item):
 #     Meta.create(body.content)
 
-@v2_router.get("/test")
-async def set_meta():
+# @v2_router.get("/test")
+# async def set_meta():
 
-    return Meta.get_meta(datetime.now())
+#     meta = Meta.get_meta(datetime.now())
+#     Meta.get_detail(meta['content'])
