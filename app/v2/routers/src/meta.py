@@ -13,7 +13,6 @@ class Meta:
                 'date': datetime.now(),
                 'content': content
             }
-            print(meta)
             new_id = Meta.DB.create('temp', meta)
             return new_id
         
@@ -21,7 +20,7 @@ class Meta:
             print('fail')
     
     @staticmethod
-    def get_meta(date: datetime):
+    def get_meta(date=datetime.now()):
         '''
             주어진 날짜 기준에서의 Meta data를 불러온다.
         '''
