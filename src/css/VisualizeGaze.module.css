@@ -36,13 +36,14 @@
   color: #008b3c;
 }
 
-/* .screens {
+.screensForCompare {
   display: flex;
-  justify-content: space-between;
-  flex-flow: row wrap;
-} */
+  flex-direction: row;
+  align-items: center;
+}
 
-.screensBeforeFilter {
+.screensBeforeFilter,
+.screensAfterFilter {
   display: flex;
   flex-direction: column;
 }
