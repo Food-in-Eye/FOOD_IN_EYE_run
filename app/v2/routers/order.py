@@ -237,6 +237,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
         return {'success': False}
 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
+    # todo::: Meta 클래스 통해서 데이터 받아다가 같이 보내야함
     print('in preprocess function')
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
