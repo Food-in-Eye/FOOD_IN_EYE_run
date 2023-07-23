@@ -1,6 +1,6 @@
 import MenuBar from "../components/MenuBar";
 import VisualizeGaze from "../css/VisualizeGaze.module.css";
-import CalculateHeight from "../components/CalculateScreensHeight.module";
+import CalculateFixationHeight from "../components/CalculateScreensHeight.module";
 import fixData from "../data/fixation data.json";
 import heatmap from "heatmap.js";
 
@@ -14,9 +14,7 @@ function VisualizeFixPage() {
     const heights = pages.map((page) => {
       const filteredData = fixData.filter((item) => item.page === page);
       return filteredData.length > 0
-        ? CalculateHeight(
-            filteredData[0].fixations.flatMap((fixation) => fixation.gp)
-          )
+        ? CalculateFixationHeight(filteredData)
         : 0;
     });
 
