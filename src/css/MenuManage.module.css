@@ -127,6 +127,7 @@ hr {
   width: 30%;
   height: auto;
   margin-top: 10%;
+  object-fit: cover;
 }
 
 .Img form {
