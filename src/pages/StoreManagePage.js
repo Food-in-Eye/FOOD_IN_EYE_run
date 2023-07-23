@@ -92,6 +92,8 @@ function StoreManagePage() {
   const handleOpenBtnClick = () => {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
+    localStorage.setItem("storeOpen", true);
+    localStorage.setItem("storeClosed", false);
 
     putStore(sID, {
       ...store,
@@ -108,6 +110,8 @@ function StoreManagePage() {
   const handleCloseBtnClick = () => {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
+    localStorage.setItem("storeOpen", false);
+    localStorage.setItem("storeClosed", true);
 
     putStore(sID, {
       ...store,
