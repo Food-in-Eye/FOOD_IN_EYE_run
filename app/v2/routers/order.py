@@ -7,11 +7,13 @@ from core.models import OrderModel, RawGazeModel
 from core.common.mongo2 import MongodbController
 from core.common.s3 import Storage
 from .src.util import Util
+from .src.meta import Meta
 from dotenv import load_dotenv
 
 import os
 import requests
 import asyncio
+import httpx
 
 from datetime import datetime, timedelta
 
@@ -221,7 +223,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
 
         if DB.update_field_by_id('history', h_id, 'gaze_path', key):
             # 임시로 비활성화
-            # asyncio.create_task(preprocess_and_update(key, h_id))
+            asyncio.create_task(preprocess_and_update(key, h_id))
 
             # websocket으로 gaze 요청 그만 보내기
             websocket_manager.app_connections[h_id]['gaze'] = True
@@ -238,7 +240,6 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     # todo::: Meta 클래스 통해서 데이터 받아다가 같이 보내야함
-    print('in preprocess function')
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
     aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/aoi"
@@ -246,12 +247,19 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         "raw_data_key": raw_data_key
     }
     headers = {"Content-Type": "application/json"}
-    response: requests.Response = requests.post(filter_url, json=payload, headers=headers)
-    data = response.json()
-    fix_key = data["fixation_key"]
-    DB.update_field_by_id('history', h_id, 'fixation_path', fix_key)
-    print()
 
-    response: requests.Response = requests.get(aoi_url + "?key="+ fix_key, headers=headers)
-    data = response.json()
-    DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
+    print('start', filter_url, aoi_url)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(filter_url, json=payload, headers=headers)
+        data = response.json()
+        print(data)  
+        fix_key = data["fixation_key"]
+        DB.update_field_by_id('history', h_id, 'fixation_path', fix_key)
+    
+        doc = DB.read_by_id('history', h_id)
+        payload = {'data' : Meta.get_meta_detail(doc['date'])}
+        print(payload)
+        response = await client.post(aoi_url + "?key=" + fix_key, json=payload, headers=headers)
+        data = response.json()
+        print('aoi result', data)
+        DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
