@@ -154,9 +154,13 @@ function VisualizeGazePage() {
                     )
                 );
 
+              const filteredFixData = fixData.filter(
+                (item) => item.page === pages[index]
+              );
+
               return (
                 <div
-                  key={index}
+                  key={`page_${index}`}
                   className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
                   style={{ height: divHeight }}
                 >
@@ -165,7 +169,7 @@ function VisualizeGazePage() {
                   </div>
                   {filteredGazeData.map((point, idx) => (
                     <div
-                      key={`${idx}`}
+                      key={`gaze_point_${idx}`}
                       className={VisualizeGaze.gazePoint}
                       style={{
                         left: `${(point.x / 643.2) * 100}%`,
@@ -175,16 +179,18 @@ function VisualizeGazePage() {
                     ></div>
                   ))}
                   <svg width="643.2" height={divHeight}>
-                    {filteredGazeData.map((point, idx) => (
-                      <circle
-                        key={`${idx}`}
-                        cx={point.cx}
-                        cy={point.cy}
-                        r={point.r}
-                        className={`${VisualizeGaze.fixCircle} ${VisualizeGaze.gazePoint}`}
-                        title={pages[index]}
-                      />
-                    ))}
+                    {filteredFixData.flatMap((item) =>
+                      item.fixations.flatMap((fixation, fixationIdx) => (
+                        <circle
+                          key={`fixation_${fixationIdx}`}
+                          cx={fixation.cx}
+                          cy={fixation.cy}
+                          r={fixation.r}
+                          className={`${VisualizeGaze.fixCircle} ${VisualizeGaze.gazePoint}`}
+                          title={pages[index]}
+                        />
+                      ))
+                    )}
                   </svg>
                 </div>
               );
