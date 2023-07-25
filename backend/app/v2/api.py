@@ -41,3 +41,20 @@ async def get_keys(prefix:str, key: str):
     except:
 
         return "ERROR"
+
+from v2.routers.src.meta import Meta
+    
+from pydantic import BaseModel, Field
+from datetime import datetime
+class Item(BaseModel):
+    content: dict
+
+# @v2_router.post("/t")
+# async def set_meta(body: Item):
+#     Meta.create(body.content)
+
+@v2_router.get("/test")
+async def set_meta():
+
+    meta = Meta.get_meta_detail(datetime.now())
+    return meta

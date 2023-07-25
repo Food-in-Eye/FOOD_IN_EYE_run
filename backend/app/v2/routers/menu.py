@@ -9,6 +9,7 @@ from fastapi import APIRouter
 from core.models.store import MenuModel
 from core.common.mongo2 import MongodbController
 from .src.util import Util
+from .src.meta import Meta
 
 menu_router = APIRouter(prefix="/menus")
 
@@ -82,8 +83,9 @@ async def create_menu(s_id:str, menu:MenuModel):
         new_id = DB.create('menu', new_menu)
 
         if DB.update_field_by_id('store', s_id, 'm_id', new_id):
+            update_meta(s_id, new_id)
             return {
-                'request': f'POST {PREFIX}/menu?s_id={s_id}',  # 경로 수정 s_id -> ?s_id
+                'request': f'POST {PREFIX}/menu?s_id={s_id}',
                 'status': 'OK'
             }
         
@@ -141,3 +143,9 @@ async def read_menu_with_foods(id:str):
         'status': 'OK',
         'response': response
     }
+
+def update_meta(s_id:str, new_m_id:str):
+    cur = Meta.get_meta()
+    content = cur['content']
+    content[s_id] = new_m_id
+    Meta.create(content)
