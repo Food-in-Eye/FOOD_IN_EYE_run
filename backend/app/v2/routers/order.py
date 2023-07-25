@@ -219,7 +219,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
 
     try:
         Util.check_id(h_id)
-        key = storage.upload(gaze_data, 'json', 'C_0714')
+        key = storage.upload(gaze_data, 'json', 'C_0725')
 
         if DB.update_field_by_id('history', h_id, 'gaze_path', key):
             # 임시로 비활성화
