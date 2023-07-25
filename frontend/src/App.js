@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminPage from "./pages/AdminPage";
 import DetailAnalysisPage from "./pages/DetailAnalysisPage";
 import AnalysisPage from "./pages/AnalysisPage";
+import VisualizeGazePage from "./pages/VisualizeGazePage";
+import VisualizeFixPage from "./pages/VisualizeFixPage";
 import BenefitManagePage from "./pages/BenefitManagePage";
 import MenuPlacementPage from "./pages/MenuPlacementPage";
 import StoreManagePage from "./pages/StoreManagePage";
@@ -18,6 +20,8 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
+        <Route path="/gaze-visualize" element={<VisualizeGazePage />} />
+        <Route path="/fixation-visualize" element={<VisualizeFixPage />} />
         <Route path="/benefit-manage" element={<BenefitManagePage />} />
         <Route path="/menu-placement" element={<MenuPlacementPage />} />
         <Route path="/store-manage" element={<StoreManagePage />} />

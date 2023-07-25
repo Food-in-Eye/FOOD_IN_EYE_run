@@ -15,7 +15,7 @@ td {
 
 .menuItemImg {
   width: 100%;
-  height: 80%;
+  height: auto;
   border-radius: 50%;
   object-fit: cover;
 }
