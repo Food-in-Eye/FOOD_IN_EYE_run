@@ -41,13 +41,13 @@ class Meta:
     def get_detail(content: dict):
 
         try:
-            
+
             s_id_list = content.keys()
             m_id_list = content.values()
 
             store_documents = Meta.DB.read_all_by_id('store', Meta.to_ObjectId_list(s_id_list))
             menu_documents = Meta.DB.read_all_by_id('menu', Meta.to_ObjectId_list(m_id_list))
-
+            
             new_dict = {}
             for i in range(len(s_id_list)):
                 k = store_documents[i]['num']
@@ -74,3 +74,8 @@ class Meta:
         for f in f_list:
             result.append(f['f_num'])
         return result
+    
+    @staticmethod
+    def get_meta_detail(date):
+        data = Meta.get_meta(date)
+        return Meta.get_detail(data['content'])
