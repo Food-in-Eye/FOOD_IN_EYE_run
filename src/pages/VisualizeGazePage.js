@@ -46,9 +46,7 @@ function VisualizeGazePage() {
     }
 
     try {
-      await getGaze(`/gaze?key=${key}`).then((res) =>
-        setGazeData(res.data.response)
-      );
+      await getGaze(`/gaze?key=${key}`).then((res) => setGazeData(res.data));
     } catch (error) {
       console.error("Error fetching data from S3:", error);
     }
@@ -61,7 +59,6 @@ function VisualizeGazePage() {
       const pageFilteredData = gazeData.filter((item) => item.page === page);
       if (pageFilteredData && pageFilteredData.length > 0) {
         const calculatedHeight = CalculateHeight(pageFilteredData);
-        // console.log(calculatedHeight);
         return calculatedHeight;
       } else {
         return 0;
@@ -70,6 +67,8 @@ function VisualizeGazePage() {
 
     setDivHeights(heights);
   }, [gazeData]);
+
+  console.log(fixData);
 
   return (
     <div>
@@ -105,13 +104,15 @@ function VisualizeGazePage() {
               const filteredGazeData = gazeData
                 .filter((item) => item.page === pages[index])
                 .flatMap((item) =>
-                  item.gaze.filter(
-                    (point) =>
-                      point.x >= 0 &&
-                      point.x <= 643.2 &&
-                      point.y >= 0 &&
-                      point.y <= divHeight
-                  )
+                  item.gaze.length > 0
+                    ? item.gaze.filter(
+                        (point) =>
+                          point.x >= 0 &&
+                          point.x <= 643.2 &&
+                          point.y >= 0 &&
+                          point.y <= divHeight
+                      )
+                    : []
                 );
 
               return (
