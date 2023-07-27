@@ -7,7 +7,7 @@
 
 .fixCircle {
   position: absolute;
-  fill: red;
+  fill: rgb(122, 126, 184);
   opacity: 0.5;
 }
 
