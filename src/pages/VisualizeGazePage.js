@@ -9,16 +9,20 @@ import { getGaze } from "../components/API.module";
 
 function VisualizeGazePage() {
   const pages = ["store_list", "store_menu", "menu_detail"];
+  const [pageList, setPageList] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [divHeights, setDivHeights] = useState([]);
   const [gazeData, setGazeData] = useState([]);
+  const [pageGazeData, setPageGazeData] = useState([]);
+  const [pageFixData, setPageFixData] = useState([]);
   const [fixData, setFixData] = useState([]);
 
   useEffect(() => {
+    /**임시: 디렉토리 내 폴더명 확인용 코드 */
     const getJsonFiles = async () => {
       try {
-        const response = await getGaze(`?prefix=C_0714&extension=.json`);
-        // console.log(response.data);
+        const response = await getGaze(`?prefix=C_0725&extension=.json`);
+        console.log(response.data);
         setFileList(response.data);
       } catch (error) {
         console.error("Error getting file names from api: ", error);
@@ -52,13 +56,15 @@ function VisualizeGazePage() {
     }
   };
 
-  /**TODO: gazeData 형식 확인 후 다시 체크 */
-
   useEffect(() => {
-    const heights = pages.map((page) => {
-      const pageFilteredData = gazeData.filter((item) => item.page === page);
-      if (pageFilteredData && pageFilteredData.length > 0) {
-        const calculatedHeight = CalculateHeight(pageFilteredData);
+    setPageGazeData(gazeData.filter((item) => pages.includes(item.page)));
+    setPageFixData(fixData.filter((item) => pages.includes(item.page)));
+    setPageList(pageGazeData.map((data) => data.page));
+
+    const heights = pageList.map((page) => {
+      const pageDataForPage = pageGazeData.filter((item) => item.page === page);
+      if (pageDataForPage && pageDataForPage.length > 0) {
+        const calculatedHeight = CalculateHeight(pageDataForPage);
         return calculatedHeight;
       } else {
         return 0;
@@ -67,8 +73,6 @@ function VisualizeGazePage() {
 
     setDivHeights(heights);
   }, [gazeData]);
-
-  console.log(fixData);
 
   return (
     <div>
@@ -101,19 +105,21 @@ function VisualizeGazePage() {
         <div className={VisualizeGaze.screensForCompare}>
           <section className={VisualizeGaze.screensBeforeFilter}>
             {divHeights.map((divHeight, index) => {
-              const filteredGazeData = gazeData
-                .filter((item) => item.page === pages[index])
-                .flatMap((item) =>
-                  item.gaze.length > 0
-                    ? item.gaze.filter(
-                        (point) =>
-                          point.x >= 0 &&
-                          point.x <= 643.2 &&
-                          point.y >= 0 &&
-                          point.y <= divHeight
-                      )
-                    : []
-                );
+              console.log(`${pageList[index]}: ${divHeight}`);
+
+              const filteredGazeData = pageGazeData.map((data) =>
+                data.gaze.length > 0
+                  ? data.gaze.filter(
+                      (point) =>
+                        point.x >= 0 &&
+                        point.x <= 643.2 &&
+                        point.y >= 0 &&
+                        point.y <= divHeight
+                    )
+                  : []
+              );
+
+              console.log("filteredGazeData", filteredGazeData);
 
               return (
                 <div
@@ -122,9 +128,9 @@ function VisualizeGazePage() {
                   style={{ height: divHeight }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
-                    {pages[index]}
+                    {pageList[index]}
                   </div>
-                  {filteredGazeData.map((point, idx) => (
+                  {filteredGazeData[index].map((point, idx) => (
                     <div
                       key={`${idx}`}
                       className={VisualizeGaze.gazePoint}
@@ -132,7 +138,7 @@ function VisualizeGazePage() {
                         left: `${(point.x / 643.2) * 100}%`,
                         top: `${(point.y / divHeight) * 100}%`,
                       }}
-                      title={pages[index]}
+                      title={pageList[index]}
                     ></div>
                   ))}
                 </div>
@@ -141,23 +147,20 @@ function VisualizeGazePage() {
           </section>
           <section className={VisualizeGaze.screensAfterFilter}>
             {divHeights.map((divHeight, index) => {
-              const filteredGazeData = fixData
-                .filter((item) => item.page === pages[index])
-                .flatMap((item) =>
-                  item.fixations
-                    .flatMap((item) => item.gp)
-                    .filter(
-                      (point) =>
-                        point.x >= 0 &&
-                        point.x <= 643.2 &&
-                        point.y >= 0 &&
-                        point.y <= divHeight
-                    )
-                );
-
-              const filteredFixData = fixData.filter(
-                (item) => item.page === pages[index]
+              console.log("pageFixData", pageFixData);
+              const filteredGPData = pageFixData.map((item) =>
+                item.fixations
+                  .flatMap((item) => item.gp)
+                  .filter(
+                    (point) =>
+                      point.x >= 0 &&
+                      point.x <= 643.2 &&
+                      point.y >= 0 &&
+                      point.y <= divHeight
+                  )
               );
+
+              console.log("filteredGPData", filteredGPData);
 
               return (
                 <div
@@ -166,9 +169,9 @@ function VisualizeGazePage() {
                   style={{ height: divHeight }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
-                    {pages[index]}
+                    {pageList[index]}
                   </div>
-                  {filteredGazeData.map((point, idx) => (
+                  {filteredGPData[index].map((point, idx) => (
                     <div
                       key={`gaze_point_${idx}`}
                       className={VisualizeGaze.gazePoint}
@@ -176,21 +179,21 @@ function VisualizeGazePage() {
                         left: `${(point.x / 643.2) * 100}%`,
                         top: `${(point.y / divHeight) * 100}%`,
                       }}
-                      title={pages[index]}
+                      title={pageList[index]}
                     ></div>
                   ))}
                   <svg width="643.2" height={divHeight}>
-                    {filteredFixData.flatMap((item) =>
-                      item.fixations.flatMap((fixation, fixationIdx) => (
+                    {pageFixData[index].fixations.map(
+                      (fixation, fixationIdx) => (
                         <circle
                           key={`fixation_${fixationIdx}`}
                           cx={fixation.cx}
                           cy={fixation.cy}
                           r={fixation.r}
                           className={`${VisualizeGaze.fixCircle} ${VisualizeGaze.gazePoint}`}
-                          title={pages[index]}
+                          title={pageList[index]}
                         />
-                      ))
+                      )
                     )}
                   </svg>
                 </div>
