@@ -33,10 +33,10 @@ async def get_keys(prefix:str='/', extension:str=None):
 
 
 @v2_router.get("/s3/keys/gaze")
-async def get_keys(prefix:str, key: str):
+async def get_keys(key: str):
     try:
         storage = Storage('foodineye2')
-        return storage.get_json(prefix + '/' + key)
+        return storage.get_json(key)
 
     except:
 

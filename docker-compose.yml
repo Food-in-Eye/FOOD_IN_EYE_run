@@ -16,7 +16,7 @@ services:
     build:
       context: ./nginx
     ports:
-      - "80:80"
+      - "4040:80"
     depends_on:
       - frontend
       - backend
