@@ -44,6 +44,7 @@ function VisualizeGazePage() {
         `?key=${key}&win_size=${winSize}&fix_dist=${fixDist}`
       ).then((res) => {
         setFixData(res.data);
+        // console.log("fix_data", res);
       });
     } catch (error) {
       console.error("Error getting data from anlyz:", error);
@@ -72,7 +73,7 @@ function VisualizeGazePage() {
     });
 
     setDivHeights(heights);
-  }, [gazeData]);
+  }, [gazeData, fixData]);
 
   return (
     <div>
