@@ -1,8 +1,22 @@
-.gazePoint {
+.gazePoint,
+.overGazePoint,
+.overGP {
   position: absolute;
   width: 5px;
   height: 5px;
+}
+
+.gazePoint {
   background-color: red;
+}
+
+.overGazePoint {
+  background-color: rgb(149, 248, 0);
+}
+
+.overGP {
+  background-color: blue;
+  opacity: 0.3;
 }
 
 .fixCircle {
@@ -72,8 +86,4 @@ h1 {
 
 input {
   margin: 20px 5px 0 5px;
-}
-
-#input {
-  padding: 5px;
 }
