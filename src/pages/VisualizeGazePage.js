@@ -48,7 +48,7 @@ function VisualizeGazePage() {
         `?key=${key}&win_size=${winSize}&fix_dist=${fixDist}`
       ).then((res) => {
         setFixData(res.data);
-        // console.log("fix_data", res);
+        console.log("fix_data", res);
       });
     } catch (error) {
       console.error("Error getting data from anlyz:", error);
@@ -76,6 +76,9 @@ function VisualizeGazePage() {
           (item.s_num === 0 || item.s_num === storeNum)
       )
     );
+  }, [gazeData, fixData]);
+
+  useEffect(() => {
     setPageList(pageGazeData.map((data) => data.page));
 
     const heights = pageList.map((page) => {
