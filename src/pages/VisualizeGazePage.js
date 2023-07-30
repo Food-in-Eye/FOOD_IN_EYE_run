@@ -62,23 +62,22 @@ function VisualizeGazePage() {
   };
 
   useEffect(() => {
-    setPageGazeData(
-      gazeData.filter(
-        (item) =>
-          pages.includes(item.page) &&
-          (item.s_num === 0 || item.s_num === storeNum)
-      )
-    );
-    setPageFixData(
-      fixData.filter(
-        (item) =>
-          pages.includes(item.page) &&
-          (item.s_num === 0 || item.s_num === storeNum)
-      )
-    );
-  }, [gazeData, fixData]);
+    if (!gazeData || gazeData.length === 0) return;
 
-  useEffect(() => {
+    const filteredGazeData = gazeData.filter(
+      (item) =>
+        pages.includes(item.page) &&
+        (item.s_num === 0 || item.s_num === storeNum)
+    );
+
+    setPageGazeData(filteredGazeData);
+
+    const filteredFixData = fixData.filter(
+      (item) =>
+        pages.includes(item.page) &&
+        (item.s_num === 0 || item.s_num === storeNum)
+    );
+    setPageFixData(filteredFixData);
     setPageList(pageGazeData.map((data) => data.page));
 
     const heights = pageList.map((page) => {
@@ -92,7 +91,7 @@ function VisualizeGazePage() {
     });
 
     setDivHeights(heights);
-  }, [gazeData, fixData]);
+  }, [gazeData, fixData, storeNum]);
 
   /** Calculate filteredGazeData, filteredGPData */
   useEffect(() => {

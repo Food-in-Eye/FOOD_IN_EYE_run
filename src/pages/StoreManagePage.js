@@ -26,11 +26,11 @@ function StoreManagePage() {
         const request = await getStore(sID);
         console.log(request.data.response);
         setStore(request.data.response);
-        localStorage.setItem(
-          "storeNum",
-          request.data.response.num
-          // JSON.stringify(request.data.response._id)
-        );
+        // localStorage.setItem(
+        //   "storeNum",
+        //   request.data.response.num
+        //   // JSON.stringify(request.data.response._id)
+        // );
 
         if (request.data.response.status === 1) {
           setIsOpenButtonClicked(true);
