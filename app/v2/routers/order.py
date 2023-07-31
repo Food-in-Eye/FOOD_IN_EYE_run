@@ -262,3 +262,91 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         data = response.json()
         print('aoi result', data)
         DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
+
+import math
+
+@order_router.get("/historylist")
+async def get_history_list(u_id: str, unit: int = 1):
+    try:     
+        # 전체 history 개수 세기
+        total_history = 0
+        historys = DB.read_all_by_feild('history', 'u_id', u_id)
+        for history in historys:
+            total_history += 1   
+
+        if unit > 0 and unit < math.ceil(total_history / 10) + 1:
+            response_list = []
+
+            historys_unit = historys[10*(unit-1):10*unit]
+            for history in historys_unit:
+                order_list = []
+                for o_id in history['orders']:
+                    order = DB.read_by_id('order', o_id)
+                    store = DB.read_by_id('store', order['s_id'])
+
+                    order_list.append({
+                        "s_name": store['name']
+                    })
+
+                response_list.append({
+                    "h_id": history['_id'],
+                    "date": history['date'],
+                    "total_price": history['total_price'],
+                    "orders": order_list
+                })
+        else:
+            raise Exception('requested unit exceeds range')
+        
+        return {
+            'request': f'POST {PREFIX}/order/historylist?u_id={u_id}&unit={unit}',
+            'status': 'OK',
+            'total_history': total_history,
+            'response': response_list
+        }
+     
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'POST {PREFIX}/order',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+    
+
+@order_router.get("/orderlist")
+async def get_order_list(h_id: str):
+    try:     
+        response_list = []
+
+        history = DB.read_by_id('history', h_id)
+        for o_id in history['orders']:
+            order = DB.read_by_id('order', o_id)
+            store = DB.read_by_id('store', order['s_id'])
+            food_list = []
+            for f in order['f_list']:
+                food = DB.read_by_id('food', f['f_id'])
+                food_list.append({
+                    "s_name": store['name'],
+                    "f_name": food['name'],
+                    "count": f['count'],
+                    "price": f['price']
+                })
+            
+            response_list.append({
+                "date": history['date'],
+                "orders": food_list
+            })
+        
+        return {
+            'request': f'POST {PREFIX}/order/orderlist?h_id={h_id}',
+            'status': 'OK',
+            'response': response_list
+        }
+     
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'POST {PREFIX}/order',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
