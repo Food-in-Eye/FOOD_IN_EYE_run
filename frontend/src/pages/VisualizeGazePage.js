@@ -4,10 +4,10 @@ import CalculateHeight from "../components/CalculateScreensHeight.module";
 import heatmap from "heatmap.js";
 
 import { useState, useEffect } from "react";
-import { getFilteredGaze } from "../components/API.module";
-import { getGaze } from "../components/API.module";
+import { getGaze, getFilteredGaze } from "../components/API.module";
 
 function VisualizeGazePage() {
+  const storeNum = parseInt(localStorage.getItem("storeNum"), 10);
   const pages = ["store_list", "store_menu", "menu_detail"];
   const [pageList, setPageList] = useState([]);
   const [fileList, setFileList] = useState([]);
@@ -22,6 +22,7 @@ function VisualizeGazePage() {
 
   useEffect(() => {
     /**임시: 디렉토리 내 폴더명 확인용 코드 */
+    console.log("storeNum", storeNum);
     const getJsonFiles = async () => {
       try {
         const response = await getGaze(`?prefix=C_0725&extension=.json`);
@@ -47,7 +48,7 @@ function VisualizeGazePage() {
         `?key=${key}&win_size=${winSize}&fix_dist=${fixDist}`
       ).then((res) => {
         setFixData(res.data);
-        // console.log("fix_data", res);
+        console.log("fix_data", res);
       });
     } catch (error) {
       console.error("Error getting data from anlyz:", error);
@@ -61,8 +62,22 @@ function VisualizeGazePage() {
   };
 
   useEffect(() => {
-    setPageGazeData(gazeData.filter((item) => pages.includes(item.page)));
-    setPageFixData(fixData.filter((item) => pages.includes(item.page)));
+    if (!gazeData || gazeData.length === 0) return;
+
+    const filteredGazeData = gazeData.filter(
+      (item) =>
+        pages.includes(item.page) &&
+        (item.s_num === 0 || item.s_num === storeNum)
+    );
+
+    setPageGazeData(filteredGazeData);
+
+    const filteredFixData = fixData.filter(
+      (item) =>
+        pages.includes(item.page) &&
+        (item.s_num === 0 || item.s_num === storeNum)
+    );
+    setPageFixData(filteredFixData);
     setPageList(pageGazeData.map((data) => data.page));
 
     const heights = pageList.map((page) => {
@@ -76,7 +91,7 @@ function VisualizeGazePage() {
     });
 
     setDivHeights(heights);
-  }, [gazeData, fixData]);
+  }, [gazeData, fixData, storeNum]);
 
   /** Calculate filteredGazeData, filteredGPData */
   useEffect(() => {
@@ -136,12 +151,12 @@ function VisualizeGazePage() {
             </button>
           </div>
         </section>
+        <h3>Raw Gaze | Fixation & Fixation/gp | Raw Gaze & Fixation/gp</h3>
         <div className={VisualizeGaze.screensForCompare}>
           <section className={VisualizeGaze.screensBeforeFilter}>
             {divHeights.map((divHeight, index) => {
               console.log(`${pageList[index]}: ${divHeight}`);
               console.log("filteredGazeData", filteredGazeData);
-
               return (
                 <div
                   key={index}
@@ -170,7 +185,6 @@ function VisualizeGazePage() {
             {divHeights.map((divHeight, index) => {
               console.log("pageFixData", pageFixData);
               console.log("filteredGPData", filteredGPData);
-
               return (
                 <div
                   key={`page_${index}`}

@@ -8,6 +8,7 @@ function MenuBar() {
     e.preventDefault();
 
     localStorage.removeItem("storeID");
+    localStorage.removeItem("storeNum");
     navigate(`/`);
   };
 
