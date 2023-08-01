@@ -11,6 +11,7 @@ import MenuManagePage from "./pages/MenuManagePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
+import VisualizeNoBackground from "./pages/VisualizeGazeNoBackground";
 
 function App() {
   return (
@@ -20,6 +21,10 @@ function App() {
         <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/gaze-visualize" element={<VisualizeGazePage />} />
+        <Route
+          path="/gaze-visualize-no-background"
+          element={<VisualizeNoBackground />}
+        />
         <Route path="/benefit-manage" element={<BenefitManagePage />} />
         <Route path="/menu-placement" element={<MenuPlacementPage />} />
         <Route path="/store-manage" element={<StoreManagePage />} />
