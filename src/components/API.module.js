@@ -36,7 +36,6 @@ export const getGaze = (query) => {
   return axios.get(requestUrl);
 };
 
-// TODO: url 확인 필요
 export const getFilteredGaze = (query) => {
   const requestUrl = `/anlz/v1/filter/exp${query}`;
   return axios.get(requestUrl);
