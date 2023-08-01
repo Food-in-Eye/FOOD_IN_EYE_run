@@ -16,17 +16,17 @@ function MenuBar() {
     <section className={style.header}>
       <h2>LOGO</h2>
       <div className={style.dropMenu}>
-        <ul>
+        <ul className={style.menubarHeader}>
           <li>
-            <a href="./main" className={style.menubar_head}>
+            <a href="./main" className={style.menubarSub}>
               Home
             </a>
           </li>
           <li>
-            <a href="#!" className={style.menubar_head}>
+            <a href="#!" className={style.menubarSub}>
               관리
             </a>
-            <ul>
+            <ul className={style.menubarSubOfSub}>
               <li>
                 <a href="./store-manage">가게 관리</a>
               </li>
@@ -42,10 +42,10 @@ function MenuBar() {
             </ul>
           </li>
           <li>
-            <a href="#!" className={style.menubar_head}>
+            <a href="#!" className={style.menubarSub}>
               분석
             </a>
-            <ul>
+            <ul className={style.menubarSubOfSub}>
               <li>
                 <a href="./analysis">전체 메뉴분석</a>
               </li>
@@ -55,10 +55,16 @@ function MenuBar() {
               <li>
                 <a href="./gaze-visualize">Gaze 시각화</a>
               </li>
+              <li>
+                <a href="./gaze-visualize">Gaze 시각화</a>
+              </li>
+              <li>
+                <a href="./gaze-visualize-no-background">Gaze 시각화(배경x)</a>
+              </li>
             </ul>
           </li>
           <li>
-            <a href="./admin" className={style.menubar_head}>
+            <a href="./admin" className={style.menubarSub}>
               설정
             </a>
           </li>
