@@ -1,6 +1,7 @@
 import MenuBar from "../components/MenuBar";
 import VisualizeGaze from "../css/VisualizeGaze.module.css";
 import CalculateHeight from "../components/CalculateScreensHeight.module";
+import GenerateImgUrl from "../components/GenerateImgUrl.module";
 import heatmap from "heatmap.js";
 
 import { useState, useEffect } from "react";
@@ -9,6 +10,8 @@ import { getGaze, getFilteredGaze } from "../components/API.module";
 function VisualizeGazePage() {
   const storeNum = parseInt(localStorage.getItem("storeNum"), 10);
   const pages = ["store_list", "store_menu", "menu_detail"];
+  const screenWidth = 682;
+
   const [pageList, setPageList] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [divHeights, setDivHeights] = useState([]);
@@ -19,6 +22,8 @@ function VisualizeGazePage() {
 
   const [filteredGazeData, setFilteredGazeData] = useState([]);
   const [filteredGPData, setFilteredGPData] = useState([]);
+
+  const [imgUrls, setImgUrls] = useState([]);
 
   useEffect(() => {
     /**임시: 디렉토리 내 폴더명 확인용 코드 */
@@ -61,37 +66,86 @@ function VisualizeGazePage() {
     }
   };
 
+  // const getScreenImg = async (s_num, f_num) => {
+  //   if (s_num === 0) {
+
+  //   }
+  // }
+
   useEffect(() => {
-    if (!gazeData || gazeData.length === 0) return;
+    const loadData = async () => {
+      if (!gazeData || gazeData.length === 0) return;
 
-    const filteredGazeData = gazeData.filter(
-      (item) =>
-        pages.includes(item.page) &&
-        (item.s_num === 0 || item.s_num === storeNum)
-    );
+      const filteredGazeData = gazeData.filter(
+        (item) =>
+          pages.includes(item.page) &&
+          (item.s_num === 0 || item.s_num === storeNum)
+      );
 
-    setPageGazeData(filteredGazeData);
+      setPageGazeData(filteredGazeData);
 
-    const filteredFixData = fixData.filter(
-      (item) =>
-        pages.includes(item.page) &&
-        (item.s_num === 0 || item.s_num === storeNum)
-    );
-    setPageFixData(filteredFixData);
-    setPageList(pageGazeData.map((data) => data.page));
+      const filteredFixData = fixData.filter(
+        (item) =>
+          pages.includes(item.page) &&
+          (item.s_num === 0 || item.s_num === storeNum)
+      );
+      setPageFixData(filteredFixData);
+      // setPageList(pageGazeData.map((data) => data.page));
+      setPageList(
+        pageGazeData.map((data) => ({
+          page: data.page,
+          s_num: data.s_num,
+          f_num: data.f_num,
+        }))
+      );
 
-    const heights = pageList.map((page) => {
-      const pageDataForPage = pageGazeData.filter((item) => item.page === page);
-      if (pageDataForPage && pageDataForPage.length > 0) {
-        const calculatedHeight = CalculateHeight(pageDataForPage);
-        return calculatedHeight;
-      } else {
-        return 0;
-      }
-    });
+      console.log("pageList", pageList);
 
-    setDivHeights(heights);
+      const getImgUrls = async () => {
+        const imgUrls = await Promise.all(
+          pageList.map(async (page) => {
+            console.log("s_num, f_num", page.s_num, page.f_num);
+            return await GenerateImgUrl(page.s_num, page.f_num);
+          })
+        );
+        setImgUrls(imgUrls);
+      };
+
+      // const heights = pageList.map((data) => {
+      //   const pageDataForPage = pageGazeData.filter(
+      //     (item) => item.page === data.page
+      //   );
+      //   if (pageDataForPage && pageDataForPage.length > 0) {
+      //     const calculatedHeight = CalculateHeight(pageDataForPage);
+      //     return calculatedHeight;
+      //   } else {
+      //     return 0;
+      //   }
+      // });
+
+      const getScreenHeight = (url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            resolve(img.height);
+          };
+          img.src = url;
+        });
+      };
+
+      const imgHeights = await Promise.all(
+        imgUrls.map(async (url) => await getScreenHeight(url))
+      );
+
+      getImgUrls();
+      // setDivHeights(heights);
+      setDivHeights(imgHeights);
+    };
+
+    loadData();
   }, [gazeData, fixData, storeNum]);
+
+  useEffect(() => {}, [imgUrls]);
 
   /** Calculate filteredGazeData, filteredGPData */
   useEffect(() => {
@@ -100,7 +154,7 @@ function VisualizeGazePage() {
         ? data.gaze.filter(
             (point) =>
               point.x >= 0 &&
-              point.x <= 643.2 &&
+              point.x <= screenWidth &&
               point.y >= 0 &&
               point.y <= divHeights[index]
           )
@@ -113,7 +167,7 @@ function VisualizeGazePage() {
         .filter(
           (point) =>
             point.x >= 0 &&
-            point.x <= 643.2 &&
+            point.x <= screenWidth &&
             point.y >= 0 &&
             point.y <= divHeights[index]
         )
@@ -155,26 +209,30 @@ function VisualizeGazePage() {
         <div className={VisualizeGaze.screensForCompare}>
           <section className={VisualizeGaze.screensBeforeFilter}>
             {divHeights.map((divHeight, index) => {
-              console.log(`${pageList[index]}: ${divHeight}`);
+              console.log(`${pageList[index].page}: ${divHeight}`);
               console.log("filteredGazeData", filteredGazeData);
               return (
                 <div
                   key={index}
                   className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
-                  style={{ height: divHeight }}
+                  style={{
+                    height: divHeight,
+                    backgroundImage: `url(${imgUrls[index]})`,
+                    backgroundSize: "cover",
+                  }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
-                    {pageList[index]}
+                    {pageList[index].page}
                   </div>
                   {filteredGazeData[index].map((point, idx) => (
                     <div
                       key={`${idx}`}
                       className={VisualizeGaze.gazePoint}
                       style={{
-                        left: `${(point.x / 643.2) * 100}%`,
+                        left: `${(point.x / screenWidth) * 100}%`,
                         top: `${(point.y / divHeight) * 100}%`,
                       }}
-                      title={pageList[index]}
+                      title={pageList[index].page}
                     ></div>
                   ))}
                 </div>
@@ -189,23 +247,27 @@ function VisualizeGazePage() {
                 <div
                   key={`page_${index}`}
                   className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
-                  style={{ height: divHeight }}
+                  style={{
+                    height: divHeight,
+                    backgroundImage: `url(${imgUrls[index]})`,
+                    backgroundSize: "cover",
+                  }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
-                    {pageList[index]}
+                    {pageList[index].page}
                   </div>
                   {filteredGPData[index].map((point, idx) => (
                     <div
                       key={`gaze_point_${idx}`}
                       className={VisualizeGaze.gazePoint}
                       style={{
-                        left: `${(point.x / 643.2) * 100}%`,
+                        left: `${(point.x / screenWidth) * 100}%`,
                         top: `${(point.y / divHeight) * 100}%`,
                       }}
-                      title={pageList[index]}
+                      title={pageList[index].page}
                     ></div>
                   ))}
-                  <svg width="643.2" height={divHeight}>
+                  <svg width={screenWidth} height={divHeight}>
                     {pageFixData[index].fixations.map(
                       (fixation, fixationIdx) => (
                         <circle
@@ -214,7 +276,7 @@ function VisualizeGazePage() {
                           cy={fixation.cy}
                           r={fixation.r}
                           className={`${VisualizeGaze.fixCircle} ${VisualizeGaze.gazePoint}`}
-                          title={pageList[index]}
+                          title={pageList[index].page}
                         />
                       )
                     )}
@@ -225,27 +287,31 @@ function VisualizeGazePage() {
           </section>
           <section className={VisualizeGaze.screensOverlapGaze}>
             {divHeights.map((divHeight, index) => {
-              console.log(`${pageList[index]}: ${divHeight}`);
+              console.log(`${pageList[index].page}: ${divHeight}`);
               console.log("filteredGazeData", filteredGazeData);
 
               return (
                 <div
                   key={index}
                   className={`${VisualizeGaze.gazePlot} ${VisualizeGaze.gazePlotRow}`}
-                  style={{ height: divHeight }}
+                  style={{
+                    height: divHeight,
+                    backgroundImage: `url(${imgUrls[index]})`,
+                    backgroundSize: "cover",
+                  }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
-                    {pageList[index]}
+                    {pageList[index].page}
                   </div>
                   {filteredGazeData[index].map((point, idx) => (
                     <div
                       key={`${idx}`}
                       className={VisualizeGaze.overGazePoint}
                       style={{
-                        left: `${(point.x / 643.2) * 100}%`,
+                        left: `${(point.x / screenWidth) * 100}%`,
                         top: `${(point.y / divHeight) * 100}%`,
                       }}
-                      title={pageList[index]}
+                      title={pageList[index].page}
                     ></div>
                   ))}
                   {filteredGPData[index].map((point, idx) => (
@@ -253,10 +319,10 @@ function VisualizeGazePage() {
                       key={`gaze_point_${idx}`}
                       className={VisualizeGaze.overGP}
                       style={{
-                        left: `${(point.x / 643.2) * 100}%`,
+                        left: `${(point.x / screenWidth) * 100}%`,
                         top: `${(point.y / divHeight) * 100}%`,
                       }}
-                      title={pageList[index]}
+                      title={pageList[index].page}
                     ></div>
                   ))}
                 </div>
