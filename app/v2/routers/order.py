@@ -266,8 +266,8 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
 
 
-@order_router.get("/user_h_list")
-async def get_history_list(u_id: str, batch_num: int = 1):
+@order_router.get("/historys")
+async def get_history_list(u_id: str, batch: int = 1):
     try:     
         # 전체 history 개수 세기
         count_h_items = 0
@@ -278,11 +278,11 @@ async def get_history_list(u_id: str, batch_num: int = 1):
         # date 기준 내림차순 정렬
         sorted_historys = sorted(historys, key=lambda x: x["date"], reverse=True)
 
-        # batch_num * 10 부터 10개씩 뽑기
-        if batch_num > 0 and batch_num < math.ceil(count_h_items / 10) + 1:
+        # batch * 10 부터 10개씩 뽑기
+        if batch > 0 and batch < math.ceil(count_h_items / 10) + 1:
             response_list = []
 
-            batch_items = sorted_historys[10*(batch_num-1):10*batch_num]
+            batch_items = sorted_historys[10*(batch-1):10*batch]
             for h in batch_items:
                 order_list = []
                 for o_id in h['orders']:
@@ -299,30 +299,30 @@ async def get_history_list(u_id: str, batch_num: int = 1):
                     "orders": order_list
                 })
         else:
-            raise Exception('requested batch_num exceeds range')
+            raise Exception('requested batch exceeds range')
         
         return {
-            'request': f'POST {PREFIX}/order/user_h_list?u_id={u_id}&batch_num={batch_num}',
+            'request': f'POST {PREFIX}/order/historys?u_id={u_id}&batch={batch}',
             'status': 'OK',
-            'max_batch_num': math.ceil(count_h_items / 10),
+            'max_batch': math.ceil(count_h_items / 10),
             'response': response_list
         }
      
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/order/user_h_list?u_id={u_id}&batch_num={batch_num}',
+            'request': f'POST {PREFIX}/order/historys?u_id={u_id}&batch={batch}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
 
-@order_router.get("/user_o_list")
-async def get_order_list(h_id: str):
+@order_router.get("/history")
+async def get_order_list(id: str):
     try:     
         response_list = {}
 
-        history = DB.read_by_id('history', h_id)
+        history = DB.read_by_id('history', id)
 
         food_list = []
         for o_id in history['orders']:
@@ -344,7 +344,7 @@ async def get_order_list(h_id: str):
         }
         
         return {
-            'request': f'POST {PREFIX}/order/user_o_list?h_id={h_id}',
+            'request': f'POST {PREFIX}/order/history?id={id}',
             'status': 'OK',
             'response': response_list
         }
@@ -352,7 +352,7 @@ async def get_order_list(h_id: str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/order/user_o_list?h_id={h_id}',
+            'request': f'POST {PREFIX}/order/history?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
