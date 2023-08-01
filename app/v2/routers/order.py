@@ -14,6 +14,8 @@ import os
 import requests
 import asyncio
 import httpx
+import math
+from datetime import datetime
 
 from datetime import datetime, timedelta
 
@@ -263,66 +265,70 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         print('aoi result', data)
         DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
 
-import math
 
-@order_router.get("/historylist")
-async def get_history_list(u_id: str, unit: int = 1):
+@order_router.get("/user_h_list")
+async def get_history_list(u_id: str, batch_num: int = 1):
     try:     
         # 전체 history 개수 세기
-        total_history = 0
+        count_h_items = 0
         historys = DB.read_all_by_feild('history', 'u_id', u_id)
-        for history in historys:
-            total_history += 1   
+        for h in historys:
+            count_h_items += 1   
 
-        if unit > 0 and unit < math.ceil(total_history / 10) + 1:
+        # date 기준 내림차순 정렬
+        sorted_historys = sorted(historys, key=lambda x: x["date"], reverse=True)
+
+        # batch_num * 10 부터 10개씩 뽑기
+        if batch_num > 0 and batch_num < math.ceil(count_h_items / 10) + 1:
             response_list = []
 
-            historys_unit = historys[10*(unit-1):10*unit]
-            for history in historys_unit:
+            batch_items = sorted_historys[10*(batch_num-1):10*batch_num]
+            for h in batch_items:
                 order_list = []
-                for o_id in history['orders']:
+                for o_id in h['orders']:
                     order = DB.read_by_id('order', o_id)
                     store = DB.read_by_id('store', order['s_id'])
-
                     order_list.append({
                         "s_name": store['name']
                     })
 
                 response_list.append({
-                    "h_id": history['_id'],
-                    "date": history['date'],
-                    "total_price": history['total_price'],
+                    "h_id": h['_id'],
+                    "date": h['date'],
+                    "total_price": h['total_price'],
                     "orders": order_list
                 })
         else:
-            raise Exception('requested unit exceeds range')
+            raise Exception('requested batch_num exceeds range')
         
         return {
-            'request': f'POST {PREFIX}/order/historylist?u_id={u_id}&unit={unit}',
+            'request': f'POST {PREFIX}/order/user_h_list?u_id={u_id}&batch_num={batch_num}',
             'status': 'OK',
-            'total_history': total_history,
+            'max_batch_num': math.ceil(count_h_items / 10),
             'response': response_list
         }
      
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/order',
+            'request': f'POST {PREFIX}/order/user_h_list?u_id={u_id}&batch_num={batch_num}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
 
-@order_router.get("/orderlist")
+@order_router.get("/user_o_list")
 async def get_order_list(h_id: str):
     try:     
-        response_list = []
+        response_list = {}
 
         history = DB.read_by_id('history', h_id)
+
+        food_list = []
         for o_id in history['orders']:
             order = DB.read_by_id('order', o_id)
             store = DB.read_by_id('store', order['s_id'])
-            food_list = []
+
             for f in order['f_list']:
                 food = DB.read_by_id('food', f['f_id'])
                 food_list.append({
@@ -331,14 +337,14 @@ async def get_order_list(h_id: str):
                     "count": f['count'],
                     "price": f['price']
                 })
-            
-            response_list.append({
-                "date": history['date'],
-                "orders": food_list
-            })
+
+        response_list = {
+            "date": history['date'],
+            "orders": food_list
+        }
         
         return {
-            'request': f'POST {PREFIX}/order/orderlist?h_id={h_id}',
+            'request': f'POST {PREFIX}/order/user_o_list?h_id={h_id}',
             'status': 'OK',
             'response': response_list
         }
@@ -346,7 +352,7 @@ async def get_order_list(h_id: str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/order',
+            'request': f'POST {PREFIX}/order/user_o_list?h_id={h_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
