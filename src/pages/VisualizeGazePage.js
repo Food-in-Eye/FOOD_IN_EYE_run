@@ -1,6 +1,5 @@
 import MenuBar from "../components/MenuBar";
 import VisualizeGaze from "../css/VisualizeGaze.module.css";
-import CalculateHeight from "../components/CalculateScreensHeight.module";
 import GenerateImgUrl from "../components/GenerateImgUrl.module";
 import heatmap from "heatmap.js";
 
@@ -66,12 +65,6 @@ function VisualizeGazePage() {
     }
   };
 
-  // const getScreenImg = async (s_num, f_num) => {
-  //   if (s_num === 0) {
-
-  //   }
-  // }
-
   useEffect(() => {
     const loadData = async () => {
       if (!gazeData || gazeData.length === 0) return;
@@ -90,7 +83,7 @@ function VisualizeGazePage() {
           (item.s_num === 0 || item.s_num === storeNum)
       );
       setPageFixData(filteredFixData);
-      // setPageList(pageGazeData.map((data) => data.page));
+
       setPageList(
         pageGazeData.map((data) => ({
           page: data.page,
@@ -111,18 +104,6 @@ function VisualizeGazePage() {
         setImgUrls(imgUrls);
       };
 
-      // const heights = pageList.map((data) => {
-      //   const pageDataForPage = pageGazeData.filter(
-      //     (item) => item.page === data.page
-      //   );
-      //   if (pageDataForPage && pageDataForPage.length > 0) {
-      //     const calculatedHeight = CalculateHeight(pageDataForPage);
-      //     return calculatedHeight;
-      //   } else {
-      //     return 0;
-      //   }
-      // });
-
       const getScreenHeight = (url) => {
         return new Promise((resolve) => {
           const img = new Image();
@@ -138,7 +119,6 @@ function VisualizeGazePage() {
       );
 
       getImgUrls();
-      // setDivHeights(heights);
       setDivHeights(imgHeights);
     };
 
