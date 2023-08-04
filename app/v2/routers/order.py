@@ -15,7 +15,6 @@ import requests
 import asyncio
 import httpx
 import math
-from datetime import datetime
 
 from datetime import datetime, timedelta
 
@@ -174,8 +173,7 @@ async def new_order(body:OrderModel):
                 "date": datetime.now(),
                 "u_id": body.u_id,
                 "s_id": store_order.s_id,
-                "m_id": store_order.m_id,
-                "status": 0,
+                "m_id": store_order.m_id, #status? 삭제
                 "f_list": store_order.f_list
             }
 
@@ -265,58 +263,46 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         print('aoi result', data)
         DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
 
-
 @order_router.get("/historys")
-async def get_history_list(u_id: str, batch: int = 1):
-    try:     
-        # 전체 history 개수 세기
-        count_h_items = 0
-        historys = DB.read_all_by_feild('history', 'u_id', u_id)
-        for h in historys:
-            count_h_items += 1   
+async def get_history_list(u_id: str = None, batch: int = 1):
+    try:
+        historys = DB.read_all_by_query('history', {'u_id':u_id}, 'date', False)
 
-        # date 기준 내림차순 정렬
-        sorted_historys = sorted(historys, key=lambda x: x["date"], reverse=True)
-
-        # batch * 10 부터 10개씩 뽑기
-        if batch > 0 and batch < math.ceil(count_h_items / 10) + 1:
+        if batch > 0 and batch < math.ceil(len(historys) / 10) + 1:
             response_list = []
 
-            batch_items = sorted_historys[10*(batch-1):10*batch]
+            batch_items = historys[10*(batch-1):10*batch]
             for h in batch_items:
-                order_list = []
+                s_names = []
                 for o_id in h['orders']:
                     order = DB.read_by_id('order', o_id)
                     store = DB.read_by_id('store', order['s_id'])
-                    order_list.append({
-                        "s_name": store['name']
-                    })
+                    s_names.append(store['name'])
 
                 response_list.append({
                     "h_id": h['_id'],
                     "date": h['date'],
                     "total_price": h['total_price'],
-                    "orders": order_list
+                    "s_names": s_names
                 })
         else:
             raise Exception('requested batch exceeds range')
         
         return {
-            'request': f'POST {PREFIX}/order/historys?u_id={u_id}&batch={batch}',
+            'request': f'POST {PREFIX}/historys?u_id={u_id}&batch={batch}',
             'status': 'OK',
-            'max_batch': math.ceil(count_h_items / 10),
+            'max_batch': math.ceil(len(historys) / 10),
             'response': response_list
         }
      
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/order/historys?u_id={u_id}&batch={batch}',
+            'request': f'POST {PREFIX}/historys?u_id={u_id}&batch={batch}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
-
 @order_router.get("/history")
 async def get_order_list(id: str):
     try:     
@@ -344,7 +330,7 @@ async def get_order_list(id: str):
         }
         
         return {
-            'request': f'POST {PREFIX}/order/history?id={id}',
+            'request': f'POST {PREFIX}/history?id={id}',
             'status': 'OK',
             'response': response_list
         }
@@ -352,7 +338,76 @@ async def get_order_list(id: str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/order/history?id={id}',
+            'request': f'POST {PREFIX}/history?id={id}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+
+@order_router.get("/store/dates")
+async def get_dates(s_id: str, batch: int=1):
+    PER_PAGE = 7
+    pipeline = [
+        { "$match": { "s_id": s_id } },
+        { "$project": { "date": { "$dateToString": { "format": "%Y-%m-%d", "date": "$date" } } } },
+        { "$group": { "_id": "$date" } },
+        { "$sort": { "_id": 1 } }
+    ]
+    try:
+        aggreagted_data = DB.aggregate_pipline('order', pipeline)
+        distinct_dates = [entry["_id"] for entry in aggreagted_data]
+
+        total_dates = len(distinct_dates)
+        start_idx = (batch - 1) * PER_PAGE
+        end_idx = start_idx + PER_PAGE
+        paginated_dates = distinct_dates[start_idx:end_idx]
+
+        return {
+            'request': f'POST {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
+            'status': 'OK',
+            'max_batch': math.ceil(total_dates / PER_PAGE),
+            'response': paginated_dates
+        }
+
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'POST {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+        
+
+@order_router.get("/store/date")
+async def get_history_list(s_id: str, date: str, batch: int = 1):
+    try:
+        start_datetime = datetime.strptime(date, "%Y-%m-%d")
+        end_datetime = start_datetime + timedelta(days=1)
+
+        query = {
+            "date": {"$gte": start_datetime, "$lt": end_datetime},
+            "s_id": s_id
+        }
+
+        orders = DB.read_all_by_query('order', query, 'date', False)
+
+        result = []
+
+        for o in orders:
+            result.append({
+                'date': o['date'],
+                'detail': o['f_list']
+            })
+        
+        return {
+            'request': f'POST {PREFIX}/store/date?s_id={s_id}&date={date}',
+            'status': 'OK',
+            'response': result
+        }
+     
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'POST {PREFIX}/store/date?s_id={s_id}&date={date}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
