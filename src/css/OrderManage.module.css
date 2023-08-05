@@ -1,0 +1,52 @@
+.body {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.historyHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  height: 100px;
+  margin-top: 30px;
+  border-top: 4px solid #ff9345;
+  border-bottom: 4px solid #ff9345;
+}
+
+.historyHead form {
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: 0;
+  background: transparent;
+}
+
+.historyHead h3 {
+  margin-right: auto;
+  font: bold 2em/2 "Akaya Telivigala";
+}
+
+.historyBody {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.sortButtons {
+  margin: 10px 0 20px auto;
+}
+
+.leftHBody {
+  margin-left: 20px;
+  margin-right: auto;
+  flex-direction: column;
+}
+
+.leftHBody li {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px 10px 20px;
+  font-size: 20px;
+  border: 2px solid #000;
+}
