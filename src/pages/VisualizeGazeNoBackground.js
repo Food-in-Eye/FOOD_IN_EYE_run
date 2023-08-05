@@ -19,6 +19,8 @@ function VisualizeGazePage() {
   const [filteredGazeData, setFilteredGazeData] = useState([]);
   const [filteredGPData, setFilteredGPData] = useState([]);
 
+  const [colors, setColors] = useState([]);
+
   useEffect(() => {
     /**임시: 디렉토리 내 폴더명 확인용 코드 */
     const getJsonFiles = async () => {
@@ -57,6 +59,17 @@ function VisualizeGazePage() {
     } catch (error) {
       console.error("Error fetching data from S3:", error);
     }
+  };
+
+  /** fixation: 랜덤 색 지정 */
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+
+    return color;
   };
 
   useEffect(() => {
@@ -98,6 +111,7 @@ function VisualizeGazePage() {
           )
         : []
     );
+    console.log(pageFixData);
 
     const filteredGPData = pageFixData.map((data, index) =>
       data.fixations
@@ -113,7 +127,14 @@ function VisualizeGazePage() {
 
     setFilteredGazeData(filteredGazeData);
     setFilteredGPData(filteredGPData);
+
+    const randomColors = pageFixData.map((data) =>
+      data.fixations.map(() => getRandomColor())
+    );
+    setColors(randomColors);
   }, [pageGazeData, pageFixData, divHeights]);
+
+  console.log("colors", colors);
 
   return (
     <div>
@@ -149,6 +170,7 @@ function VisualizeGazePage() {
             {divHeights.map((divHeight, index) => {
               console.log(`${pageList[index]}: ${divHeight}`);
               console.log("filteredGazeData", filteredGazeData);
+
               return (
                 <div
                   key={index}
@@ -186,6 +208,7 @@ function VisualizeGazePage() {
                   <div className={VisualizeGaze.gazeScreenName}>
                     {pageList[index]}
                   </div>
+
                   {filteredGPData[index].map((point, idx) => (
                     <div
                       key={`gaze_point_${idx}`}
@@ -205,8 +228,9 @@ function VisualizeGazePage() {
                           cx={fixation.cx}
                           cy={fixation.cy}
                           r={fixation.r}
-                          className={`${VisualizeGaze.fixCircle} ${VisualizeGaze.gazePoint}`}
+                          className={`${VisualizeGaze.gradCircle} ${VisualizeGaze.gazePoint}`}
                           title={pageList[index]}
+                          fill={colors[index][fixationIdx]}
                         />
                       )
                     )}

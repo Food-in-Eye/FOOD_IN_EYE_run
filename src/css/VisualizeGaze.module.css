@@ -1,6 +1,7 @@
 .gazePoint,
 .overGazePoint,
-.overGP {
+.overGP,
+.gpInCircle {
   position: absolute;
   width: 5px;
   height: 5px;
@@ -20,8 +21,12 @@
 }
 
 .fixCircle {
-  position: absolute;
   fill: rgb(122, 126, 184);
+}
+
+.fixCircle,
+.gradCircle {
+  position: absolute;
   opacity: 0.5;
 }
 
