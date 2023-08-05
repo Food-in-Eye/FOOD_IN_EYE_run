@@ -56,9 +56,6 @@ function MenuBar() {
                 <a href="./gaze-visualize">Gaze 시각화</a>
               </li>
               <li>
-                <a href="./gaze-visualize">Gaze 시각화</a>
-              </li>
-              <li>
                 <a href="./gaze-visualize-no-background">Gaze 시각화(배경x)</a>
               </li>
             </ul>
