@@ -34,7 +34,7 @@ function MenuBar() {
                 <a href="./menu-manage">메뉴 관리</a>
               </li>
               <li>
-                <a href="./order-manage">주문 관리</a>
+                <a href="./order-manage">누적 주문 관리</a>
               </li>
               <li>
                 <a href="./menu-placement">메뉴판 배치</a>

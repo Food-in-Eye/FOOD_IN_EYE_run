@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/Table.module.css";
+import TableStyle from "../css/Table.module.css";
 import { useTable } from "react-table";
 
 function OrdersHistoryTable({ data }) {
@@ -8,14 +8,17 @@ function OrdersHistoryTable({ data }) {
       {
         Header: "주문 시각",
         accessor: "orderTime",
+        className: TableStyle.orderTimeCell,
       },
       {
         Header: "메뉴",
         accessor: "orderMenus",
+        className: TableStyle.orderMenusCell,
       },
       {
         Header: "총 금액",
         accessor: "orderPrice",
+        className: TableStyle.orderPriceCell,
         Cell: ({ value }) => <div style={{ textAlign: "right" }}>{value}</div>,
       },
     ],
@@ -43,7 +46,9 @@ function OrdersHistoryTable({ data }) {
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              <th {...column.getHeaderProps()} className={TableStyle.orderTH}>
+                {column.render("Header")}
+              </th>
             ))}
           </tr>
         ))}
@@ -54,20 +59,16 @@ function OrdersHistoryTable({ data }) {
           return (
             <tr {...row.getRowProps()}>
               {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                return (
+                  <td {...cell.getCellProps()} className={TableStyle.orderTD}>
+                    {cell.render("Cell")}
+                  </td>
+                );
               })}
             </tr>
           );
         })}
       </tbody>
-      {/* <tfoot>
-        <tr>
-          <td colSpan="3" style={{ textAlign: "left" }}>
-            총합계:
-          </td>
-          <td style={{ textAlign: "right" }}>{total}</td>
-        </tr>
-      </tfoot> */}
     </table>
   );
 }

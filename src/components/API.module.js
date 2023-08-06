@@ -26,6 +26,11 @@ export const getOrders = (query) => {
   return axios.get(requestUrl);
 };
 
+export const getOrderHistory = (query) => {
+  const requestUrl = `${ORDER_URL}/store/${query}`;
+  return axios.get(requestUrl);
+};
+
 export const getMenus = (query) => {
   const requestUrl = `${MENUS_URL}${query}`;
   return axios.get(requestUrl);
