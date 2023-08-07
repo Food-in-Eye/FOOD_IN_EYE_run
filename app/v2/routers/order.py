@@ -167,19 +167,28 @@ async def new_order(body:OrderModel):
         
         response_list = []
         order_id_list = []
+        store_name_list = []
 
+        total_price = 0           
         for store_order in body.content:
+            store_price = 0
+            for food in store_order.f_list:
+                store_price += food['price'] * food['count']
             order = {
                 "date": datetime.now(),
                 "u_id": body.u_id,
                 "s_id": store_order.s_id,
-                "m_id": store_order.m_id, #status? 삭제
-                "f_list": store_order.f_list
+                "m_id": store_order.m_id,
+                "s_name": store_order.s_name,
+                "f_list": store_order.f_list,
+                "total_price": store_price
             }
+
+            total_price += store_price
 
             o_id =  str(DB.create('order', order))         
             order_id_list.append(o_id)
-
+            store_name_list.append(store_order.s_name)
             response_list.append({
                 "s_id": store_order.s_id,
                 "o_id": o_id
@@ -188,9 +197,12 @@ async def new_order(body:OrderModel):
         history = {
            "u_id": body.u_id,
            "date": datetime.now(),
-           "total_price": body.total_price,
-           "gaze_path": None,
-           "orders": order_id_list
+           "total_price": total_price,
+           "raw_gaze_path": None,
+           "fixation_path": None,
+           "aoi_analysis": None,
+           "orders": order_id_list,
+           "s_names": store_name_list
         }
         
         h_id = str(DB.create('history', history))
@@ -221,7 +233,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
         Util.check_id(h_id)
         key = storage.upload(gaze_data, 'json', 'C_0714')
 
-        if DB.update_field_by_id('history', h_id, 'gaze_path', key):
+        if DB.update_field_by_id('history', h_id, 'raw_gaze_path', key):
             # 임시로 비활성화
             # asyncio.create_task(preprocess_and_update(key, h_id))
 
@@ -264,7 +276,7 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
 
 @order_router.get("/historys")
-async def get_history_list(u_id: str = None, batch: int = 1):
+async def get_history_list(u_id: str, batch: int = 1):
     try:
         historys = DB.read_all_by_query('history', {'u_id':u_id}, 'date', False)
 
@@ -273,17 +285,11 @@ async def get_history_list(u_id: str = None, batch: int = 1):
 
             batch_items = historys[10*(batch-1):10*batch]
             for h in batch_items:
-                s_names = []
-                for o_id in h['orders']:
-                    order = DB.read_by_id('order', o_id)
-                    store = DB.read_by_id('store', order['s_id'])
-                    s_names.append(store['name'])
-
                 response_list.append({
                     "h_id": h['_id'],
                     "date": h['date'],
                     "total_price": h['total_price'],
-                    "s_names": s_names
+                    "s_names": h['s_names']
                 })
         else:
             raise Exception('requested batch exceeds range')
@@ -313,13 +319,11 @@ async def get_order_list(id: str):
         food_list = []
         for o_id in history['orders']:
             order = DB.read_by_id('order', o_id)
-            store = DB.read_by_id('store', order['s_id'])
-
+            s_name = order['s_name']
             for f in order['f_list']:
-                food = DB.read_by_id('food', f['f_id'])
                 food_list.append({
-                    "s_name": store['name'],
-                    "f_name": food['name'],
+                    "s_name": s_name,
+                    "f_name": f['f_name'],
                     "count": f['count'],
                     "price": f['price']
                 })
@@ -394,6 +398,7 @@ async def get_history_list(s_id: str, date: str, batch: int = 1):
 
         for o in orders:
             result.append({
+                'o_id': o['_id'],
                 'date': o['date'],
                 'detail': o['f_list']
             })
