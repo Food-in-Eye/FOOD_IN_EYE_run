@@ -295,7 +295,7 @@ async def get_history_list(u_id: str, batch: int = 1):
             raise Exception('requested batch exceeds range')
         
         return {
-            'request': f'POST {PREFIX}/historys?u_id={u_id}&batch={batch}',
+            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
             'status': 'OK',
             'max_batch': math.ceil(len(historys) / 10),
             'response': response_list
@@ -304,7 +304,7 @@ async def get_history_list(u_id: str, batch: int = 1):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/historys?u_id={u_id}&batch={batch}',
+            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
@@ -334,7 +334,7 @@ async def get_order_list(id: str):
         }
         
         return {
-            'request': f'POST {PREFIX}/history?id={id}',
+            'request': f'GET {PREFIX}/history?id={id}',
             'status': 'OK',
             'response': response_list
         }
@@ -342,7 +342,7 @@ async def get_order_list(id: str):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/history?id={id}',
+            'request': f'GET {PREFIX}/history?id={id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
@@ -371,7 +371,7 @@ async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str
         paginated_dates = distinct_dates[start_idx:end_idx]
 
         return {
-            'request': f'POST {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
+            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
             'status': 'OK',
             'max_batch': math.ceil(total_dates / PER_PAGE),
             'response': paginated_dates
@@ -380,7 +380,7 @@ async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
+            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
@@ -409,7 +409,7 @@ async def get_history_list(s_id: str, date: str, batch: int = 1):
             })
         
         return {
-            'request': f'POST {PREFIX}/store/date?s_id={s_id}&date={date}',
+            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
             'status': 'OK',
             'response': result
         }
@@ -417,7 +417,7 @@ async def get_history_list(s_id: str, date: str, batch: int = 1):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/store/date?s_id={s_id}&date={date}',
+            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
