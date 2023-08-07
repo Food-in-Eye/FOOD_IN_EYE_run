@@ -348,7 +348,7 @@ async def get_order_list(id: str):
         }
 
 @order_router.get("/store/dates")
-async def get_dates(s_id: str, batch: int=1):
+async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str = None):
     PER_PAGE = 7
     pipeline = [
         { "$match": { "s_id": s_id } },
@@ -356,6 +356,11 @@ async def get_dates(s_id: str, batch: int=1):
         { "$group": { "_id": "$date" } },
         { "$sort": { "_id": 1 } }
     ]
+    if (start_date != None) and (end_date != None):
+        pipeline[0]["$match"]["date"] = {
+            "$gte": datetime.strptime(start_date, "%Y-%m-%d"),
+            "$lte": datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+        }
     try:
         aggreagted_data = DB.aggregate_pipline('order', pipeline)
         distinct_dates = [entry["_id"] for entry in aggreagted_data]
