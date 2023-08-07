@@ -4,6 +4,7 @@ import Button from "../css/Button.module.css";
 import OrdersHistoryTable from "../components/OrderTable.module";
 import { getOrderHistory } from "../components/API.module";
 import { useEffect, useState } from "react";
+import { min } from "moment";
 
 function OrderManagePage() {
   const sID = localStorage.getItem("storeID");
@@ -15,64 +16,85 @@ function OrderManagePage() {
   const [isRecentSortClicked, setRecentSortClicked] = useState(false);
   const [isLastSortClicked, setLastSortClicked] = useState(false);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   useEffect(() => {
     getHistory(sID);
   }, []);
 
   const getHistory = (sID) => {
     getOrderHistory(`dates?s_id=${sID}`).then((res) => {
-      console.log(res.data.response);
+      console.log(res.data);
       setPageCount(res.data.max_batch);
       setOrderHistoryList(res.data.response);
     });
   };
 
+  /** 정렬을 위한 string->Date */
+  const tStringToTime = (tString) => {
+    const [hours, minutes, seconds] = tString.split(":");
+    return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
+  };
+
   const handleDateRecent = (e) => {
     e.preventDefault();
 
-    const sortedList = [...orderHistoryList].sort(
-      (a, b) => new Date(b) - new Date(a)
-    );
-    setOrderHistoryList(sortedList);
-    setRecentSortClicked(true);
-    setLastSortClicked(false);
+    if (!isRecentSortClicked) {
+      const sortedOrderHistory = [...orderHistory].sort(
+        (a, b) => tStringToTime(b["orderTime"]) - tStringToTime(a["orderTime"])
+      );
+      setOrderHistory(sortedOrderHistory);
+
+      setRecentSortClicked(true);
+      setLastSortClicked(false);
+    }
   };
 
   const handleDateLast = (e) => {
     e.preventDefault();
 
-    const sortedList = [...orderHistoryList].sort(
-      (a, b) => new Date(a) - new Date(b)
-    );
-    setOrderHistoryList(sortedList);
-    setRecentSortClicked(false);
-    setLastSortClicked(true);
+    if (!isLastSortClicked) {
+      const sortedOrderHistory = [...orderHistory].sort(
+        (a, b) => tStringToTime(a["orderTime"]) - tStringToTime(b["orderTime"])
+      );
+      setOrderHistory(sortedOrderHistory);
+      setRecentSortClicked(false);
+      setLastSortClicked(true);
+    }
   };
 
   const handleOrderClick = async (e, date, index) => {
     e.preventDefault();
-    setOrderHistory([]);
-    console.log(date);
 
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
     console.log(res);
     const orderDetails = res.data.response;
-    console.log(orderDetails);
-    console.log(typeof orderDetails[0].detail.price);
-    console.log(typeof orderDetails[0].detail.count);
     const orderData = orderDetails.map((data) => ({
       orderTime: data.date.slice(11, 19),
-      orderMenus: data.detail.f_id,
-      //TODO: price, count 데이터형 확인 필요
-      orderPrice:
-        isNaN(data.detail.price) || isNaN(data.detail.count)
-          ? 0
-          : data.detail.price * data.detail.count,
+      // DELETE LATER: 이전 주문 중 f_name이 없는 data를 위한 f_id 남겨놓은 상태
+      orderMenus: `${
+        data.detail[0].f_name ? data.detail[0].f_name : data.detail[0].f_id
+      } ${data.detail[0].count}개`,
+      orderPrice: data.detail[0].price * data.detail[0].count,
     }));
 
-    setOrderHistory((prevOrderHistory) => [...prevOrderHistory, ...orderData]);
+    setOrderHistory(orderData);
     setSelectedOrderIndex(index);
+
+    setRecentSortClicked(true);
+    setLastSortClicked(false);
   };
+
+  const handleDateRange = (e) => {
+    e.preventDefault();
+
+    // 날짜값 형식: 2023-08-07
+    console.log("startDate", startDate);
+    console.log("endDate", endDate);
+  };
+
+  console.log("order-history", orderHistory);
 
   return (
     <div>
@@ -82,14 +104,26 @@ function OrderManagePage() {
       <section className={Order.body}>
         <div className={Order.historyHead}>
           <h3>누적 주문 내역</h3>
-          <form action="">
+          <form onSubmit={handleDateRange}>
             <label>
               시작일
-              <input type="date" name="dates" id="startDate" />
+              <input
+                type="date"
+                name="dates"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
             </label>
             <label>
               종료일
-              <input type="date" name="dates" id="endDate" />
+              <input
+                type="date"
+                name="dates"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
             </label>
             <input type="submit" value="조회" className={Button.checkDate} />
           </form>
