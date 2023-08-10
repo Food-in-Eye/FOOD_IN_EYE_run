@@ -4,7 +4,6 @@ import Button from "../css/Button.module.css";
 import OrdersHistoryTable from "../components/OrderTable.module";
 import { getOrderHistory } from "../components/API.module";
 import { useEffect, useState } from "react";
-import { min } from "moment";
 
 function OrderManagePage() {
   const sID = localStorage.getItem("storeID");
@@ -25,8 +24,8 @@ function OrderManagePage() {
 
   const getHistory = (sID) => {
     getOrderHistory(`dates?s_id=${sID}`).then((res) => {
-      console.log(res.data);
       setPageCount(res.data.max_batch);
+      console.log(res.data.response);
       setOrderHistoryList(res.data.response);
     });
   };
@@ -64,11 +63,8 @@ function OrderManagePage() {
     }
   };
 
-  const handleOrderClick = async (e, date, index) => {
-    e.preventDefault();
-
+  const fetchOrderDetails = async (date) => {
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
-    console.log(res);
     const orderDetails = res.data.response;
     const orderData = orderDetails.map((data) => ({
       orderTime: data.date.slice(11, 19),
@@ -79,6 +75,13 @@ function OrderManagePage() {
       orderPrice: data.detail[0].price * data.detail[0].count,
     }));
 
+    return orderData;
+  };
+
+  const handleOrderClick = async (e, date, index) => {
+    e.preventDefault();
+
+    const orderData = await fetchOrderDetails(date);
     setOrderHistory(orderData);
     setSelectedOrderIndex(index);
 
@@ -86,15 +89,16 @@ function OrderManagePage() {
     setLastSortClicked(false);
   };
 
-  const handleDateRange = (e) => {
+  const handleDateRange = async (e) => {
     e.preventDefault();
 
-    // 날짜값 형식: 2023-08-07
-    console.log("startDate", startDate);
-    console.log("endDate", endDate);
+    const res = await getOrderHistory(
+      `dates?s_id=${sID}&start_date=${startDate}&end_date=${endDate}`
+    );
+    setOrderHistoryList(res.data.response);
   };
 
-  console.log("order-history", orderHistory);
+  // console.log("order-history-list", orderHistoryList);
 
   return (
     <div>
