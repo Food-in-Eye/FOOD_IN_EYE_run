@@ -4,10 +4,13 @@ import Button from "../css/Button.module.css";
 import OrdersHistoryTable from "../components/OrderTable.module";
 import { getOrderHistory } from "../components/API.module";
 import { useEffect, useState } from "react";
+import { render } from "@testing-library/react";
 
 function OrderManagePage() {
   const sID = localStorage.getItem("storeID");
   const [pageCount, setPageCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 7;
   const [orderHistoryList, setOrderHistoryList] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
 
@@ -23,11 +26,38 @@ function OrderManagePage() {
   }, []);
 
   const getHistory = (sID) => {
-    getOrderHistory(`dates?s_id=${sID}`).then((res) => {
+    const batch = currentPage;
+    getOrderHistory(`dates?s_id=${sID}&batch=${batch}`).then((res) => {
       setPageCount(res.data.max_batch);
-      console.log(res.data.response);
+      setCurrentPage(batch);
+      console.log(res);
       setOrderHistoryList(res.data.response);
     });
+  };
+
+  const handlePageChange = (newBatch) => {
+    console.log(newBatch);
+    setCurrentPage(newBatch);
+    getHistory(sID);
+  };
+
+  /**현재 페이지에 해당하는 주문 목록만 렌더링 */
+  const renderOrderList = () => {
+    const startIndex = (currentPage - 1) * ordersPerPage;
+    const endIndex = startIndex + ordersPerPage;
+
+    return orderHistoryList.map((date, index) => (
+      <li
+        key={`order_${startIndex + index}`}
+        onClick={(e) => handleOrderClick(e, date, startIndex + index)}
+        className={
+          selectedOrderIndex === startIndex + index ? Order.selectedOrder : null
+        }
+      >
+        <span>{date}</span>
+        <span>총 가격</span>
+      </li>
+    ));
   };
 
   /** 정렬을 위한 string->Date */
@@ -65,6 +95,7 @@ function OrderManagePage() {
 
   const fetchOrderDetails = async (date) => {
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
+    console.log("res", res);
     const orderDetails = res.data.response;
     const orderData = orderDetails.map((data) => ({
       orderTime: data.date.slice(11, 19),
@@ -98,7 +129,7 @@ function OrderManagePage() {
     setOrderHistoryList(res.data.response);
   };
 
-  // console.log("order-history-list", orderHistoryList);
+  console.log("order-history", orderHistory);
 
   return (
     <div>
@@ -159,8 +190,10 @@ function OrderManagePage() {
           </div>
           <div className={Order.historyBodyBottom}>
             <section className={Order.leftHBody}>
-              <ul>
-                {orderHistoryList.map((date, index) => (
+              <div className={Order.orderList}>
+                <ul>
+                  {renderOrderList()}
+                  {/* {orderHistoryList.map((date, index) => (
                   <li
                     key={`order_${index}`}
                     onClick={(e) => handleOrderClick(e, date, index)}
@@ -171,8 +204,27 @@ function OrderManagePage() {
                     <span>{date}</span>
                     <span>총 가격</span>
                   </li>
-                ))}
-              </ul>
+                ))} */}
+                </ul>
+                <div className={Order.pageFooter}>
+                  <hr />
+                  {pageCount >= 1 && (
+                    <div className={Order.pageNumber}>
+                      {Array.from({ length: pageCount }, (_, index) => (
+                        <button
+                          key={`page_${index}`}
+                          onClick={() => handlePageChange(index + 1)}
+                          className={
+                            currentPage === index + 1 ? Order.pageNumBtn : ""
+                          }
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className={Order.verticalLine}></div>
             </section>
             <section className={Order.rightHBody}>

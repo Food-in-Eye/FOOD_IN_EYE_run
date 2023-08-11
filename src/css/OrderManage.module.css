@@ -51,6 +51,7 @@
 
 .leftHBody {
   display: flex;
+  width: 20%;
   margin-left: 20px;
   margin-right: auto;
 }
@@ -77,10 +78,28 @@
   margin-right: 20px;
 }
 
+.pageFooter {
+  width: 10%;
+  position: fixed;
+  bottom: 5%;
+}
+
+hr {
+  width: 100%;
+}
+
+.pageNumber {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2px;
+}
+
 .verticalLine {
   width: 2px;
   height: 600px;
-  margin-left: 50px;
+  /* margin-left: 2%; */
   background-color: #000;
 }
 
