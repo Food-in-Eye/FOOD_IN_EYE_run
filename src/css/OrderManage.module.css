@@ -71,7 +71,7 @@
   background-color: #000926;
 }
 
-.leftHBody ul {
+.orderUl {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -81,25 +81,13 @@
 .pageFooter {
   width: 10%;
   position: fixed;
-  bottom: 5%;
-}
-
-hr {
-  width: 100%;
-}
-
-.pageNumber {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2px;
+  bottom: 2%;
 }
 
 .verticalLine {
   width: 2px;
   height: 600px;
-  /* margin-left: 2%; */
+  margin-left: 100px;
   background-color: #000;
 }
 

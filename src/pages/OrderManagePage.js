@@ -4,7 +4,8 @@ import Button from "../css/Button.module.css";
 import OrdersHistoryTable from "../components/OrderTable.module";
 import { getOrderHistory } from "../components/API.module";
 import { useEffect, useState } from "react";
-import { render } from "@testing-library/react";
+import Pagination from "react-js-pagination";
+import "../css/Paging.css";
 
 function OrderManagePage() {
   const sID = localStorage.getItem("storeID");
@@ -191,7 +192,7 @@ function OrderManagePage() {
           <div className={Order.historyBodyBottom}>
             <section className={Order.leftHBody}>
               <div className={Order.orderList}>
-                <ul>
+                <ul className={Order.orderUl}>
                   {renderOrderList()}
                   {/* {orderHistoryList.map((date, index) => (
                   <li
@@ -207,21 +208,17 @@ function OrderManagePage() {
                 ))} */}
                 </ul>
                 <div className={Order.pageFooter}>
-                  <hr />
                   {pageCount >= 1 && (
-                    <div className={Order.pageNumber}>
-                      {Array.from({ length: pageCount }, (_, index) => (
-                        <button
-                          key={`page_${index}`}
-                          onClick={() => handlePageChange(index + 1)}
-                          className={
-                            currentPage === index + 1 ? Order.pageNumBtn : ""
-                          }
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                    </div>
+                    <Pagination
+                      // className={Order.pagination}
+                      activePage={currentPage}
+                      itemsCountPerPage={ordersPerPage}
+                      totalItemsCount={pageCount * ordersPerPage}
+                      pageRangeDisplayed={5}
+                      prevPageText={"<"}
+                      nextPageText={">"}
+                      onChange={handlePageChange}
+                    />
                   )}
                 </div>
               </div>
