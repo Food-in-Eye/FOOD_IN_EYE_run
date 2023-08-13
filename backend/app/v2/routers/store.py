@@ -10,7 +10,7 @@ from .src.util import Util
 store_router = APIRouter(prefix="/stores")
 
 PREFIX = 'api/v2/stores'
-DB = MongodbController('FIE_DB2')
+DB = MongodbController('FIE_DB')
 
 @store_router.get("/hello")
 async def hello():
@@ -78,7 +78,7 @@ async def create_store(store:StoreModel):
 
     try:
         store_list = DB.read_all('store')
-        if not store_list: # menu 최초 등록
+        if not store_list: # store 최초 등록
             data['num'] = 1
         else:
             max_num = max(store["num"] for store in store_list)
