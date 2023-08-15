@@ -1,6 +1,6 @@
 import styles from "../css/Account.module.css";
 import Button from "../css/Button.module.css";
-
+import { getStore } from "../components/API.module";
 import { Link, useNavigate } from "react-router-dom";
 
 function LoginPage() {
@@ -11,6 +11,9 @@ function LoginPage() {
     const storeID = document.querySelector("#storeID").value;
     // storeID를 localStorage에 저장
     localStorage.setItem("storeID", storeID);
+    getStore(storeID).then((res) =>
+      localStorage.setItem("storeNum", res.data.response.num)
+    );
 
     navigate(`/main`);
   };

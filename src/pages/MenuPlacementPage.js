@@ -48,6 +48,7 @@ function MenuPlacementPage() {
 
     const data = {
       f_list: menuItems.map((menuItem, index) => ({
+        // pos 삭제 예정
         pos: index + 1,
         f_id: menuItem._id,
         f_num: menuItem.num,

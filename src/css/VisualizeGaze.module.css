@@ -1,13 +1,32 @@
-.gazePoint {
+.gazePoint,
+.overGazePoint,
+.overGP,
+.gpInCircle {
   position: absolute;
   width: 5px;
   height: 5px;
+}
+
+.gazePoint {
   background-color: red;
 }
 
+.overGazePoint {
+  background-color: rgb(149, 248, 0);
+}
+
+.overGP {
+  background-color: blue;
+  opacity: 0.4;
+}
+
 .fixCircle {
+  fill: rgb(122, 126, 184);
+}
+
+.fixCircle,
+.gradCircle {
   position: absolute;
-  fill: red;
   opacity: 0.5;
 }
 
@@ -21,7 +40,6 @@
 
 .gazePlotRow {
   display: flex;
-
   margin-bottom: 20px;
 }
 
@@ -33,29 +51,40 @@
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  color: #008b3c;
+  color: #002b13;
 }
 
 .screensForCompare {
+  width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: center;
   align-items: center;
 }
 
 .screensBeforeFilter,
 .screensAfterFilter {
-  display: flex;
+  flex: 1;
   flex-direction: column;
+  margin: 0 10px;
+}
+
+.screensBeforeFilter {
+  margin: 0 10px 0 auto;
+}
+
+.screensAfterFilter {
+  margin: 0 auto 0 10px;
 }
 
 .head {
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-between;
 }
 
-h1 {
-  margin: 0 auto 0 20px;
+h1,
+h3 {
+  margin: 0 auto 10px 20px;
 }
 
 .inputs {
@@ -64,8 +93,4 @@ h1 {
 
 input {
   margin: 20px 5px 0 5px;
-}
-
-#input {
-  padding: 5px;
 }
