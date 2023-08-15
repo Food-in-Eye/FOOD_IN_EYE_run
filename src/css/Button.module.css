@@ -76,3 +76,31 @@
   font-size: 20px;
   transform: translate(-50%, -50%) rotate(16deg);
 }
+
+.checkDate {
+  padding: 5px 15px 5px 15px;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 18px;
+  font-family: "Akaya Telivigala";
+  background-color: #000926;
+}
+
+.activeSortBtn {
+  padding: 5px 15px 5px 15px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  font-size: 18px;
+  font-family: "Akaya Telivigala";
+}
+
+.inactiveSortBtn {
+  padding: 5px 17px 5px 17px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-family: "Akaya Telivigala";
+  color: #fff;
+  background-color: #959292;
+}

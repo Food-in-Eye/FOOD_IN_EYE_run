@@ -1,0 +1,102 @@
+.body {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.historyHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  height: 100px;
+  margin-top: 30px;
+  border-top: 4px solid #ff9345;
+  border-bottom: 4px solid #ff9345;
+}
+
+.historyHead form {
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: 0;
+  background: transparent;
+}
+
+.historyHead h3 {
+  margin-right: auto;
+  font: bold 2em/2 "Akaya Telivigala";
+}
+
+.historyBody {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.historyBodyTop {
+  display: flex;
+  margin: 10px 0 20px auto;
+}
+
+.historyBodyBottom {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sortButtons button {
+  margin: 0 5px;
+}
+
+.leftHBody {
+  display: flex;
+  width: 20%;
+  margin-left: 20px;
+  margin-right: auto;
+}
+
+.leftHBody li {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  font-size: 20px;
+  white-space: nowrap;
+  border: 2px solid #000;
+}
+
+.selectedOrder {
+  color: #fff;
+  background-color: #000926;
+}
+
+.orderUl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 20px;
+}
+
+.pageFooter {
+  width: 10%;
+  position: fixed;
+  bottom: 2%;
+}
+
+.verticalLine {
+  width: 2px;
+  height: 600px;
+  margin-left: 100px;
+  background-color: #000;
+}
+
+.rightHBody {
+  display: flex;
+  width: 90%;
+  height: 100%;
+  overflow-y: auto;
+  margin-right: 20px;
+  margin-left: 100px;
+  flex-direction: column;
+}

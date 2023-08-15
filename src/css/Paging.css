@@ -1,0 +1,56 @@
+.pagination {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.pagination ul {
+  display: flex;
+  flex-direction: row;
+}
+
+ul.pagination li {
+  justify-content: center;
+  align-items: center;
+  width: 10px;
+  height: 30px;
+  margin: 0 2px;
+  border: 1px solid #e2e2e2;
+  font-size: 1rem;
+}
+
+ul.pagination li:first-child {
+  border-radius: 5px 0 0 5px;
+}
+
+ul.pagination li:last-child {
+  border-radius: 0 5px 5px 0;
+}
+
+ul.pagination li a {
+  text-align: center;
+  text-decoration: none;
+  color: #000926;
+  font-size: 1rem;
+}
+
+ul.pagination li.active a {
+  color: white;
+}
+
+ul.pagination li.active {
+  background-color: #000926;
+}
+
+ul.pagination li a:hover,
+ul.pagination li a.active {
+  color: blue;
+}
+
+.page-selection {
+  width: 100px;
+  height: 30px;
+  color: #000926;
+}

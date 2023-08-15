@@ -6,7 +6,7 @@ import Main from "../css/Main.module.css";
 import Bar from "../css/UnderBar.module.css";
 import Button from "../css/Button.module.css";
 import MenuBar from "../components/MenuBar";
-import Table from "../components/Table.module";
+import MenuTable from "../components/MenuTable.module";
 import ShortCuts from "../components/ShortCutForPages.module";
 
 import orderReceive from "../images/order_received.png";
@@ -275,7 +275,7 @@ function MainPage() {
               <section className={Main.orderDetail}>
                 <h3>주문 내역</h3>
                 <div className={Main.orderContents}>
-                  <Table data={orderData} />
+                  <MenuTable data={orderData} />
                 </div>
               </section>
             </div>
