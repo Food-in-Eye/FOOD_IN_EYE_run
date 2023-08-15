@@ -9,6 +9,8 @@ import { useState, useEffect, useCallback } from "react";
 
 function MenuPlacementPage() {
   const sID = localStorage.getItem("storeID");
+  const [storeOpen, setStoreOpen] = useState(false);
+  const [storeClosed, setStoreClosed] = useState(false);
   const [menuList, setMenuList] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -26,11 +28,18 @@ function MenuPlacementPage() {
   }, [sID]);
 
   useEffect(() => {
+    setStoreOpen(localStorage.getItem("storeOpen"));
+    setStoreClosed(localStorage.getItem("storeClosed"));
+
     getMenuLists();
   }, [getMenuLists]);
 
   const handleEditBtnClick = () => {
-    setIsEditMode(true);
+    if (storeOpen === "true" && storeClosed === "false") {
+      alert("가게를 닫고 진행해주세요!");
+    } else if (storeOpen === "false" && storeClosed === "true") {
+      setIsEditMode(true);
+    }
   };
 
   const handleSaveBtnClick = async (e) => {

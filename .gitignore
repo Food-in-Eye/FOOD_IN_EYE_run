@@ -38,6 +38,9 @@ yarn-error.log*
 .AppleDouble
 .LSOverride
 
+# exe
+/src/data
+
 
 
 

@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-
 import TM from "../css/TheMenus.module.css";
 import { getMenus, getFoods } from "./API.module";
 
 function TheMenus({ isEditMode, menuItems, setMenuItems }) {
   const sID = localStorage.getItem("storeID");
-  // const [menuItems, setMenuItems] = useState([]);
   const [foodCount, setFoodCount] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -30,7 +28,6 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
         setMenuItems([]);
       }
 
-      // setMenuItems(resMenu.data.response.f_list || []);
       setFoodCount(resFood.data.response.length);
     } catch (error) {
       console.error(`menu-items GET error: ${error}`);
@@ -55,9 +52,7 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
 
       const data = e.dataTransfer.getData("text/plain");
       const draggedMenuItem = JSON.parse(data);
-      console.log(draggedMenuItem);
       const targetIndex = index;
-      console.log(targetIndex);
 
       setMenuItems((prevMenuItems) => {
         const updatedMenuItems = [...prevMenuItems];
