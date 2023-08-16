@@ -1,4 +1,5 @@
 from .data import *
+
 from core.common.mongo2 import MongodbController
 
 DB = MongodbController('FIE_DB2')
@@ -9,6 +10,7 @@ def data_preprocess(orders:list) -> list:
         - input  : orders   (하루동안 발생한 모든 주문 데이터)
         - output : orders  (s_num, f_num이 추가된 데이터)
     """
+
     try:
         store_info = DB.read_all('store')
         store_info_dict = {}
@@ -24,9 +26,14 @@ def data_preprocess(orders:list) -> list:
         for order in orders:
             if order['s_id'] in store_info_dict.keys():
                 order['s_num'] = store_info_dict[order['s_id']]['num']
+
+            del order['_id']
+
             for f in order['f_list']:
                 if f['f_id'] in food_info_dict.keys():
                     f['f_num'] = food_info_dict[f['f_id']]['num']
+                
+
 
         return orders
 
@@ -57,5 +64,9 @@ def split_by_store_n_food(orders:list) -> dict:
                 store_data[S_NUM].food_dict[F_NUM] = FoodData(F_NUM)
             store_data[S_NUM].food_dict[F_NUM].total_count += f['count']
             store_data[S_NUM].food_dict[F_NUM].total_sales += f['count'] * f['price']
+
+    # # orders를 s_num 기준으로 정렬하기 -> 조금 더 효율적인 방법이 있을거 같고, 딕셔너리라 굳이 필요할까 싶음
+    # sorted_orders = sorted(store_data.items(), key=lambda x: x[0])
+    # sorted_orders_dict = collections.OrderedDict(sorted_orders)
 
     return store_data

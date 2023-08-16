@@ -29,19 +29,14 @@ async def execute_sale(yesterday, today):
     # store와 food 별로 orders 정리하기
     store_data = split_by_store_n_food(orders)
     
-    try:
-        result = {}
-        for k, v in store_data.items():
-            print(v)
-            # response = requests.get(URL, v)
-            # response.raise_for_status()
+    # try:
+    #     result = requests.get(URL, store_data)
+    #     result.raise_for_status()
 
-            # result[f'Store {k}'] = response
-
-    except requests.exceptions.Timeout:
-        return "Timeout: The request took too long to complete."
-    except requests.exceptions.RequestException as e:
-        return f"An error occurred: {e}"
-    return result
+    # except requests.exceptions.Timeout:
+    #     return "Timeout: The request took too long to complete."
+    # except requests.exceptions.RequestException as e:
+    #     return f"An error occurred: {e}"
+    # return result
 
 
