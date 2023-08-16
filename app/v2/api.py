@@ -6,16 +6,12 @@ from .routers.food import food_router
 from .routers.order import order_router
 from .routers.websocket import websocket_router
 
-from .routers.analysis import router
-
-
 v2_router = APIRouter(prefix="/api/v2", tags=["v2"])
 v2_router.include_router(store_router)
 v2_router.include_router(menu_router)
 v2_router.include_router(food_router)
 v2_router.include_router(order_router)
 v2_router.include_router(websocket_router)
-v2_router.include_router(router)
 
 @v2_router.get("/")
 async def hello():
@@ -74,13 +70,12 @@ async def analsis_test():
         하루동안의 통계를 내기 위해 세팅하는 함수이다.
         1. 분석 날짜를 선정한다. 어제 00:00 ~ 오늘 00:00
         2. execute_sale 함수를 실행한다. -> return sale_report
-        3. execute_aoi 함수를 실행한다.  -> return aoi_report
-        4. 분석 보고서를 리턴한다.
+        3. 분석 보고서를 리턴한다.
     """
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    # today = datetime(2023, 7, 26) # 0808 기준 데이터 많은 날짜
+    # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today = datetime(2023, 7, 26)
     yesterday = today - timedelta(1)
 
-    sale_report = execute_sale(yesterday, today)
+    sale_report = await execute_sale(yesterday, today)
 
     return sale_report
