@@ -174,21 +174,6 @@ class MongodbController:
         
         return response  
     
-    def read_all_by_two_field(self, collection:str, field1:str, value, field2:str, start:datetime, end:datetime) -> dict:
-        """ field1(s_id)의 value가 일치하고, field2(날짜)의 start부터 end까지의 document를 모두 읽어온다. """
-        assert collection and id is not None
-        coll = self.get_collection(collection)
-
-        result = list(coll.find({field1: value, field2: {"$gte": start, "$lte": end}}))
-        
-        if result is None:
-            raise Exception(f'Failed to READ document with field \'{field1, field2}\'')
-
-        response = []
-        for r in result:
-            response.append(dictToStr(r))
-        
-        return response  
 
     # 고민중이니 주석처리
     # def delete(self, id:str) -> bool:

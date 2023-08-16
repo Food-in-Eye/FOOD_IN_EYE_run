@@ -61,3 +61,26 @@ async def set_meta():
 
     meta = Meta.get_meta_detail(datetime.now())
     return meta
+
+
+
+
+from datetime import datetime, timedelta
+from core.execute.anlz import execute_sale
+
+@v2_router.get("/anlz_test")
+async def analsis_test():
+    """
+        하루동안의 통계를 내기 위해 세팅하는 함수이다.
+        1. 분석 날짜를 선정한다. 어제 00:00 ~ 오늘 00:00
+        2. execute_sale 함수를 실행한다. -> return sale_report
+        3. execute_aoi 함수를 실행한다.  -> return aoi_report
+        4. 분석 보고서를 리턴한다.
+    """
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    # today = datetime(2023, 7, 26) # 0808 기준 데이터 많은 날짜
+    yesterday = today - timedelta(1)
+
+    sale_report = execute_sale(yesterday, today)
+
+    return sale_report
