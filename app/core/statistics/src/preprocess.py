@@ -4,10 +4,10 @@ from core.common.mongo2 import MongodbController
 
 DB = MongodbController('FIE_DB2')
 
-class Preprocess:
+class Preprocessor:
 
     @staticmethod
-    async def for_sale(orders:list) -> list:
+    def for_sale(orders:list) -> list:
         """
             전체 데이터 중에서 분석에 필요한 데이터를 정리하는 함수
             1. s_num, f_num 추가
@@ -28,7 +28,7 @@ class Preprocess:
             for food in foods:
                 foods_dict[food['_id']] = food['num']
 
-            new_orders = []
+            result = []
             for order in orders:
 
                 # food 데이터 정리 - num 추가, 기타 데이터 제외
@@ -40,16 +40,24 @@ class Preprocess:
                             "count": f['count'],
                             "price": f['price']
                         })
+                    else:
+                        pass
+                        # todo: 정체를 알 수 없는 f_id가 있을 경우, 이 order_id에 대한 정보를 로그로 남겨야함.
+                        #       그래야 관리자가 확인 후 처리 가능
 
                 # store 데이터 정리 - num 추가, 기타 데이터 제외
                 if order['s_id'] in stores_dict.keys():
-                    new_orders.append({
+                    result.append({
                         "s_num": stores_dict[order['s_id']],
                         "date": order['date'].strftime('%Y-%m-%d %H:%M:%S'),
                         "f_list": new_foods
                     })
+                else:
+                    pass
+                    # todo: 정체를 알 수 없는 s_id가 있을 경우, 이 order_id에 대한 정보를 로그로 남겨야함.
+                    #       그래야 관리자가 확인 후 처리 가능
 
-            return new_orders
+            return result
 
         except Exception as e:
             print('ERROR', e)

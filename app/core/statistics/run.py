@@ -1,25 +1,18 @@
-from fastapi import FastAPI, APIRouter
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 import os
 import httpx
-import asyncio
-import requests
-import json
 
 from core.common.mongo2 import MongodbController
-from core.common.s3 import Storage
-from .src import *
+from .src import Preprocessor
 
 DB = MongodbController('FIE_DB2')
 
-URL = "http://httpbin.org/uuid"
 
-
-class ExecuteAnalysis:
+class CallAnalysis:
     @staticmethod
-    async def sale(today):
+    async def sale_stats(today:datetime):
         """
             하루동안의 판매 통계를 하는 함수이다.
             1. 어제 00:00 ~ 오늘 00:00 까지의 주문(orders)를 불러온다.
@@ -34,10 +27,10 @@ class ExecuteAnalysis:
         orders = DB.read_all_by_query('order', query)
 
         # s_num, f_num 추가하기, 필요한 데이터로만 정리하기
-        orders = await Preprocess.for_sale(orders)
+        orders = Preprocessor.for_sale(orders)
 
         load_dotenv()
-        anlz_sale_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/sale/analysis"
+        anlz_sale_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/sale/execute"
         headers = {"Content-Type": "application/json"}
         payload = {
             "data": orders

@@ -62,7 +62,7 @@ async def set_meta():
 
 
 from datetime import datetime
-from core.execute.anlz import ExecuteAnalysis
+from core.statistics.run import CallAnalysis
 
 @v2_router.get("/anlz_test")
 async def analysis_test():
@@ -74,7 +74,9 @@ async def analysis_test():
     """
     # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today = datetime(2023, 7, 26)
+    try:
+        sale_report = await CallAnalysis.sale_stats(today)
 
-    sale_report = await ExecuteAnalysis.sale(today)
-
-    return sale_report
+        return sale_report
+    except Exception as e:
+        return e
