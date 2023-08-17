@@ -22,41 +22,38 @@ function OrderManagePage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  useEffect(() => {
-    getHistory(sID);
-  }, []);
-
-  const getHistory = (sID) => {
-    const batch = currentPage;
-    getOrderHistory(`dates?s_id=${sID}&batch=${batch}`).then((res) => {
-      setPageCount(res.data.max_batch);
-      setCurrentPage(batch);
-      console.log(res);
-      setOrderHistoryList(res.data.response);
-    });
+  const handlePageChange = (newPageNumber) => {
+    console.log(newPageNumber);
+    setCurrentPage(newPageNumber);
+    // getHistory(sID);
   };
 
-  const handlePageChange = (newBatch) => {
-    console.log(newBatch);
-    setCurrentPage(newBatch);
-    getHistory(sID);
+  useEffect(() => {
+    getHistory(sID, currentPage);
+  }, [currentPage]);
+
+  const getHistory = (sID, batch) => {
+    getOrderHistory(`dates?s_id=${sID}&batch=${batch}`).then((res) => {
+      setPageCount(res.data.max_batch);
+      setOrderHistoryList(res.data.response);
+    });
   };
 
   /**현재 페이지에 해당하는 주문 목록만 렌더링 */
   const renderOrderList = () => {
     const startIndex = (currentPage - 1) * ordersPerPage;
-    const endIndex = startIndex + ordersPerPage;
+    // const endIndex = startIndex + ordersPerPage;
 
-    return orderHistoryList.map((date, index) => (
+    return orderHistoryList.map((order, index) => (
       <li
         key={`order_${startIndex + index}`}
-        onClick={(e) => handleOrderClick(e, date, startIndex + index)}
+        onClick={(e) => handleOrderClick(e, order.date, startIndex + index)}
         className={
           selectedOrderIndex === startIndex + index ? Order.selectedOrder : null
         }
       >
-        <span>{date}</span>
-        <span>총 가격</span>
+        <span>{order.date}</span>
+        <span>{order.total_price}원</span>
       </li>
     ));
   };
@@ -96,7 +93,6 @@ function OrderManagePage() {
 
   const fetchOrderDetails = async (date) => {
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
-    console.log("res", res);
     const orderDetails = res.data.response;
     const orderData = orderDetails.map((data) => ({
       orderTime: data.date.slice(11, 19),
@@ -129,8 +125,6 @@ function OrderManagePage() {
     );
     setOrderHistoryList(res.data.response);
   };
-
-  console.log("order-history", orderHistory);
 
   return (
     <div>
@@ -192,25 +186,10 @@ function OrderManagePage() {
           <div className={Order.historyBodyBottom}>
             <section className={Order.leftHBody}>
               <div className={Order.orderList}>
-                <ul className={Order.orderUl}>
-                  {renderOrderList()}
-                  {/* {orderHistoryList.map((date, index) => (
-                  <li
-                    key={`order_${index}`}
-                    onClick={(e) => handleOrderClick(e, date, index)}
-                    className={
-                      selectedOrderIndex === index ? Order.selectedOrder : null
-                    }
-                  >
-                    <span>{date}</span>
-                    <span>총 가격</span>
-                  </li>
-                ))} */}
-                </ul>
+                <ul className={Order.orderUl}>{renderOrderList()}</ul>
                 <div className={Order.pageFooter}>
                   {pageCount >= 1 && (
                     <Pagination
-                      // className={Order.pagination}
                       activePage={currentPage}
                       itemsCountPerPage={ordersPerPage}
                       totalItemsCount={pageCount * ordersPerPage}
