@@ -43,7 +43,7 @@ async def get_keys(prefix:str, key: str):
 
 from v2.routers.src.meta import Meta
     
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
 class Item(BaseModel):
     content: dict
@@ -61,21 +61,20 @@ async def set_meta():
 
 
 
-from datetime import datetime, timedelta
-from core.execute.anlz import execute_sale
+from datetime import datetime
+from core.execute.anlz import ExecuteAnalysis
 
 @v2_router.get("/anlz_test")
-async def analsis_test():
+async def analysis_test():
     """
         하루동안의 통계를 내기 위해 세팅하는 함수이다.
-        1. 분석 날짜를 선정한다. 어제 00:00 ~ 오늘 00:00
+        1. 분석 날짜(= 오늘)를 선정한다.
         2. execute_sale 함수를 실행한다. -> return sale_report
         3. 분석 보고서를 리턴한다.
     """
     # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today = datetime(2023, 7, 26)
-    yesterday = today - timedelta(1)
 
-    sale_report = await execute_sale(yesterday, today)
+    sale_report = await ExecuteAnalysis.sale(today)
 
     return sale_report
