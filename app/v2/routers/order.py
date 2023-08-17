@@ -285,11 +285,13 @@ async def get_history_list(u_id: str, batch: int = 1):
 
             batch_items = historys[10*(batch-1):10*batch]
             for h in batch_items:
+                if 's_names' in h.keys(): s_names = h['s_names']
+                else: s_names = ["nothing", "is", 'here']
                 response_list.append({
                     "h_id": h['_id'],
                     "date": h['date'],
                     "total_price": h['total_price'],
-                    "s_names": h['s_names']
+                    "s_names": s_names
                 })
         else:
             raise Exception('requested batch exceeds range')
