@@ -323,9 +323,11 @@ async def get_order_list(id: str):
             order = DB.read_by_id('order', o_id)
             s_name = order['s_name']
             for f in order['f_list']:
+                if 'f_name' in f.keys(): f_name = f['f_name']
+                else: f_name = 'unknown'
                 food_list.append({
                     "s_name": s_name,
-                    "f_name": f['f_name'],
+                    "f_name": f_name,
                     "count": f['count'],
                     "price": f['price']
                 })
@@ -431,85 +433,3 @@ async def get_history_list(s_id: str, date: str):
             'message': f'ERROR {e}'
         }
     
-# 여러 배치를 프론트에서 잘 확인할 수 있는지, 배치별 불러오기가 잘 되는지 확인하기 위해 test용 api 작성
-# for app
-@order_router.get('/test/historys')
-async def test_historys(u_id:str, batch: int = 1):
-    MAX_BATCH = 10
-    date = datetime.strptime('2023-08-15T14:06:00.419+00:00', '%Y-%m-%dT%H:%M:%S.%f%z')
-    
-    if batch > 0 and batch < MAX_BATCH + 1:
-        response_list = []
-        for i in range(1,11):
-            num = i + (batch - 1) * 10
-            response_list.append({
-                "h_id": '64db86489c92c62a28ff19b8',
-                "date": date,
-                "total_price": num,
-                "s_names": ["해장국", "파스타"]
-            })
-    
-        return {
-            'request': f'GET {PREFIX}/test/historys?u_id={u_id}&batch={batch}',
-            'status': 'OK',
-            'max_batch': MAX_BATCH,
-            'response': response_list
-        }
-    else:
-        return {
-            'request': f'GET {PREFIX}/test/historys?u_id={u_id}&batch={batch}',
-            'status': 'ERROR',
-            'message': f'this batch is out of range'
-        }
-
-
-@order_router.get('/test/store/dates')
-async def test_store_dates(s_id:str, batch:int = 1):
-    PER_PAGE = 7
-    MAX_BATCH = 10
-    delta = (batch - 1) * int(PER_PAGE)
-    
-    date = datetime(2023, 1, 1) + timedelta(days=delta)
-
-    if batch > 0 and batch < MAX_BATCH + 1:
-        result = []
-        for _ in range(PER_PAGE):
-            result.append({
-                "date": date.strftime("%Y-%m-%d"),
-                "total_price": 100000
-            })
-            date = date + timedelta(days=1)
-
-        return {
-            'request': f'GET {PREFIX}/test/store/dates?s_id={s_id}&batch={batch}',
-            'status': 'OK',
-            'max_batch': MAX_BATCH,
-            'response': result
-        }
-    
-    else:
-        return {
-            'request': f'GET {PREFIX}/test/store/dates?s_id={s_id}&batch={batch}',
-            'status': 'ERROR',
-            'message': f'this batch is out of range'
-        }
-    
-@order_router.get('/test/store/date')
-async def test_store_date(s_id:str, date:str):
-    MAX_ORDERS = 20
-    result = []
-    for i in range(MAX_ORDERS):
-        result.append({
-            'o_id': '64d0b0cbc53696675f70f43a',
-            'date': date,
-            'detail': [
-                { 'f_id': '64a3ecaff83156a99a7f1926', 'f_name': '베이컨치즈피자', 'count': 2, 'price': 16000}
-            ],
-            'total_price': i+1
-        })
-    
-    return {
-        'request': f'GET {PREFIX}/test/store/date?s_id={s_id}&date={date}',
-        'status': 'OK',
-        'response': result
-    }
