@@ -289,11 +289,13 @@ async def get_history_list(u_id: str, batch: int = 1):
 
             batch_items = historys[10*(batch-1):10*batch]
             for h in batch_items:
+                if 's_names' in h.keys(): s_names = h['s_names']
+                else: s_names = ["nothing", "is", 'here']
                 response_list.append({
                     "h_id": h['_id'],
                     "date": h['date'],
                     "total_price": h['total_price'],
-                    "s_names": h['s_names']
+                    "s_names": s_names
                 })
         else:
             raise Exception('requested batch exceeds range')
@@ -356,8 +358,8 @@ async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str
     PER_PAGE = 7
     pipeline = [
         { "$match": { "s_id": s_id } },
-        { "$project": { "date": { "$dateToString": { "format": "%Y-%m-%d", "date": "$date" } } } },
-        { "$group": { "_id": "$date" } },
+        { "$project": { "date": { "$dateToString": { "format": "%Y-%m-%d", "date": "$date" } }, "total_price": 1 } },
+        { "$group": { "_id": "$date", "total_price": { "$sum": "$total_price" } } },
         { "$sort": { "_id": 1 } }
     ]
     if (start_date != None) and (end_date != None):
@@ -367,7 +369,13 @@ async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str
         }
     try:
         aggreagted_data = DB.aggregate_pipline('order', pipeline)
-        distinct_dates = [entry["_id"] for entry in aggreagted_data]
+        
+        distinct_dates = []
+        for entry in aggreagted_data:
+            distinct_dates.append({
+                "date": entry["_id"],
+                "total_price": entry["total_price"]
+            })
 
         total_dates = len(distinct_dates)
         start_idx = (batch - 1) * PER_PAGE
@@ -409,7 +417,8 @@ async def get_history_list(s_id: str, date: str):
             result.append({
                 'o_id': o['_id'],
                 'date': o['date'],
-                'detail': o['f_list']
+                'detail': o['f_list'],
+                'total': o['total_price']
             })
         
         return {
