@@ -63,6 +63,7 @@ async def set_meta():
 
 from datetime import datetime
 from core.statistics.run import CallAnalysis
+from core.statistics.src.dataloader import DataLoader
 
 @v2_router.get("/anlz_test")
 async def analysis_test():
@@ -72,6 +73,7 @@ async def analysis_test():
         2. execute_sale 함수를 실행한다. -> return sale_report
         3. 분석 보고서를 리턴한다.
     """
+    
     # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today = datetime(2023, 7, 26)
     try:
