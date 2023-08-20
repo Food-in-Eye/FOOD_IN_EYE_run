@@ -15,7 +15,9 @@ class BuyerModel(BaseModel):
     gender: Gender = Field(title="Gender of user [male:1/female:2]")
     age: int
 
+
 class SellerModel(BaseModel):
     id: str
     pw: str
+
 

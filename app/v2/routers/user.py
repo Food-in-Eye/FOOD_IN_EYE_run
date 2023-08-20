@@ -50,6 +50,7 @@ async def check_duplicate_id(data: dict = Body(...)):
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     try:
+        AuthManager.validate_pw(data.pw)
         response = {}
 
         if AuthManager.check_id(data.id) == False:
@@ -66,7 +67,6 @@ async def buyer_signup(data: BuyerModel):
             response = {"u_id" : str(DB.create('user', user))}
         else:
             raise Exception(f'Duplicate ID \'{data.id}\'')
-
     except Exception as e:
         print('ERROR', e)
         return {
@@ -99,7 +99,7 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
         
         else:
             raise Exception(f'Nonexistent ID \'{data.username}\'')
-    
+        
     except Exception as e:
         print('ERROR', e)
         return {
