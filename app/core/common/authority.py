@@ -12,22 +12,32 @@ DB = MongodbController('FIE_DB2')
 
 class AuthManager:
     def __init__(self):
-        self.password_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
 
-    def get_hashed_pw(self, password: str) -> str:
-        return self.password_handler.hash(password)
+    def get_hashed_pw(self, pw: str) -> str:
+        return self.pw_handler.hash(pw)
 
+    def check_id(self, id:str, role:int = 0) -> bool:
+        if role == 0:
+            query = {'id': id}
+        else:    
+            query = {'id': id, 'role': role}
+            
+        users = DB.read_all_by_query('user', query)
         
-
-    def verify_pw(self, stored_password:str, hashed_password:str) -> bool:
-        if self.password_handler.verify(stored_password, hashed_password):
-            return True
+        if users:
+            return users[0]
         else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect password"
-            )
+            return False
+
+    def verify_id(self, plain_id:str, stored_id:str):
+        if plain_id != stored_id:
+            raise Exception(f'Incorrect ID \'{plain_id}\'')
+
+    def verify_pw(self, plain_pw:str, stored_pw:str):
+        if not self.pw_handler.verify(plain_pw, stored_pw):
+            raise Exception(f'Incorrect PW \'{plain_pw}\'')
 
         
 
