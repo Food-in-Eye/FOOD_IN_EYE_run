@@ -51,8 +51,8 @@ async def check_duplicate_id(data: dict = Body(...)):
 async def buyer_signup(data: BuyerModel):
     try:
         AuthManager.validate_pw(data.pw)
-        response = {}
 
+        response = {}
         if AuthManager.check_id(data.id) == False:
             user = {
                 'id': data.id,
@@ -84,8 +84,9 @@ async def buyer_signup(data: BuyerModel):
 @user_router.post('/buyer/login')
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
+        AuthManager.validate_pw(data.password)
+
         response = {}
-        
         user = AuthManager.check_id(data.username, 1)
         if user:
             AuthManager.verify_id(data.username, user['id'])
@@ -119,16 +120,16 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
     try:
-        response = {}
+        AuthManager.validate_pw(data.pw)
 
+        response = {}
         if AuthManager.check_id(data.id) == False:
             user = {
                 'id': data.id,
                 'pw': AuthManager.get_hashed_pw(data.pw),
                 'role': 2,
                 'R_Token': ''
-            }
-                            
+            }           
             response = {"u_id" : str(DB.create('user', user))}
         else:
             raise Exception(f'Duplicate ID \'{data.id}\'')
@@ -150,8 +151,9 @@ async def seller_signup(data: SellerModel):
 @user_router.post('/seller/login')
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        response = {}
+        AuthManager.validate_pw(data.password)
 
+        response = {}
         user = AuthManager.check_id(data.username, 2)
         if user:
             AuthManager.verify_id(data.username, user['id'])
