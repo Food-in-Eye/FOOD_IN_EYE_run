@@ -1,16 +1,17 @@
-import os
-from fastapi import HTTPException
-from jose import jwt
 from passlib.context import CryptContext
-from pydantic import validator
 import re
+
+import os
+import time
+from jose import jwt
+from datetime import datetime, timedelta
 
 from core.common.mongo2 import MongodbController
 
 DB = MongodbController('FIE_DB2')
 
 
-class AuthManager:
+class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
@@ -51,12 +52,38 @@ class AuthManager:
 
         
 
-class TokenManager: # todo: 작성하기
+class TokenManagement:
     def __init__(self) -> None:
-        ALGORITHM = "HS256"
+        self.algorithm = "HS256"
+        self.token_type = "bearer"
 
-        ACCESS_EXPIRE_MINUTES = 30 # 만료 기간 30분
-        ACCESS_SECRET_KEY = os.environ['JWT_ACCESS_SECRET_KEY']
+        self.ACCESS_EXP = 30 # 만료 기간 30분
+        self.ACCESS_SK = os.environ['JWT_ACCESS_SECRET_KEY']
+        self.ACCESS_TOKEN = ''
 
-        REFRESH_EXPIRE_MINUTES = 0 # 만료 기간은 사용자에 따라 차등 설정
-        REFRESH_SECRET_KEY = os.environ['JWT_REFRESH_SECRET_KEY']
+        self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
+    
+    def create_access_token(self):
+        data = {
+            "sub": "FOOD-IN-EYE",
+            "exp": self.ACCESS_EXP,
+            "iat": int(time.time()),
+            "role": "API server"
+        }
+        self.ACCESS_TOKEN = jwt.encode(data,  self.ACCESS_SK, algorithm=self.algorithm)
+        return self.ACCESS_TOKEN
+    
+    def create_refresh_token(self, u_id, role):
+        if role == 1:
+            REFRESH_EXP = 60
+        elif role == 2:
+            REFRESH_EXP = 60 * 2
+
+        data = {
+            "sub": u_id,
+            "exp": REFRESH_EXP,
+            "iat": int(time.time()),
+            "role": role
+        }
+        return jwt.encode(data,  self.REFRESH_SK, algorithm=self.algorithm)
+        
