@@ -1,18 +1,36 @@
-.login {
+.login,
+.register,
+.duplicateCheck {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 350px;
-  height: 40px;
-  margin-top: 10px;
   padding: 30px 15px;
   border-radius: 10px;
   border: 1px solid #fd773e;
   text-align: center;
+  color: #fff;
   font-size: 20px;
   font-weight: 600;
-  color: #fff;
   background-color: #fd773e;
+}
+
+.login {
+  width: 350px;
+  height: 40px;
+  margin-top: 10px;
+}
+
+.duplicateCheck {
+  width: 200px;
+  height: 30px;
+  margin-top: 25px;
+  margin-left: 10px;
+}
+
+.register {
+  width: 600px;
+  height: 40px;
+  margin-top: 10px;
 }
 
 .plus {

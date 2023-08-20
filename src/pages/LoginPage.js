@@ -84,11 +84,11 @@ function LoginPage() {
       <section className={Login.LoginForm}>
         <h2>Login</h2>
         <form>
-          <label for="id">
+          <label htmlFor="id">
             ID
             <input id="id" type="text" name="id" placeholder="ID" />
           </label>
-          <label for="password">
+          <label htmlFor="password">
             비밀번호
             <input type="password" name="password" placeholder="비밀번호" />
           </label>
