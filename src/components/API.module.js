@@ -1,5 +1,6 @@
 import axios from "axios";
 
+const USER_URL = "api/v2/users";
 const STORE_URL = "/api/v2/stores";
 const FOODS_URL = "/api/v2/foods";
 const ORDER_URL = "/api/v2/orders";
@@ -72,6 +73,17 @@ export const putOrderStatus = (o_id) => {
   const requestUrl = `${ORDER_URL}/order/status?id=${o_id}`;
 
   return axios.put(requestUrl);
+};
+
+export const postUser = (query, data) => {
+  const requestUrl = `${USER_URL}${query}`;
+
+  return axios.post(requestUrl, JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
 };
 
 export const postFood = (s_id, data) => {

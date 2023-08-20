@@ -76,14 +76,30 @@ input {
   padding: 20px 10px;
   border: 1px solid #e2e1e5;
   border-radius: 5px;
-  color: #d2d2d2;
   font-size: 17px;
+  color: #000;
 }
 
-.StoreNameSection,
-.IDSection {
+.IDSection,
+.PasswdSection,
+.PasswdCheckSection {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 0px;
+}
+
+.firstSection p,
+.secondSection p,
+.thirdSection p {
+  margin: 0px 5px;
+  background: none;
+}
+
+.firstSection,
+.secondSection,
+.thirdSection {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0px;
 }
