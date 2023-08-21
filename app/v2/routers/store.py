@@ -4,7 +4,7 @@ store_router
 
 from fastapi import APIRouter
 from core.models.store import StoreModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from .src.util import Util
 
 store_router = APIRouter(prefix="/stores")
@@ -51,7 +51,7 @@ async def read_store(id:str):
     try:
         Util.check_id(id)
 
-        response = DB.read_by_id('store', id)
+        response = DB.read_one('store', {'_id':id})
 
     except Exception as e:
         print('ERROR', e)
@@ -84,7 +84,7 @@ async def create_store(store:StoreModel):
             max_num = max(store["num"] for store in store_list)
             data['num'] = max_num + 1
 
-        id = str(DB.create('store', data))
+        id = str(DB.insert_one('store', data))
 
     except Exception as e:
         print('ERROR', e)
@@ -109,7 +109,7 @@ async def update_store(id:str, store: StoreModel):
     try:
         Util.check_id(id)
         
-        if DB.update_by_id('store', id, data):
+        if DB.replace_one('store', {'_id':id}, data):
             return {
                 'request': f'PUT {PREFIX}/store?id={id}',
                 'status': 'OK'

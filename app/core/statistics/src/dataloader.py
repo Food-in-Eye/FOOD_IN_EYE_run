@@ -1,5 +1,5 @@
 
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 
 DB = MongodbController('FIE_DB2')
 
@@ -9,7 +9,7 @@ class DataLoader:
     def get_store_table():
         
         try:
-            stores = DB.read_all_about_fileds('store', {'_id': 1, 'num':1})
+            stores = DB.read_all('store', {}, {'_id': 1, 'num':1})
             result = {}
             for store in stores:
                print(store)
@@ -25,7 +25,7 @@ class DataLoader:
     def get_food_table():
         
         try:
-            foods = DB.read_all_about_fileds('food', {'_id': 1, 'num':1})
+            foods = DB.read_all('food', {}, {'_id': 1, 'num':1})
             result = {}
             for food in foods:
                result[food['_id']] = food['num']
@@ -38,7 +38,7 @@ class DataLoader:
     def get_orders(query):
 
         try:
-            orders = DB.read_all_about_fileds_by_query('order', query, {'s_id': 1, 'date':1, 'f_list':1})
+            orders = DB.read_all('order', query, {'s_id': 1, 'date':1, 'f_list':1})
             for order in orders:
                 order['date'] = order['date'].strftime('%Y-%m-%d %H:%M:%S')
             return orders

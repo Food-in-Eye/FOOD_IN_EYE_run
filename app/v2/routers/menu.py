@@ -7,7 +7,7 @@ from datetime import datetime
 
 from fastapi import APIRouter
 from core.models.store import MenuModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from .src.util import Util
 from .src.meta import Meta
 
@@ -26,7 +26,7 @@ async def read_menus_of_store(s_id:str):
     print('hi')
     try:
         Util.check_id(s_id)
-        response = DB.read_all_by_feild('menu', 's_id', s_id) # menus -> menu로 수정 DB 이름 오류
+        response = DB.read_all('menu', {'s_id': s_id}) 
         # 날짜별로 정리 or 가장 최신 것만 주는거 고민
     except Exception as e:
         print('ERROR', e)
@@ -47,7 +47,7 @@ async def read_menu(id:str):
     """ 해당하는 id의 menu 정보를 받아온다. """
     try:
 
-        response = DB.read_by_id('menu', id)
+        response = DB.read_one('menu', {'_id':id})
 
     except Exception as e:
         print('ERROR', e)
@@ -80,9 +80,9 @@ async def create_menu(s_id:str, menu:MenuModel):
             'f_list': sotred_f_list
         }
 
-        new_id = DB.create('menu', new_menu)
+        new_id = DB.insert_one('menu', new_menu)
 
-        if DB.update_field_by_id('store', s_id, 'm_id', new_id):
+        if DB.update_one('store', {'_id': s_id}, {'m_id': new_id}):
             update_meta(s_id, new_id)
             return {
                 'request': f'POST {PREFIX}/menu?s_id={s_id}',
@@ -110,14 +110,14 @@ async def read_menu_with_foods(id:str):
 
     try:
         Util.check_id(id)
-        response = DB.read_by_id('menu', id)
+        response = DB.read_one('menu', {'_id':id})
         
         
         food_ids = [food['f_id'] for food in response['f_list']]
         food_list = []
 
         for f_id in food_ids:
-            food = DB.read_by_id('food', f_id)
+            food = DB.read_one('food', {'_id': f_id})
             food_list.append({
                 "f_id": f_id,
                 "name": food['name'],
