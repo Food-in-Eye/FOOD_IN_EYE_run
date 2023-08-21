@@ -30,28 +30,21 @@ async def hello():
 async def check_duplicate_id(data: dict = Body(...)):
     try:
         if AuthManager.check_id(data['id']):
-            response = 'unavailable'
+            state = 'unavailable'
         else:
-            response = 'available'
+            state = 'available'
 
     except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/idcheck',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+        raise HTTPException(status_code = 400, detail = str(e))
     return {
         'request': f'POST {PREFIX}/idcheck',
-        'status': 'OK',
-        'response': response
+        'state': state
     }
 
 
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     try:
-        response = {}
         if AuthManager.check_id(data.id) == False:
             user = {
                 'id': data.id,
@@ -62,53 +55,34 @@ async def buyer_signup(data: BuyerModel):
                 'age': data.age,
                 'R_Token': ''
             }
-                            
-            response = {"u_id" : str(DB.create('user', user))}
+            u_id = str(DB.create('user', user))
         else:
             raise Exception(f'Duplicate ID')
+        
     except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/buyer/signup',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+        raise HTTPException(status_code = 400, detail = str(e))
     return {
         'request': f'POST {PREFIX}/buyer/signup',
-        'status': 'OK',
-        'response': response
+        'u_id': u_id
     }
 
 
 @user_router.post('/buyer/login')
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        response = {}
-
         user = AuthManager.auth_user(data, 1)
         user['R_Token'] = TokenManager.create_r_token(user['_id'], 1)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
-        response = {
-            "user_id": user['_id'],
-            "token_type": "bearer",
-            "A_Token": TokenManager.ACCESS_TOKEN,
-            "R_Token": user['R_Token']
-        }
-
     except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/buyer/login',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
-
+        raise HTTPException(status_code = 400, detail = str(e))
     return {
         'request': f'POST {PREFIX}/buyer/login',
-        'status': 'OK',
-        'response': response
+        'user_id': user['_id'],
+        'token_type': "bearer",
+        'A_Token': TokenManager.ACCESS_TOKEN,
+        'R_Token': user['R_Token']
     }
 
 
@@ -116,88 +90,82 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
     try:
-        response = {}
         if AuthManager.check_id(data.id) == False:
             user = {
                 "id": data.id,
                 "pw": AuthManager.get_hashed_pw(data.pw),
                 "role": 2,
                 "R_Token": ""
-            }           
-            response = {"u_id" : str(DB.create('user', user))}
+            }
+            u_id = str(DB.create('user', user))
 
     except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/seller/signup',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+        raise HTTPException(status_code = 400, detail = str(e))
     return {
         'request': f'POST {PREFIX}/seller/signup',
-        'status': 'OK',
-        'response': response
+        "u_id": u_id
     }
 
 
 @user_router.post('/seller/login')
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        response = {}
-
         user = AuthManager.auth_user(data, 2)
         user['R_Token'] = TokenManager.create_r_token(user['_id'], 2)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
-        response = {
-            "token_type": "bearer",
-            "A_Token": TokenManager.ACCESS_TOKEN,
-            "R_Token": user['R_Token']
-        }
-
     except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/seller/login',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+        raise HTTPException(status_code = 400, detail = str(e))
     return {
         'request': f'POST {PREFIX}/seller/login',
-        'status': 'OK',
-        'response': response
+        "token_type": "bearer",
+        "A_Token": TokenManager.ACCESS_TOKEN,
+        "R_Token": user['R_Token']
     }
 
 @user_router.get('/issue/access')
 async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
     try:
         user = DB.read_by_id('user', u_id)
-        print(user)
-        if user['R_Token'] == r_token:
-            return {
-                "A_Token": TokenManager.recreate_a_token()
-            }
+        if user['R_Token'] != r_token:
+            raise Exception(f'Invalid request')
+        
+        A_Token = TokenManager.recreate_a_token()
+
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
+    return {
+        'request': f'GET {PREFIX}/issue/access',
+        'A_Token': A_Token
+    }
 
 @user_router.get('/issue/refresh')
 async def get_refresh_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
     try:
         user = DB.read_by_id('user', u_id)
-        print(user)
-        if user['R_Token'] == r_token:
-            return {
-                "R_Token": TokenManager.recreate_r_token(r_token, u_id, user['role'])
-            }
+        if user['R_Token'] != r_token:
+            raise Exception(f'Invalid request')
+        
+        R_Token = TokenManager.recreate_r_token(r_token, u_id, user['role'])
+
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
-    
+    return {
+        'request': f'GET {PREFIX}/issue/refresh',
+        'R_Token': R_Token
+    }
 
-
-@user_router.get('/tokentest')
+@user_router.get('/test/a_token')
 async def get_refresh_token(a_token: str = Depends(TokenManager.auth_a_token)):
-    try:
-        return a_token
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    return {
+        'request': f'GET {PREFIX}/test/a_token',
+        'a_token': a_token
+    }
+    
+@user_router.get('/test/r_token')
+async def get_refresh_token(r_token: str = Depends(TokenManager.auth_r_token)):
+    return {
+        'request': f'GET {PREFIX}/test/r_token',
+        'r_token': r_token
+    }

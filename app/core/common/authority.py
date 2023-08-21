@@ -1,5 +1,4 @@
 from passlib.context import CryptContext
-import re
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -64,41 +63,40 @@ class TokenManagement:
         data = {
             "iss": "FOOD-IN-EYE",
             "sub": "FOOD-IN-EYE",
-            "aud": "0",
-            "exp": datetime.utcnow() + timedelta(minutes = 30),
-            "iat": int(time.time())
+            "exp": datetime.utcnow() + timedelta(minutes = 1),
+            "iat": int(time.time()),
+            "role": 0
         }
         self.ACCESS_TOKEN = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
         return self.ACCESS_TOKEN
     
     def create_r_token(self, u_id, role):
         if role == 1:
-            EXP = datetime.utcnow() + timedelta(minutes = 60)
+            EXP = datetime.utcnow() + timedelta(minutes = 5)
         elif role == 2:
-            EXP = datetime.utcnow() + timedelta(minutes = 60 * 2)
+            EXP = datetime.utcnow() + timedelta(minutes = 5)
 
         data = {
             "iss": "FOOD-IN-EYE",
             "sub": u_id,
-            "aud": str(role),
             "exp": EXP,
-            "iat": int(time.time())
+            "iat": int(time.time()),
+            "role": role
         }
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
 
+
+
     def recreate_a_token(self):
-        try:
-            payload = jwt.decode(self.ACCESS_TOKEN, self.ACCESS_SK, algorithms=self.algorithm)
+        payload = jwt.decode(self.ACCESS_TOKEN, self.ACCESS_SK, algorithms=self.algorithm)
 
-            cur_time = int(time.time())
-            exp_time = payload.get("exp", 0)
+        cur_time = int(time.time())
+        exp_time = payload.get("exp", 0)
 
-            if (exp_time - cur_time) > 0:
-                raise HTTPException(status_code = 400, detail = str(e))
-            return self.create_a_token()
+        if (exp_time - cur_time) > 0:
+            raise Exception(f'Token not expired')
         
-        except JWTError as e:
-            raise HTTPException(status_code = 401, detail = "Token not expired")
+        return self.create_a_token()
         
     def recreate_r_token(self, token:str, u_id:str, role:int):
         try:
@@ -108,12 +106,14 @@ class TokenManagement:
             exp_time = payload.get("exp", 0)
 
             if (exp_time - cur_time) > 10 or (exp_time - cur_time) < 0:
-                raise HTTPException(status_code = 400, detail = str(e))
+                raise Exception(f'Token not expired')
+            
             return self.create_r_token(u_id, role)
         
         except JWTError as e:
-            raise HTTPException(status_code = 401, detail = "Token not expired")
+            raise HTTPException(status_code = 401, detail = str(e))
         
+
 
     def auth_a_token(self, token: str = Depends(oauth2_scheme)):
         try:
@@ -125,9 +125,7 @@ class TokenManagement:
         
     def auth_r_token(self, token: str = Depends(oauth2_scheme)):
         try:
-            print(token)
             payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
-            print(payload)
             return token
         
         except JWTError as e:
