@@ -184,4 +184,8 @@ class MongodbController:
     #         raise Exception(f'Failed to DELETE document with id \'{id}\'')
         
     #     return True
-    
+
+    def aggregate_pipline(self, collection:str, pipeline:list):
+        coll = self.get_collection(collection)
+
+        return list(coll.aggregate(pipeline))
