@@ -1,7 +1,8 @@
 import Login from "../css/Login.module.css";
 import Button from "../css/Button.module.css";
-import { getStore } from "../components/API.module";
+import { getStore, postLogin } from "../components/API.module";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 import barChart from "../images/bar-chart.png";
 import bidLandscape from "../images/bid-landscape.png";
@@ -17,17 +18,59 @@ import calendar from "../images/calendar.png";
 
 function LoginPage() {
   const navigate = useNavigate();
+
+  const [id, setId] = useState("");
+  const [passwd, setPasswd] = useState("");
+
+  const [isIdExist, setIsIdExist] = useState(false);
+  const [isPasswdMatch, setIsPasswdMatch] = useState(false);
+  const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
+  const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
+
   const onLogin = async (e) => {
     e.preventDefault();
+    const newId = document.querySelector("#id").value;
+    const newPasswd = document.querySelector("#password").value;
 
-    const storeID = document.querySelector("#storeID").value;
-    // storeID를 localStorage에 저장
-    localStorage.setItem("storeID", storeID);
-    getStore(storeID).then((res) =>
-      localStorage.setItem("storeNum", res.data.response.num)
-    );
+    const formData = new FormData();
+    formData.append("username", newId);
+    formData.append("password", newPasswd);
 
-    navigate(`/main`);
+    setId(newId);
+    setPasswd(newPasswd);
+
+    try {
+      const request = await postLogin(`/seller/login`, formData);
+      if (request.data.status === "OK") {
+        setIsIdExist(true);
+        setIsPasswdMatch(true);
+        // navigate(`/main`);
+      } else if (
+        (request.data.status === "ERROR") &
+        (request.data.message === "ERROR Incorrect PW")
+      ) {
+        setIsIdExist(true);
+        setIsPasswdMatch(false);
+        setShowPasswdErrorMsg(true);
+      } else if (
+        (request.data.status === "ERROR") &
+        (request.data.message === "ERROR Nonexistent ID")
+      ) {
+        setIsIdExist(false);
+        setIsPasswdMatch(false);
+        setShowIdErrorMsg(true);
+      }
+    } catch (error) {
+      console.log("Login failed:", error);
+    }
+
+    /**DELETE LATER: 이전 storeID로 storeNum을 받아오는 코드*/
+    // const storeID = document.querySelector("#storeID").value;
+    // // storeID를 localStorage에 저장
+    // localStorage.setItem("storeID", storeID);
+    // getStore(storeID).then((res) =>
+    //   localStorage.setItem("storeNum", res.data.response.num)
+    // );
   };
 
   return (
@@ -84,14 +127,31 @@ function LoginPage() {
       <section className={Login.LoginForm}>
         <h2>Login</h2>
         <form>
-          <label htmlFor="id">
-            ID
-            <input id="id" type="text" name="id" placeholder="ID" />
-          </label>
-          <label htmlFor="password">
-            비밀번호
-            <input type="password" name="password" placeholder="비밀번호" />
-          </label>
+          <div className={Login.firstSection}>
+            <section className={Login.IDSection}>
+              <label htmlFor="id">
+                아이디
+                <input id="id" type="text" name="id" placeholder="아이디" />
+              </label>
+            </section>
+            {showIdErrorMsg && <p>존재하지 않는 ID입니다.</p>}
+          </div>
+          <div className={Login.secondSection}>
+            <section className={Login.PasswdSection}>
+              <label htmlFor="password">
+                비밀번호
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="비밀번호"
+                />
+              </label>
+            </section>
+            {showPasswdErrorMsg && (
+              <p>ID와 맞지 않는 비밀번호 입니다. 다시 입력해주세요.</p>
+            )}
+          </div>
           <button className={Button.login} onClick={onLogin}>
             로그인
           </button>

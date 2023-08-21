@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const USER_URL = "api/v2/users";
+const USER_URL = "/api/v2/users";
 const STORE_URL = "/api/v2/stores";
 const FOODS_URL = "/api/v2/foods";
 const ORDER_URL = "/api/v2/orders";
@@ -81,6 +81,17 @@ export const postUser = (query, data) => {
   return axios.post(requestUrl, JSON.stringify(data), {
     headers: {
       "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+};
+
+export const postLogin = (query, formData) => {
+  const requestUrl = `${USER_URL}${query}`;
+
+  return axios.post(requestUrl, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
     withCredentials: true,
   });

@@ -34,6 +34,9 @@ form {
 }
 
 .LoginForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 20px;
   border-radius: 15px;
   position: absolute;
@@ -45,6 +48,7 @@ form {
 
 .LoginForm h2 {
   margin-top: 20px;
+  margin-bottom: 10px;
   text-align: center;
   font-family: Palanquin Dark;
   font-size: 40px;
@@ -60,18 +64,44 @@ label {
 }
 
 label {
+  width: 400px;
+  justify-content: center;
   margin: 15px 0 20px 0;
   font-size: 20px;
 }
 
 input {
-  width: 350px;
+  width: 400px;
   margin-top: 5px;
+  margin-left: 0px;
   padding: 20px 10px;
   border: 1px solid #e2e1e5;
   border-radius: 5px;
   color: #d2d2d2;
   font-size: 15px;
+}
+
+.IDSection,
+.PasswdSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0px;
+}
+
+.firstSection p,
+.secondSection p {
+  margin: 0px 5px;
+  white-space: nowrap;
+  color: #b9062f;
+  background: none;
+}
+
+.firstSection,
+.secondSection {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0px;
 }
 
 .link {

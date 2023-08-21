@@ -22,7 +22,7 @@ function RegisterPage() {
     e.preventDefault();
 
     try {
-      await postUser(`/signup/idcheck`, {
+      await postUser(`/idcheck`, {
         id: id,
       }).then((res) =>
         res.data.response === "available"
@@ -58,7 +58,7 @@ function RegisterPage() {
 
     if (!isIdDuplicate && isValidPasswd && isPasswdMatch) {
       try {
-        await postUser(`/signup/seller`, {
+        await postUser(`/seller/signup`, {
           id: id,
           pw: passwd,
         }).then((res) => console.log(res));
@@ -88,12 +88,12 @@ function RegisterPage() {
           <div className={Register.firstSection}>
             <section className={Register.IDSection}>
               <label htmlFor="id">
-                ID
+                아이디
                 <input
                   id="id"
                   type="text"
                   name="id"
-                  placeholder="ID"
+                  placeholder="아이디"
                   onChange={(e) => {
                     setId(e.target.value);
                   }}
@@ -107,7 +107,7 @@ function RegisterPage() {
                 className={Button.duplicateCheck}
                 onClick={handleIdDuplicate}
               >
-                ID 중복 확인
+                아이디 중복 확인
               </button>
             </section>
             {isIdDuplicate && id ? (
@@ -162,10 +162,10 @@ function RegisterPage() {
             </section>
             {!isPasswdMatch && passwdCheck ? (
               <p style={{ color: "#B9062F" }}>
-                비밀번호와 동일하지 않습니다. 다시 한번 입력해주세요.
+                비밀번호와 일치하지 않습니다. 다시 한번 입력해주세요.
               </p>
             ) : (
-              passwdCheck && <p>비밀번호와 동일합니다.</p>
+              passwdCheck && <p>비밀번호와 일치합니다.</p>
             )}
           </div>
           <button className={Button.register} onClick={onRegister}>
