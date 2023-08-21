@@ -18,7 +18,7 @@ TokenManager = TokenManagement()
 PREFIX = 'api/v2/users'
 
 DB = MongodbController('FIE_DB2')
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 
 @user_router.get("/hello")
@@ -51,8 +51,6 @@ async def check_duplicate_id(data: dict = Body(...)):
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     try:
-        AuthManager.validate_pw(data.pw)
-
         response = {}
         if AuthManager.check_id(data.id) == False:
             user = {
@@ -67,7 +65,7 @@ async def buyer_signup(data: BuyerModel):
                             
             response = {"u_id" : str(DB.create('user', user))}
         else:
-            raise Exception(f'Duplicate ID \'{data.id}\'')
+            raise Exception(f'Duplicate ID')
     except Exception as e:
         print('ERROR', e)
         return {
@@ -86,20 +84,19 @@ async def buyer_signup(data: BuyerModel):
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
         response = {}
-        user = AuthManager.check_id(data.username, 1)
-        if user:
-            AuthManager.verify_id(data.username, user['id'])
-            AuthManager.verify_pw(data.password, user['pw'])
 
-            response = {
-                "user_id": user['_id'],
-                "A_Token": '',#TokenManager.ACCESS_TOKEN,
-                "R_Token": '',#TokenManager.create_refresh_token(user['_id'], 1)
-            }
-        
-        else:
-            raise Exception(f'Nonexistent ID \'{data.username}\'')
-        
+        user = AuthManager.authentic_user(data, 1)
+        user['R_Token'] = TokenManager.create_refresh_token(user['_id'], 1)
+
+        DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
+
+        response = {
+            "user_id": user['_id'],
+            "token_type": "bearer",
+            "A_Token": TokenManager.ACCESS_TOKEN,
+            "R_Token": user['R_Token']
+        }
+
     except Exception as e:
         print('ERROR', e)
         return {
@@ -119,19 +116,16 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
     try:
-        AuthManager.validate_pw(data.pw)
-
         response = {}
         if AuthManager.check_id(data.id) == False:
             user = {
-                'id': data.id,
-                'pw': AuthManager.get_hashed_pw(data.pw),
-                'role': 2,
-                'R_Token': ''
+                "id": data.id,
+                "pw": AuthManager.get_hashed_pw(data.pw),
+                "role": 2,
+                "s_id": "",
+                "R_Token": ""
             }           
             response = {"u_id" : str(DB.create('user', user))}
-        else:
-            raise Exception(f'Duplicate ID \'{data.id}\'')
 
     except Exception as e:
         print('ERROR', e)
@@ -151,16 +145,18 @@ async def seller_signup(data: SellerModel):
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
         response = {}
-        user = AuthManager.check_id(data.username, 2)
-        if user:
-            AuthManager.verify_id(data.username, user['id'])
-            AuthManager.verify_pw(data.password, user['pw'])
 
-            response = {
-                "user_id": user['_id'],
-                "A_Token": '',#TokenManager.ACCESS_TOKEN,
-                "R_Token": '',#TokenManager.create_refresh_token(user['_id'], 2)
-            } 
+        user = AuthManager.authentic_user(data, 2)
+        user['R_Token'] = TokenManager.create_refresh_token(user['_id'], 2)
+
+        DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
+
+        response = {
+            "user_id": user['_id'],
+            "token_type": "bearer",
+            "A_Token": TokenManager.ACCESS_TOKEN,
+            "R_Token": user['R_Token']
+        }
 
     except Exception as e:
         print('ERROR', e)

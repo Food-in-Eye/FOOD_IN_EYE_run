@@ -1,15 +1,18 @@
 from passlib.context import CryptContext
 import re
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 import os
 import time
-from jose import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta
+
 
 from core.common.mongo2 import MongodbController
 
 DB = MongodbController('FIE_DB2')
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scheme_name="JWT")
 
 class AuthManagement:
     def __init__(self):
@@ -30,24 +33,40 @@ class AuthManagement:
     def get_hashed_pw(self, pw: str) -> str:
         return self.pw_handler.hash(pw)
     
+    def authentic_user(self, data: OAuth2PasswordRequestForm, role:int):
+        user = self.check_id(data.username, role)
+        if user:
+            user_id = user['id']
+            user_pw = user['pw']
+
+            if data.username != user_id:
+                raise Exception(f'Incorrect ID')
+            if not self.pw_handler.verify(data.password, user_pw):
+                raise Exception(f'Incorrect PW')
+        else:
+            raise Exception(f'Nonexistent ID')
+        
+        return user
+
+
     def verify_id(self, plain_id:str, stored_id:str):
         if plain_id != stored_id:
-            raise Exception(f'Incorrect ID \'{plain_id}\'')
+            raise Exception(f'Incorrect ID')
 
     def verify_pw(self, plain_pw:str, stored_pw:str):
         if not self.pw_handler.verify(plain_pw, stored_pw):
-            raise Exception(f'Incorrect PW \'{plain_pw}\'')
+            raise Exception(f'Incorrect PW')
     
-    @staticmethod
-    def validate_pw(v):
-        if len(v) < 8:
-            raise Exception("비밀번호는 8자리 이상 영문과 숫자를 포함하여 작성해 주세요.")
+    # @staticmethod
+    # def validate_pw(v):
+    #     if len(v) < 8:
+    #         raise Exception("비밀번호는 8자리 이상 영문과 숫자를 포함하여 작성해 주세요.")
         
-        pattern = re.compile(r'[!@#$%^&*()_+{}\[\]:;<>,.?~\\]')
-        if not any(char.isdigit() for char in v) or not any(char.isalpha() for char in v) or not pattern.search(v):
-            raise Exception("비밀번호는 8자리 이상 영문과 숫자, 특수문자(!,@,#,$,% 등)를 포함하여 작성해 주세요.")
+    #     pattern = re.compile(r'[!@#$%^&*()_+{}\[\]:;<>,.?~\\]')
+    #     if not any(char.isdigit() for char in v) or not any(char.isalpha() for char in v) or not pattern.search(v):
+    #         raise Exception("비밀번호는 8자리 이상 영문과 숫자, 특수문자(!,@,#,$,% 등)를 포함하여 작성해 주세요.")
             
-        return v
+    #     return v
 
 
         
@@ -87,3 +106,14 @@ class TokenManagement:
         }
         return jwt.encode(data,  self.REFRESH_SK, algorithm=self.algorithm)
         
+
+
+    def verify_refresh_token(self, token: str = Depends(oauth2_scheme)):
+        try:
+            decoded_token = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
+            return decoded_token
+        except jwt.ExpiredSignatureError:
+            raise Exception(status_code=401, detail="토큰이 만료되었습니다.")
+        except jwt.InvalidTokenError:
+            raise Exception(status_code=401, detail="유효하지 않은 토큰입니다.")
+
