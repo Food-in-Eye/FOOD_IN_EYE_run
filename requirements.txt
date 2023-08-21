@@ -30,3 +30,4 @@ urllib3==1.26.15
 uvicorn==0.20.0
 websockets==11.0.3
 wheel==0.38.4
+requests==2.31.0
