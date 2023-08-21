@@ -56,24 +56,24 @@ class MongodbController:
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
-        if result.modified_count > 1:
-            raise Exception(f'Multiple documents have changed.')
+        if result.modified_count != 1:
+            raise Exception(f'modified_count is not 1')
 
         return True
     
-    def update_one(self, collection:str, query:dict, data:dict) -> bool:
+    def update_one(self, collection:str, query:dict, fields:dict) -> bool:
         """ query와 일치하는 document의 내용을 변경한다. """
-        assert collection and data is not None
+        assert collection and fields is not None
 
         coll = self.get_collection(collection)
 
-        result = coll.update_one(query,
-                                {'$set':data})
+        result = coll.update_one(query, {'$set':fields})
+
         if result.acknowledged is False:
             raise Exception(f'Failed to UPDATE document with id \'{id}\'')
         
         if result.modified_count > 1:
-            raise Exception(f'Multiple documents have changed.')
+            raise Exception(f'modified_count is not 1')
 
         return True
 
@@ -92,7 +92,7 @@ class MongodbController:
         """ query와 일치하는 모든 문서들을 받아온다. 정렬 조건이 존재할 시 반영한다. """
         assert collection is not None
         coll = self.get_collection(collection)
-        
+
         if fields == None:
             result = coll.find(query)
         else: 

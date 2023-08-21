@@ -25,7 +25,7 @@ class FoodModel(BaseModel):
     origin: str = Field(title="Food country of origin indication")
 
 class FoodPos(BaseModel):
-    pos: int = Field(title="position of food")
+    # pos: int = Field(title="position of food")
     f_id: str = Field(title="Food identifier")
     f_num: int = Field(title="number of food")
 

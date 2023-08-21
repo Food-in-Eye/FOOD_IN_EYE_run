@@ -87,14 +87,15 @@ async def get_order(id: str, detail: bool=False):
     q_str = ""
     try:
         q_str += f"id={id}"
-        Util.check_id(id)
-        response = DB.read_one('order', {'_id':id})
+        _id = Util.check_id(id)
+        response = DB.read_one('order', {'_id':_id})
         if detail:
             q_str += f"&detail={detail}"
             f_list = response["f_list"]
             new_list = []
             for dict in f_list:
-                food_detail = DB.read_one("food", {'_id': dict["f_id"]})
+                _id = Util.check_id(dict["f_id"])
+                food_detail = DB.read_one("food", {'_id':_id})
                 new_list.append({
                     "name": food_detail["name"],
                     "count": dict["count"],
@@ -121,15 +122,15 @@ async def change_status(id: str):
     ''' 특정 주문 내역의 진행 상태를 변경한다. '''
     
     try:
-        Util.check_id(id)
-        response = DB.read_one('order', {'_id': id})
+        _id = Util.check_id(id)
+        response = DB.read_one('order', {'_id':_id})
         s = response['status']
 
         # websocket으로 전송 결과를 받기 위함 
         s_id = response['s_id']
         
         if s < 2:
-            DB.update_one('order', {'_id':id}, {'status': s+1})
+            DB.update_one('order', {'_id':_id}, {'status': s+1})
 
             # websocket으로 전달하기
             await websocket_manager.send_update(id)
@@ -181,7 +182,8 @@ async def new_order(body:OrderModel):
                 "m_id": store_order.m_id,
                 "s_name": store_order.s_name,
                 "f_list": store_order.f_list,
-                "total_price": store_price
+                "total_price": store_price,
+                "status": 0
             }
 
             total_price += store_price
@@ -230,10 +232,10 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
         gaze_data.append(page.dict())
 
     try:
-        Util.check_id(h_id)
+        _id = Util.check_id(h_id)
         key = storage.upload(gaze_data, 'json', 'C_0714')
 
-        if DB.update_one('history', {'_id':h_id}, {'raw_gaze_path': key}):
+        if DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key}):
             # 임시로 비활성화
             asyncio.create_task(preprocess_and_update(key, h_id))
 
@@ -250,6 +252,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
     except:
         return {'success': False}
 
+#todo!!
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
@@ -309,14 +312,16 @@ async def get_history_list(u_id: str, batch: int = 1):
     
 @order_router.get("/history")
 async def get_order_list(id: str):
-    try:     
+    try:
+        _id = Util.check_id(id)     
         response_list = {}
 
-        history = DB.read_one('history', {'_id': id})
+        history = DB.read_one('history', {'_id':_id})
 
         food_list = []
         for o_id in history['orders']:
-            order = DB.read_one('order', {'_id': o_id})
+            _id = Util.check_id(o_id)  
+            order = DB.read_one('order', {'_id':_id})
             s_name = order['s_name']
             for f in order['f_list']:
                 if 'f_name' in f.keys(): f_name = f['f_name']

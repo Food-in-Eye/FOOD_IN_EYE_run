@@ -49,9 +49,9 @@ async def read_store(id:str):
     """ 특정 id의 가게 정보를 받아온다."""
 
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
 
-        response = DB.read_one('store', {'_id':id})
+        response = DB.read_one('store', {'_id':_id})
 
     except Exception as e:
         print('ERROR', e)
@@ -68,7 +68,6 @@ async def read_store(id:str):
     }
 
 
-# ToDo: user id 같이 받아야 할 듯. 
 @store_router.post("/store")
 async def create_store(store:StoreModel):
     """ 입력받은 정보의 가게를 생성한다. (최초 가입시에만 가능) """
@@ -107,9 +106,9 @@ async def update_store(id:str, store: StoreModel):
     data['status'] = data['status'].value
     
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
         
-        if DB.replace_one('store', {'_id':id}, data):
+        if DB.replace_one('store', {'_id':_id}, data):
             return {
                 'request': f'PUT {PREFIX}/store?id={id}',
                 'status': 'OK'
