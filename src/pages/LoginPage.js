@@ -19,11 +19,6 @@ import calendar from "../images/calendar.png";
 function LoginPage() {
   const navigate = useNavigate();
 
-  const [id, setId] = useState("");
-  const [passwd, setPasswd] = useState("");
-
-  const [isIdExist, setIsIdExist] = useState(false);
-  const [isPasswdMatch, setIsPasswdMatch] = useState(false);
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
 
@@ -36,28 +31,19 @@ function LoginPage() {
     formData.append("username", newId);
     formData.append("password", newPasswd);
 
-    setId(newId);
-    setPasswd(newPasswd);
-
     try {
       const request = await postLogin(`/seller/login`, formData);
       if (request.data.status === "OK") {
-        setIsIdExist(true);
-        setIsPasswdMatch(true);
         // navigate(`/main`);
       } else if (
         (request.data.status === "ERROR") &
         (request.data.message === "ERROR Incorrect PW")
       ) {
-        setIsIdExist(true);
-        setIsPasswdMatch(false);
         setShowPasswdErrorMsg(true);
       } else if (
         (request.data.status === "ERROR") &
         (request.data.message === "ERROR Nonexistent ID")
       ) {
-        setIsIdExist(false);
-        setIsPasswdMatch(false);
         setShowIdErrorMsg(true);
       }
     } catch (error) {
@@ -131,7 +117,13 @@ function LoginPage() {
             <section className={Login.IDSection}>
               <label htmlFor="id">
                 아이디
-                <input id="id" type="text" name="id" placeholder="아이디" />
+                <input
+                  id="id"
+                  type="text"
+                  name="id"
+                  placeholder="아이디"
+                  onChange={() => setShowIdErrorMsg(false)}
+                />
               </label>
             </section>
             {showIdErrorMsg && <p>존재하지 않는 ID입니다.</p>}
@@ -145,6 +137,10 @@ function LoginPage() {
                   type="password"
                   name="password"
                   placeholder="비밀번호"
+                  onChange={() => {
+                    setShowPasswdErrorMsg(false);
+                    setShowIdErrorMsg(false);
+                  }}
                 />
               </label>
             </section>

@@ -93,6 +93,7 @@ input {
 .secondSection p,
 .thirdSection p {
   margin: 0px 5px;
+  white-space: nowrap;
   background: none;
 }
 

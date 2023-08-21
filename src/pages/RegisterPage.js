@@ -10,25 +10,32 @@ import mainLogo from "../images/foodineye.png";
 function RegisterPage() {
   const navigate = useNavigate();
 
+  const [idCheck, setIdCheck] = useState("");
   const [id, setId] = useState("");
   const [passwd, setPasswd] = useState("");
   const [passwdCheck, setPasswdCheck] = useState("");
 
-  const [isIdDuplicate, setIsIdDuplicate] = useState(false);
-  const [isValidPasswd, setIsValidPasswd] = useState(false);
-  const [isPasswdMatch, setIsPasswdMatch] = useState(false);
+  const [showIdDuplicateMsg, setShowIdDuplicateMsg] = useState(false);
+  const [showIdUniqueMsg, setShowIdUniqueMsg] = useState(false);
+  const [showValidPasswdMsg, setShowValidPasswdMsg] = useState(false);
+  const [showPasswdMatchMsg, setShowPasswdMatchMsg] = useState(false);
 
   const handleIdDuplicate = async (e) => {
     e.preventDefault();
 
     try {
-      await postUser(`/idcheck`, {
-        id: id,
-      }).then((res) =>
-        res.data.response === "available"
-          ? setIsIdDuplicate(false)
-          : setIsIdDuplicate(true)
-      );
+      const response = await postUser(`/idcheck`, {
+        id: idCheck,
+      });
+
+      if (response.data.response === "available") {
+        setShowIdUniqueMsg(true);
+        setShowIdDuplicateMsg(false);
+        setId(idCheck);
+      } else if (response.data.response === "unavailable") {
+        setShowIdUniqueMsg(false);
+        setShowIdDuplicateMsg(true);
+      }
     } catch (error) {
       console.error("Error checking ID duplicate:", error);
     }
@@ -37,26 +44,31 @@ function RegisterPage() {
   const isPasswordValid = (password) => {
     // 비밀번호 조건: 8자리 이상, 대문자, 소문자, 특수문자 모두 포함
     const passwordPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
     return passwordPattern.test(password);
   };
 
   const handlePasswdChange = (e) => {
+    setShowValidPasswdMsg(false);
+    setShowPasswdMatchMsg(false);
+
     const newPasswd = e.target.value;
     setPasswd(newPasswd);
-    setIsValidPasswd(isPasswordValid(passwd));
+    setShowValidPasswdMsg(isPasswordValid(passwd));
   };
 
   const handlePasswdCheck = (e) => {
+    setShowPasswdMatchMsg(false);
+
     const newPasswdCheck = e.target.value;
     setPasswdCheck(newPasswdCheck);
-    setIsPasswdMatch(newPasswdCheck === passwd);
+    setShowPasswdMatchMsg(newPasswdCheck === passwd);
   };
 
   const onRegister = async (e) => {
     e.preventDefault();
 
-    if (!isIdDuplicate && isValidPasswd && isPasswdMatch) {
+    if (showIdUniqueMsg && showValidPasswdMsg && showPasswdMatchMsg) {
       try {
         await postUser(`/seller/signup`, {
           id: id,
@@ -95,11 +107,13 @@ function RegisterPage() {
                   name="id"
                   placeholder="아이디"
                   onChange={(e) => {
-                    setId(e.target.value);
+                    setIdCheck(e.target.value);
+                    setShowIdUniqueMsg(false);
+                    setShowIdDuplicateMsg(false);
                   }}
                   style={{
                     width: "350px",
-                    border: !isIdDuplicate && id ? "2px solid #52bf8b" : "",
+                    border: showIdUniqueMsg ? "2px solid #52bf8b" : "",
                   }}
                 />
               </label>
@@ -110,10 +124,11 @@ function RegisterPage() {
                 아이디 중복 확인
               </button>
             </section>
-            {isIdDuplicate && id ? (
+            {showIdDuplicateMsg && !showIdUniqueMsg ? (
               <p style={{ color: "#B9062F" }}>이미 사용 중인 ID입니다.</p>
             ) : (
-              id && <p>사용 가능한 ID입니다.</p>
+              !showIdDuplicateMsg &&
+              showIdUniqueMsg && <p>사용 가능한 ID입니다.</p>
             )}
           </div>
           <div className={Register.secondSection}>
@@ -128,18 +143,20 @@ function RegisterPage() {
                   onChange={handlePasswdChange}
                   style={{
                     width: "600px",
-                    border: isValidPasswd && passwd ? "2px solid #52bf8b" : "",
+                    border: showValidPasswdMsg ? "2px solid #52bf8b" : "",
                   }}
                 />
               </label>
             </section>
-            {!isValidPasswd && passwd ? (
-              <p style={{ color: "#B9062F" }}>
-                비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두
-                포함이어야 합니다.
-              </p>
+            {showValidPasswdMsg ? (
+              <p>사용 가능한 비밀번호 입니다.</p>
             ) : (
-              passwd && <p>사용 가능한 비밀번호 입니다.</p>
+              passwd && (
+                <p style={{ color: "#B9062F" }}>
+                  비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두
+                  포함이어야 합니다.
+                </p>
+              )
             )}
           </div>
           <div className={Register.thirdSection}>
@@ -155,17 +172,19 @@ function RegisterPage() {
                   style={{
                     width: "600px",
                     border:
-                      isPasswdMatch && passwdCheck ? "2px solid #52bf8b" : "",
+                      showValidPasswdMsg && showPasswdMatchMsg
+                        ? "2px solid #52bf8b"
+                        : "",
                   }}
                 />
               </label>
             </section>
-            {!isPasswdMatch && passwdCheck ? (
+            {!showPasswdMatchMsg && passwdCheck ? (
               <p style={{ color: "#B9062F" }}>
                 비밀번호와 일치하지 않습니다. 다시 한번 입력해주세요.
               </p>
             ) : (
-              passwdCheck && <p>비밀번호와 일치합니다.</p>
+              showPasswdMatchMsg && passwdCheck && <p>비밀번호와 일치합니다.</p>
             )}
           </div>
           <button className={Button.register} onClick={onRegister}>
