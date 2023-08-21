@@ -39,7 +39,7 @@ async def check_duplicate_id(data: dict = Body(...)):
         return {
             'request': f'POST {PREFIX}/idcheck',
             'status': 'ERROR',
-            'message': f'ERROR {e}'
+            'response': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}/idcheck',
@@ -71,7 +71,7 @@ async def buyer_signup(data: BuyerModel):
         return {
             'request': f'POST {PREFIX}/buyer/signup',
             'status': 'ERROR',
-            'message': f'ERROR {e}'
+            'response': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}/buyer/signup',
@@ -102,7 +102,7 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
         return {
             'request': f'POST {PREFIX}/buyer/login',
             'status': 'ERROR',
-            'message': f'ERROR {e}'
+            'response': f'ERROR {e}'
         }
 
     return {
@@ -122,7 +122,6 @@ async def seller_signup(data: SellerModel):
                 "id": data.id,
                 "pw": AuthManager.get_hashed_pw(data.pw),
                 "role": 2,
-                "s_id": "",
                 "R_Token": ""
             }           
             response = {"u_id" : str(DB.create('user', user))}
@@ -132,7 +131,7 @@ async def seller_signup(data: SellerModel):
         return {
             'request': f'POST {PREFIX}/seller/signup',
             'status': 'ERROR',
-            'message': f'ERROR {e}'
+            'response': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}/seller/signup',
@@ -152,7 +151,6 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
         response = {
-            "user_id": user['_id'],
             "token_type": "bearer",
             "A_Token": TokenManager.ACCESS_TOKEN,
             "R_Token": user['R_Token']
@@ -163,7 +161,7 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
         return {
             'request': f'POST {PREFIX}/seller/login',
             'status': 'ERROR',
-            'message': f'ERROR {e}'
+            'response': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}//seller/login',
