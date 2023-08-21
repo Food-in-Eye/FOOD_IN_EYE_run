@@ -7,6 +7,7 @@ import os
 import time
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
+from fastapi import HTTPException
 
 
 from core.common.mongo2 import MongodbController
@@ -33,7 +34,7 @@ class AuthManagement:
     def get_hashed_pw(self, pw: str) -> str:
         return self.pw_handler.hash(pw)
     
-    def authentic_user(self, data: OAuth2PasswordRequestForm, role:int):
+    def auth_user(self, data: OAuth2PasswordRequestForm, role:int):
         user = self.check_id(data.username, role)
         if user:
             user_id = user['id']
@@ -47,28 +48,6 @@ class AuthManagement:
             raise Exception(f'Nonexistent ID')
         
         return user
-
-
-    def verify_id(self, plain_id:str, stored_id:str):
-        if plain_id != stored_id:
-            raise Exception(f'Incorrect ID')
-
-    def verify_pw(self, plain_pw:str, stored_pw:str):
-        if not self.pw_handler.verify(plain_pw, stored_pw):
-            raise Exception(f'Incorrect PW')
-    
-    # @staticmethod
-    # def validate_pw(v):
-    #     if len(v) < 8:
-    #         raise Exception("비밀번호는 8자리 이상 영문과 숫자를 포함하여 작성해 주세요.")
-        
-    #     pattern = re.compile(r'[!@#$%^&*()_+{}\[\]:;<>,.?~\\]')
-    #     if not any(char.isdigit() for char in v) or not any(char.isalpha() for char in v) or not pattern.search(v):
-    #         raise Exception("비밀번호는 8자리 이상 영문과 숫자, 특수문자(!,@,#,$,% 등)를 포함하여 작성해 주세요.")
-            
-    #     return v
-
-
         
 
 class TokenManagement:
@@ -76,44 +55,84 @@ class TokenManagement:
         self.algorithm = "HS256"
         self.token_type = "bearer"
 
-        self.ACCESS_EXP = 30 # 만료 기간 30분
         self.ACCESS_SK = os.environ['JWT_ACCESS_SECRET_KEY']
-        self.ACCESS_TOKEN = ''
+        self.ACCESS_TOKEN = self.create_a_token()
 
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
-    def create_access_token(self):
+    def create_a_token(self):
         data = {
+            "iss": "FOOD-IN-EYE",
             "sub": "FOOD-IN-EYE",
-            "exp": self.ACCESS_EXP,
-            "iat": int(time.time()),
-            "role": "API server"
+            "aud": "0",
+            "exp": datetime.utcnow() + timedelta(minutes = 30),
+            "iat": int(time.time())
         }
-        self.ACCESS_TOKEN = jwt.encode(data,  self.ACCESS_SK, algorithm=self.algorithm)
+        self.ACCESS_TOKEN = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
         return self.ACCESS_TOKEN
     
-    def create_refresh_token(self, u_id, role):
+    def create_r_token(self, u_id, role):
         if role == 1:
-            REFRESH_EXP = 60
+            EXP = datetime.utcnow() + timedelta(minutes = 60)
         elif role == 2:
-            REFRESH_EXP = 60 * 2
+            EXP = datetime.utcnow() + timedelta(minutes = 60 * 2)
 
         data = {
+            "iss": "FOOD-IN-EYE",
             "sub": u_id,
-            "exp": REFRESH_EXP,
-            "iat": int(time.time()),
-            "role": role
+            "aud": str(role),
+            "exp": EXP,
+            "iat": int(time.time())
         }
-        return jwt.encode(data,  self.REFRESH_SK, algorithm=self.algorithm)
+        return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
+
+    def recreate_a_token(self):
+        try:
+            payload = jwt.decode(self.ACCESS_TOKEN, self.ACCESS_SK, algorithms=self.algorithm)
+
+            cur_time = int(time.time())
+            exp_time = payload.get("exp", 0)
+
+            if (exp_time - cur_time) > 0:
+                raise HTTPException(status_code = 400, detail = str(e))
+            return self.create_a_token()
+        
+        except JWTError as e:
+            raise HTTPException(status_code = 401, detail = "Token not expired")
+        
+    def recreate_r_token(self, token:str, u_id:str, role:int):
+        try:
+            payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
+
+            cur_time = int(time.time())
+            exp_time = payload.get("exp", 0)
+
+            if (exp_time - cur_time) > 10 or (exp_time - cur_time) < 0:
+                raise HTTPException(status_code = 400, detail = str(e))
+            return self.create_r_token(u_id, role)
+        
+        except JWTError as e:
+            raise HTTPException(status_code = 401, detail = "Token not expired")
         
 
-
-    def verify_refresh_token(self, token: str = Depends(oauth2_scheme)):
+    def auth_a_token(self, token: str = Depends(oauth2_scheme)):
         try:
-            decoded_token = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
-            return decoded_token
-        except jwt.ExpiredSignatureError:
-            raise Exception(status_code=401, detail="토큰이 만료되었습니다.")
-        except jwt.InvalidTokenError:
-            raise Exception(status_code=401, detail="유효하지 않은 토큰입니다.")
+            payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
+            return token
+        
+        except JWTError as e:
+            raise HTTPException(status_code = 401, detail = str(e))
+        
+    def auth_r_token(self, token: str = Depends(oauth2_scheme)):
+        try:
+            print(token)
+            payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
+            print(payload)
+            return token
+        
+        except JWTError as e:
+            raise HTTPException(status_code = 401, detail = str(e))
+
+
+
 

@@ -18,7 +18,7 @@ TokenManager = TokenManagement()
 PREFIX = 'api/v2/users'
 
 DB = MongodbController('FIE_DB2')
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scheme_name="JWT")
 
 
 @user_router.get("/hello")
@@ -39,7 +39,7 @@ async def check_duplicate_id(data: dict = Body(...)):
         return {
             'request': f'POST {PREFIX}/idcheck',
             'status': 'ERROR',
-            'response': f'ERROR {e}'
+            'message': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}/idcheck',
@@ -71,7 +71,7 @@ async def buyer_signup(data: BuyerModel):
         return {
             'request': f'POST {PREFIX}/buyer/signup',
             'status': 'ERROR',
-            'response': f'ERROR {e}'
+            'message': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}/buyer/signup',
@@ -85,8 +85,8 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
         response = {}
 
-        user = AuthManager.authentic_user(data, 1)
-        user['R_Token'] = TokenManager.create_refresh_token(user['_id'], 1)
+        user = AuthManager.auth_user(data, 1)
+        user['R_Token'] = TokenManager.create_r_token(user['_id'], 1)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
@@ -102,7 +102,7 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
         return {
             'request': f'POST {PREFIX}/buyer/login',
             'status': 'ERROR',
-            'response': f'ERROR {e}'
+            'message': f'ERROR {e}'
         }
 
     return {
@@ -131,7 +131,7 @@ async def seller_signup(data: SellerModel):
         return {
             'request': f'POST {PREFIX}/seller/signup',
             'status': 'ERROR',
-            'response': f'ERROR {e}'
+            'message': f'ERROR {e}'
         }
     return {
         'request': f'POST {PREFIX}/seller/signup',
@@ -145,8 +145,8 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
         response = {}
 
-        user = AuthManager.authentic_user(data, 2)
-        user['R_Token'] = TokenManager.create_refresh_token(user['_id'], 2)
+        user = AuthManager.auth_user(data, 2)
+        user['R_Token'] = TokenManager.create_r_token(user['_id'], 2)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
@@ -161,10 +161,43 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
         return {
             'request': f'POST {PREFIX}/seller/login',
             'status': 'ERROR',
-            'response': f'ERROR {e}'
+            'message': f'ERROR {e}'
         }
     return {
-        'request': f'POST {PREFIX}//seller/login',
+        'request': f'POST {PREFIX}/seller/login',
         'status': 'OK',
         'response': response
     }
+
+@user_router.get('/issue/access')
+async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
+    try:
+        user = DB.read_by_id('user', u_id)
+        print(user)
+        if user['R_Token'] == r_token:
+            return {
+                "A_Token": TokenManager.recreate_a_token()
+            }
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
+
+@user_router.get('/issue/refresh')
+async def get_refresh_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
+    try:
+        user = DB.read_by_id('user', u_id)
+        print(user)
+        if user['R_Token'] == r_token:
+            return {
+                "R_Token": TokenManager.recreate_r_token(r_token, u_id, user['role'])
+            }
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
+    
+
+
+@user_router.get('/tokentest')
+async def get_refresh_token(a_token: str = Depends(TokenManager.auth_a_token)):
+    try:
+        return a_token
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
