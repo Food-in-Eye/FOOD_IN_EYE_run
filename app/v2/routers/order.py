@@ -240,7 +240,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
             asyncio.create_task(preprocess_and_update(key, h_id))
 
             # websocket으로 gaze 요청 그만 보내기
-            websocket_manager.app_connections[h_id]['gaze'] = True
+            # websocket_manager.app_connections[h_id]['gaze'] = True
             
             return {
             'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
@@ -252,26 +252,30 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
     except:
         return {'success': False}
 
-#todo!!
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
-    # aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/aoi"
+    aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/analysis"
     headers = {"Content-Type": "application/json"}
 
-    # print('start', filter_url, aoi_url)
     async with httpx.AsyncClient() as client:
-        doc = DB.read_one('history', {'_id':h_id})
+        _id = Util.check_id(h_id)
+        doc = DB.read_one('history', {'_id':_id})
         payload = {
         "raw_data_key": raw_data_key,
         "meta_info": Meta.get_meta_detail(doc['date'])
         }
-        # print(Meta.get_meta_detail(doc['date']))
         response = await client.post(filter_url, json=payload, headers=headers)
         data = response.json()
-        # print(data)  
         fix_key = data["fixation_key"]
-        DB.update_one('history', {'_id':h_id}, {'fixation_path': fix_key})
+
+        response = await client.get(aoi_url + f'?key={fix_key}')
+        data = response.json()
+        aoi_key = data["aoi_key"]
+        print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
+        
+        DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
+
 
 
 @order_router.get("/historys")
