@@ -7,7 +7,7 @@ from datetime import datetime
 
 from fastapi import APIRouter
 from core.models.store import MenuModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from .src.util import Util
 from .src.meta import Meta
 
@@ -23,11 +23,11 @@ async def hello():
 @menu_router.get("/q")
 async def read_menus_of_store(s_id:str):
     """ 주어진 가게 아이디의 모든 메뉴판들을 불러온다. """
-    print('hi')
+
     try:
         Util.check_id(s_id)
-        response = DB.read_all_by_feild('menu', 's_id', s_id) # menus -> menu로 수정 DB 이름 오류
-        # 날짜별로 정리 or 가장 최신 것만 주는거 고민
+        response = DB.read_all('menu', {'s_id': s_id}) 
+
     except Exception as e:
         print('ERROR', e)
         return {
@@ -46,8 +46,8 @@ async def read_menus_of_store(s_id:str):
 async def read_menu(id:str):
     """ 해당하는 id의 menu 정보를 받아온다. """
     try:
-
-        response = DB.read_by_id('menu', id)
+        _id = Util.check_id(id)
+        response = DB.read_one('menu', {'_id':_id})
 
     except Exception as e:
         print('ERROR', e)
@@ -69,20 +69,18 @@ async def create_menu(s_id:str, menu:MenuModel):
 
     data = menu.dict()
     
-    sotred_f_list = sorted(data['f_list'], key=operator.itemgetter("pos"))
-    
     try:
-        Util.check_id(s_id)
+        _id = Util.check_id(s_id)
 
         new_menu = {
             's_id': s_id,
             'date': datetime.now(),
-            'f_list': sotred_f_list
+            'f_list': data['f_list']
         }
 
-        new_id = DB.create('menu', new_menu)
+        new_id = str(DB.insert_one('menu', new_menu))
 
-        if DB.update_field_by_id('store', s_id, 'm_id', new_id):
+        if DB.update_one('store', {'_id': _id}, {'m_id': new_id}):
             update_meta(s_id, new_id)
             return {
                 'request': f'POST {PREFIX}/menu?s_id={s_id}',
@@ -109,15 +107,16 @@ async def read_menu_with_foods(id:str):
     """ 해당하는 id의 음식 정보를 포함한 메뉴판 정보를 받아온다. """
 
     try:
-        Util.check_id(id)
-        response = DB.read_by_id('menu', id)
+        _id = Util.check_id(id)
+        response = DB.read_one('menu', {'_id':_id})
         
         
         food_ids = [food['f_id'] for food in response['f_list']]
         food_list = []
 
         for f_id in food_ids:
-            food = DB.read_by_id('food', f_id)
+            _id = Util.check_id(f_id)
+            food = DB.read_one('food', {'_id': _id})
             food_list.append({
                 "f_id": f_id,
                 "name": food['name'],

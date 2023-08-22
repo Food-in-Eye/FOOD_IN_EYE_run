@@ -41,29 +41,8 @@ async def get_keys(key: str):
 
         return "ERROR"
 
-from v2.routers.src.meta import Meta
-    
-from pydantic import BaseModel
-from datetime import datetime
-class Item(BaseModel):
-    content: dict
-
-# @v2_router.post("/t")
-# async def set_meta(body: Item):
-#     Meta.create(body.content)
-
-@v2_router.get("/test")
-async def set_meta():
-
-    meta = Meta.get_meta_detail(datetime.now())
-    return meta
-
-
-
-
 from datetime import datetime
 from core.statistics.run import CallAnalysis
-from core.statistics.src.dataloader import DataLoader
 
 @v2_router.get("/anlz_test")
 async def analysis_test():

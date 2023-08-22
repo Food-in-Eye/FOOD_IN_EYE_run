@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 import httpx
 
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from .src import DataLoader
 
 DB = MongodbController('FIE_DB2')

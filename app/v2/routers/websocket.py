@@ -3,7 +3,7 @@ websocket_router
 """
 
 from fastapi import APIRouter
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from core.common.websocket import ConnectionManager
 
 from fastapi import WebSocket, WebSocketDisconnect

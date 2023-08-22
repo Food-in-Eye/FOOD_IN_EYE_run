@@ -4,7 +4,7 @@ store_router
 
 from fastapi import APIRouter
 from core.models.store import StoreModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from .src.util import Util
 
 store_router = APIRouter(prefix="/stores")
@@ -49,9 +49,9 @@ async def read_store(id:str):
     """ 특정 id의 가게 정보를 받아온다."""
 
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
 
-        response = DB.read_by_id('store', id)
+        response = DB.read_one('store', {'_id':_id})
 
     except Exception as e:
         print('ERROR', e)
@@ -68,7 +68,6 @@ async def read_store(id:str):
     }
 
 
-# ToDo: user id 같이 받아야 할 듯. 
 @store_router.post("/store")
 async def create_store(store:StoreModel):
     """ 입력받은 정보의 가게를 생성한다. (최초 가입시에만 가능) """
@@ -84,7 +83,7 @@ async def create_store(store:StoreModel):
             max_num = max(store["num"] for store in store_list)
             data['num'] = max_num + 1
 
-        id = str(DB.create('store', data))
+        id = str(DB.insert_one('store', data))
 
     except Exception as e:
         print('ERROR', e)
@@ -107,9 +106,9 @@ async def update_store(id:str, store: StoreModel):
     data['status'] = data['status'].value
     
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
         
-        if DB.update_by_id('store', id, data):
+        if DB.replace_one('store', {'_id':_id}, data):
             return {
                 'request': f'PUT {PREFIX}/store?id={id}',
                 'status': 'OK'
