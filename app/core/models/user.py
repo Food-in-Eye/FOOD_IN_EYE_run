@@ -21,3 +21,13 @@ class SellerModel(BaseModel):
     pw: str
 
 
+# 정보 수정 시 에 입력을 받는 BaseModel
+
+class ModifyInfoModel(BaseModel):
+    name: str
+    gender: Gender = Field(title="Gender of user [male:1/female:2]")
+    age: int
+
+class ModifyPwModel(BaseModel):
+    old_pw: str 
+    new_pw: str

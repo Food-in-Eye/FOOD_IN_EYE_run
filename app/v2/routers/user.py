@@ -2,11 +2,12 @@
 user_router
 """
 
+from .src.util import Util
 from core.models import *
 from core.common.mongo2 import MongodbController
 from core.common.authority import AuthManagement, TokenManagement
 
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException, Body, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 user_router = APIRouter(prefix="/users")
@@ -68,7 +69,7 @@ async def buyer_signup(data: BuyerModel):
 @user_router.post('/buyer/login')
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = AuthManager.auth_user(data, 1)
+        user = AuthManager.auth_user(data)
         user['R_Token'] = TokenManager.create_r_token(user['_id'], 1)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
@@ -84,6 +85,49 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
+@user_router.post('/change')
+async def change_pw(data: OAuth2PasswordRequestForm = Depends()):
+    try:
+        user = AuthManager.auth_user(data)
+    
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
+    return {
+        'id': user['id'],
+        'name': user['name'],
+        'gender': user['gender'],
+        'age': user['age'],
+    }
+    
+@user_router.put('/change/pw')
+async def change_pw(u_id:str, data:ModifyPwModel):
+    try:
+        Util.check_id(u_id)
+
+        user = DB.read_by_id('user', u_id)
+        
+        AuthManager.auth_pw(data.old_pw, user['pw'])
+        new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
+
+        if DB.update_by_id('user', u_id, {"pw": new_hashed_pw}) != True:
+            raise HTTPException(status_code = 403, detail = f'Information can not modified')
+    
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
+
+@user_router.put('/buyer/change/info')
+async def buyer_info_change(u_id:str, info: ModifyInfoModel):
+    data = info.dict()
+    data['gender'] = data['gender'].value
+
+    try:
+        Util.check_id(u_id)
+
+        DB.update_by_id('user', u_id, data) != True
+    
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
+    
 
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
@@ -111,7 +155,7 @@ async def seller_signup(data: SellerModel):
 @user_router.post('/seller/login')
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = AuthManager.auth_user(data, 2)
+        user = AuthManager.auth_user(data)
         user['R_Token'] = TokenManager.create_r_token(user['_id'], 2)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})

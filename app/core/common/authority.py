@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -28,19 +29,28 @@ class AuthManagement:
     def get_hashed_pw(self, pw: str) -> str:
         return self.pw_handler.hash(pw)
     
-    def auth_user(self, data: OAuth2PasswordRequestForm, role:int):
+    def auth_pw(self, plain_pw:str, hashed_pw:str):
+        try:
+            if self.pw_handler.verify(plain_pw, hashed_pw):
+                return True
+            raise HTTPException(status_code = 401, detail = f'Incorrect PW')
+        except UnknownHashError as e:
+            raise HTTPException(status_code = 401, detail = str(e))
+
+    def auth_user(self, data: OAuth2PasswordRequestForm):
         user = self.check_id(data.username)
 
         if user:
             if data.username != user['id']:
                 raise HTTPException(status_code = 401, detail = f'Incorrect ID')
-            if not self.pw_handler.verify(data.password, user['pw']):
-                raise HTTPException(status_code = 401, detail = f'Incorrect PW')
+            self.auth_pw(data.password, user['pw'])
         else:
             raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
         
         return user
-        
+    
+
+            
 
 class TokenManagement:
     def __init__(self) -> None:
@@ -84,39 +94,36 @@ class TokenManagement:
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
 
 
-    def decode_token(self, type:str, token:str):
-        SK = self.ACCESS_SK if type == 'access' else self.REFRESH_SK
+
+    def recreate_a_token(self):
         try:
-            payload = jwt.decode(token, SK, algorithms=self.algorithm)
-            return payload
+            cur_time = int(datetime.now().timestamp())
+            
+            if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
+                raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
+            
+            return self.create_a_token()
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
-
-
-
-    def recreate_a_token(self):
-        cur_time = int(datetime.now().timestamp())
         
-        if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
-            raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
-        
-        return self.create_a_token()
-    
-        
+
     def recreate_r_token(self, token:str, u_id:str, role:int):
-        payload = self.decode_token('refresh', token)
+        try:
+            payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
 
-        cur_time = int(datetime.now().timestamp())
-        exp_time = payload.get("exp", 0)
+            cur_time = int(datetime.now().timestamp())
+            exp_time = payload.get("exp", 0)
 
-        if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
-            raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
+            if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
+                raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
-        return self.create_r_token(u_id, role)
+            return self.create_r_token(u_id, role)
         
-    
-    # ToDo : 테스트 완료시 삭제할 코드
+        except JWTError as e:
+            raise HTTPException(status_code = 401, detail = str(e))
+        
+
 
     def auth_a_token(self, token: str = Depends(oauth2_scheme)):
         try:
