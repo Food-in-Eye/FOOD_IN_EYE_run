@@ -6,9 +6,7 @@ from core.models import *
 from core.common.mongo2 import MongodbController
 from core.common.authority import AuthManagement, TokenManagement
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 user_router = APIRouter(prefix="/users")
@@ -34,8 +32,8 @@ async def check_duplicate_id(data: dict = Body(...)):
         else:
             state = 'available'
 
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'POST {PREFIX}/idcheck',
         'state': state
@@ -57,10 +55,10 @@ async def buyer_signup(data: BuyerModel):
             }
             u_id = str(DB.create('user', user))
         else:
-            raise Exception(f'Duplicate ID')
+            raise HTTPException(status_code = 409, detail = f'Duplicate ID')
         
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'POST {PREFIX}/buyer/signup',
         'u_id': u_id
@@ -75,11 +73,11 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'POST {PREFIX}/buyer/login',
-        'user_id': user['_id'],
+        'u_id': user['_id'],
         'token_type': "bearer",
         'A_Token': TokenManager.ACCESS_TOKEN,
         'R_Token': user['R_Token']
@@ -95,12 +93,15 @@ async def seller_signup(data: SellerModel):
                 "id": data.id,
                 "pw": AuthManager.get_hashed_pw(data.pw),
                 "role": 2,
+                "s_id": '',
                 "R_Token": ""
             }
             u_id = str(DB.create('user', user))
-
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+        else:
+            raise HTTPException(status_code = 409, detail = f'Duplicate ID')
+        
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'POST {PREFIX}/seller/signup',
         "u_id": u_id
@@ -115,14 +116,18 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'POST {PREFIX}/seller/login',
-        "token_type": "bearer",
-        "A_Token": TokenManager.ACCESS_TOKEN,
-        "R_Token": user['R_Token']
+        'u_id': user['_id'],
+        's_id': user['s_id'],
+        'token_type': "bearer",
+        'A_Token': TokenManager.ACCESS_TOKEN,
+        'R_Token': user['R_Token']
     }
+
+
 
 @user_router.get('/issue/access')
 async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
@@ -144,7 +149,6 @@ async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_
 async def get_refresh_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
     try:
         user = DB.read_by_id('user', u_id)
-        print(user['R_Token'])
         if user['R_Token'] != r_token:
             raise HTTPException(status_code = 401, detail = f'Ownership verification failed.')
         

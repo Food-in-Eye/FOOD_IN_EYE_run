@@ -3,27 +3,22 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 import os
-import time
 from jose import jwt, JWTError
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from fastapi import HTTPException
-
 
 from core.common.mongo2 import MongodbController
 
 DB = MongodbController('FIE_DB2')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scheme_name="JWT")
 
+
 class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
-    def check_id(self, id:str, role:int = 0) -> bool:
-        if role == 0:
-            query = {'id': id}
-        else:    
-            query = {'id': id, 'role': role}
-        users = DB.read_all_by_query('user', query)
+    def check_id(self, id:str) -> bool:
+        users = DB.read_all_by_feild('user', 'id', id)
         
         if users:
             return users[0]
@@ -34,17 +29,15 @@ class AuthManagement:
         return self.pw_handler.hash(pw)
     
     def auth_user(self, data: OAuth2PasswordRequestForm, role:int):
-        user = self.check_id(data.username, role)
-        if user:
-            user_id = user['id']
-            user_pw = user['pw']
+        user = self.check_id(data.username)
 
-            if data.username != user_id:
-                raise Exception(f'Incorrect ID')
-            if not self.pw_handler.verify(data.password, user_pw):
-                raise Exception(f'Incorrect PW')
+        if user:
+            if data.username != user['id']:
+                raise HTTPException(status_code = 401, detail = f'Incorrect ID')
+            if not self.pw_handler.verify(data.password, user['pw']):
+                raise HTTPException(status_code = 401, detail = f'Incorrect PW')
         else:
-            raise Exception(f'Nonexistent ID')
+            raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
         
         return user
         
@@ -63,6 +56,7 @@ class TokenManagement:
     
     def create_a_token(self):
         self.ACCESS_EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) #Todo : 테스트 끝난 후에 minutes = 30 으로 수정할 것
+        
         data = {
             "iss": "FOOD-IN-EYE",
             "sub": "FOOD-IN-EYE",
