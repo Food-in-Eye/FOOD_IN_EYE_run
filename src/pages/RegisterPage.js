@@ -24,15 +24,16 @@ function RegisterPage() {
     e.preventDefault();
 
     try {
-      const response = await postUser(`/idcheck`, {
+      const res = await postUser(`/idcheck`, {
         id: idCheck,
       });
 
-      if (response.data.response === "available") {
+      console.log(res);
+      if (res.data.state === "available") {
         setShowIdUniqueMsg(true);
         setShowIdDuplicateMsg(false);
         setId(idCheck);
-      } else if (response.data.response === "unavailable") {
+      } else if (res.data.state === "unavailable") {
         setShowIdUniqueMsg(false);
         setShowIdDuplicateMsg(true);
       }
@@ -124,10 +125,9 @@ function RegisterPage() {
                 아이디 중복 확인
               </button>
             </section>
-            {showIdDuplicateMsg && !showIdUniqueMsg ? (
+            {showIdDuplicateMsg ? (
               <p style={{ color: "#B9062F" }}>이미 사용 중인 ID입니다.</p>
             ) : (
-              !showIdDuplicateMsg &&
               showIdUniqueMsg && <p>사용 가능한 ID입니다.</p>
             )}
           </div>

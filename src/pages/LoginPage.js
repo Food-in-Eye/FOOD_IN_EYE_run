@@ -1,6 +1,7 @@
 import Login from "../css/Login.module.css";
 import Button from "../css/Button.module.css";
 import { getStore, postLogin } from "../components/API.module";
+import { handleJWT } from "../components/JWT.module";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -33,21 +34,21 @@ function LoginPage() {
 
     try {
       const request = await postLogin(`/seller/login`, formData);
-      if (request.data.status === "OK") {
+      console.log(request);
+      if (request.status === 200) {
+        console.log("a_token:", request.data.A_Token);
+        console.log("r_token:", request.data.R_Token);
+        handleJWT(request.data.A_Token, request.data.R_Token);
         // navigate(`/main`);
-      } else if (
-        (request.data.status === "ERROR") &
-        (request.data.message === "ERROR Incorrect PW")
-      ) {
-        setShowPasswdErrorMsg(true);
-      } else if (
-        (request.data.status === "ERROR") &
-        (request.data.message === "ERROR Nonexistent ID")
-      ) {
-        setShowIdErrorMsg(true);
       }
     } catch (error) {
-      console.log("Login failed:", error);
+      if (error.response.status === 400) {
+        if (error.response.data.detail === "Incorrect PW") {
+          setShowPasswdErrorMsg(true);
+        } else if (error.response.data.detail === "Nonexistent ID") {
+          setShowIdErrorMsg(true);
+        }
+      }
     }
 
     /**DELETE LATER: 이전 storeID로 storeNum을 받아오는 코드*/
