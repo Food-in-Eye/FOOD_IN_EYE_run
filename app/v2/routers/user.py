@@ -129,31 +129,33 @@ async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_
     try:
         user = DB.read_by_id('user', u_id)
         if user['R_Token'] != r_token:
-            raise Exception(f'Invalid request')
+            raise HTTPException(status_code = 401, detail = f'Ownership verification failed.')
         
-        A_Token = TokenManager.recreate_a_token()
+        response = TokenManager.recreate_a_token()
 
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'GET {PREFIX}/issue/access',
-        'A_Token': A_Token
+        'A_Token': response
     }
 
 @user_router.get('/issue/refresh')
 async def get_refresh_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
     try:
         user = DB.read_by_id('user', u_id)
+        print(user['R_Token'])
         if user['R_Token'] != r_token:
-            raise Exception(f'Invalid request')
+            raise HTTPException(status_code = 401, detail = f'Ownership verification failed.')
         
-        R_Token = TokenManager.recreate_r_token(r_token, u_id, user['role'])
+        response = TokenManager.recreate_r_token(r_token, u_id, user['role'])
+        DB.update_by_id('user', user['_id'], {"R_Token": response})
 
-    except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
         'request': f'GET {PREFIX}/issue/refresh',
-        'R_Token': R_Token
+        'R_Token': response
     }
 
 @user_router.get('/test/a_token')
