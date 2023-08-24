@@ -2,15 +2,18 @@
 store_router
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from core.models.store import StoreModel
 from core.common.mongo2 import MongodbController
 from .src.util import Util
+
+from core.common.authority import TokenManagement
 
 store_router = APIRouter(prefix="/stores")
 
 PREFIX = 'api/v2/stores'
 DB = MongodbController('FIE_DB2')
+TokenManager = TokenManagement()
 
 @store_router.get("/hello")
 async def hello():
@@ -70,13 +73,15 @@ async def read_store(id:str):
 
 # ToDo: user id 같이 받아야 할 듯. 
 @store_router.post("/store")
-async def create_store(store:StoreModel):
+async def create_store(u_id:str, store:StoreModel):
     """ 입력받은 정보의 가게를 생성한다. (최초 가입시에만 가능) """
 
     data = store.dict()
     data['status'] = data['status'].value
 
     try:
+        Util.check_id(u_id)
+
         store_list = DB.read_all('store')
         if not store_list: # menu 최초 등록
             data['num'] = 1
@@ -85,6 +90,12 @@ async def create_store(store:StoreModel):
             data['num'] = max_num + 1
 
         id = str(DB.create('store', data))
+
+        user = DB.read_by_id('user', u_id)
+        if user['role'] == 2:
+            DB.update_by_id('user', u_id, {"s_id": id})
+        else:
+            raise Exception(f'Request has denied')
 
     except Exception as e:
         print('ERROR', e)

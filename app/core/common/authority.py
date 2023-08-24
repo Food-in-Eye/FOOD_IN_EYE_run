@@ -67,6 +67,7 @@ class TokenManagement:
         self.ACCESS_TOKEN = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
         return self.ACCESS_TOKEN
     
+
     def create_r_token(self, u_id, role):
         if role == 1:
             EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) # Todo : 테스트 이후 minutes = 60 으로 바꿀 것
@@ -83,35 +84,39 @@ class TokenManagement:
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
 
 
+    def decode_token(self, type:str, token:str):
+        SK = self.ACCESS_SK if type == 'access' else self.REFRESH_SK
+        try:
+            payload = jwt.decode(token, SK, algorithms=self.algorithm)
+            return payload
+        
+        except JWTError as e:
+            raise HTTPException(status_code = 401, detail = str(e))
+
+
 
     def recreate_a_token(self):
-        try:
-            cur_time = int(datetime.now().timestamp())
-            
-            if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
-                raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
-            
-            return self.create_a_token()
+        cur_time = int(datetime.now().timestamp())
         
-        except JWTError as e:
-            raise HTTPException(status_code = 401, detail = str(e))
+        if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
+            raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
+        
+        return self.create_a_token()
+    
         
     def recreate_r_token(self, token:str, u_id:str, role:int):
-        try:
-            payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
+        payload = self.decode_token('refresh', token)
 
-            cur_time = int(datetime.now().timestamp())
-            exp_time = payload.get("exp", 0)
+        cur_time = int(datetime.now().timestamp())
+        exp_time = payload.get("exp", 0)
 
-            if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
-                raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
+        if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
+            raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
-            return self.create_r_token(u_id, role)
+        return self.create_r_token(u_id, role)
         
-        except JWTError as e:
-            raise HTTPException(status_code = 401, detail = str(e))
-        
-
+    
+    # ToDo : 테스트 완료시 삭제할 코드
 
     def auth_a_token(self, token: str = Depends(oauth2_scheme)):
         try:
