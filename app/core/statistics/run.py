@@ -41,7 +41,6 @@ class CallAnalysis:
         }
         
         async with httpx.AsyncClient() as client:
-            print(anlz_sale_url)
             response = await client.post(anlz_sale_url, json=payload, headers=headers)
             data = response.json()
 

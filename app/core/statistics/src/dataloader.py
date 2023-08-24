@@ -12,10 +12,8 @@ class DataLoader:
             stores = DB.read_all('store', {}, {'_id': 1, 'num':1})
             result = {}
             for store in stores:
-               print(store)
                result[store['_id']] = store['num']
             
-            print(result)
             return result
 
         except Exception as e:
@@ -29,7 +27,6 @@ class DataLoader:
             result = {}
             for food in foods:
                result[food['_id']] = food['num']
-            print(result)
             return result
 
         except Exception as e:
