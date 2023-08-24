@@ -95,7 +95,7 @@ class TokenManagement:
             cur_time = int(datetime.now().timestamp())
             
             if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
-                raise HTTPException(status_code = 403, detail =f'Signature renew has denied.')
+                raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
             
             return self.create_a_token()
         
@@ -108,10 +108,9 @@ class TokenManagement:
 
             cur_time = int(datetime.now().timestamp())
             exp_time = payload.get("exp", 0)
-            print(datetime.fromtimestamp(cur_time))
-            print(datetime.fromtimestamp(exp_time))
+
             if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
-                raise HTTPException(status_code = 403, detail =f'Signature renew has denied.')
+                raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
             return self.create_r_token(u_id, role)
         
