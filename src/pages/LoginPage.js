@@ -3,7 +3,11 @@ import Button from "../css/Button.module.css";
 import { getStore, postLogin } from "../components/API.module";
 import { handleJWT } from "../components/JWT.module";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useState } from "react";
+
+import { setRefreshToken } from "../storage/Cookie";
+import { SET_TOKEN } from "../store/Auth";
 
 import barChart from "../images/bar-chart.png";
 import bidLandscape from "../images/bid-landscape.png";
@@ -19,6 +23,7 @@ import calendar from "../images/calendar.png";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
@@ -34,12 +39,20 @@ function LoginPage() {
 
     try {
       const request = await postLogin(`/seller/login`, formData);
-      console.log(request);
+      console.log("request", request);
       if (request.status === 200) {
-        console.log("a_token:", request.data.A_Token);
-        console.log("r_token:", request.data.R_Token);
-        handleJWT(request.data.A_Token, request.data.R_Token);
-        // navigate(`/main`);
+        // const currentTime = Date.now(); // 현재 시간 (밀리초)
+        const tokenCreationTime = new Date(request.headers.date).getTime(); // 토큰 생성 시간 (밀리초)
+
+        const userData = {
+          u_id: request.data.u_id,
+          // s_id: request.data.s_id,
+          a_token: request.data.A_Token,
+          r_token: request.data.R_Token,
+          a_create_date: tokenCreationTime,
+          r_create_date: tokenCreationTime,
+        };
+        startTokenRefresh(userData);
       }
     } catch (error) {
       if (error.response.status === 400) {
@@ -58,6 +71,24 @@ function LoginPage() {
     // getStore(storeID).then((res) =>
     //   localStorage.setItem("storeNum", res.data.response.num)
     // );
+  };
+
+  /** 10초마다 token 재발급 함수 호출 */
+  const startTokenRefresh = (userData) => {
+    try {
+      setInterval(async () => {
+        const data = await handleJWT(userData);
+        console.log("data", data);
+        console.log("data newRToken", data.r_token);
+        console.log("data newAToken", data.a_token);
+        setRefreshToken(data.r_token, data.r_create_date);
+        dispatch(SET_TOKEN(data.a_token, data.a_create_date));
+
+        // navigate(`/main`);
+      }, 10000);
+    } catch (error) {
+      console.log("Error Refreshing Tokens:", error);
+    }
   };
 
   return (
