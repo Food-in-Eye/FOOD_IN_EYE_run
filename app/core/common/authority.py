@@ -20,7 +20,7 @@ class AuthManagement:
     
     def check_id(self, id:str) -> bool:
         users = DB.read_all_by_feild('user', 'id', id)
-        
+
         if users:
             return users[0]
         else:
@@ -37,18 +37,32 @@ class AuthManagement:
         except UnknownHashError as e:
             raise HTTPException(status_code = 401, detail = str(e))
 
-    def auth_user(self, data: OAuth2PasswordRequestForm):
-        user = self.check_id(data.username)
+    def auth_user(self, id, pw):
+        user = self.check_id(id)
 
         if user:
-            if data.username != user['id']:
+            if id != user['id']:
                 raise HTTPException(status_code = 401, detail = f'Incorrect ID')
-            self.auth_pw(data.password, user['pw'])
+            self.auth_pw(pw, user['pw'])
         else:
             raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
         
         return user
+
+    def auth_user_by_uid(self, u_id, pw):
+        try:  # ToDo : mongo 코드 바뀌면 Exception 바꾸기 - try-excepy 문을 밖으로 빼면 다른 오류들도 잡힘
+            user = DB.read_by_id('user', u_id)
+        except Exception:
+            raise HTTPException(status_code = 401, detail = f'Nonexistent u_ID') 
+
+        if user:
+            if u_id != user['_id']:
+                raise HTTPException(status_code = 401, detail = f'Incorrect ID')
+            self.auth_pw(pw, user['pw'])
+        else:
+            raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
     
+        return user
 
             
 

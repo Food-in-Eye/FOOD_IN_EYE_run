@@ -20,14 +20,25 @@ class SellerModel(BaseModel):
     id: str
     pw: str
 
+# 아이디, 비밀번호만 따로 입력 받을 때 사용할 BaseModel
 
-# 정보 수정 시 에 입력을 받는 BaseModel
+class IdModel(BaseModel):
+    id: str
 
-class ModifyInfoModel(BaseModel):
+class PwModel(BaseModel):
+    pw: str
+
+# 정보 수정 시에 입력을 받는 BaseModel
+
+class BuyerModifyModel(BaseModel):
+    id: str
+    old_pw: str
+    new_pw: str
     name: str
     gender: Gender = Field(title="Gender of user [male:1/female:2]")
     age: int
 
-class ModifyPwModel(BaseModel):
-    old_pw: str 
+class SellerModifyModel(BaseModel):
+    id: str
+    old_pw: str
     new_pw: str

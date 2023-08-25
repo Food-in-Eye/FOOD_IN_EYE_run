@@ -7,7 +7,7 @@ from core.models import *
 from core.common.mongo2 import MongodbController
 from core.common.authority import AuthManagement, TokenManagement
 
-from fastapi import APIRouter, Depends, HTTPException, Body, Form
+from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 user_router = APIRouter(prefix="/users")
@@ -26,7 +26,7 @@ async def hello():
 
 
 @user_router.post('/idcheck')
-async def check_duplicate_id(data: dict = Body(...)):
+async def check_duplicate_id(data: IdModel):
     try:
         if AuthManager.check_id(data['id']):
             state = 'unavailable'
@@ -69,7 +69,7 @@ async def buyer_signup(data: BuyerModel):
 @user_router.post('/buyer/login')
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = AuthManager.auth_user(data)
+        user = AuthManager.auth_user(data.username, data.password)
         user['R_Token'] = TokenManager.create_r_token(user['_id'], 1)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
@@ -85,10 +85,12 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
-@user_router.post('/change')
-async def change_pw(data: OAuth2PasswordRequestForm = Depends()):
+@user_router.post('/info')
+async def get_user_info(u_id:str, data: PwModel):
     try:
-        user = AuthManager.auth_user(data)
+        Util.check_id(u_id)
+
+        user = AuthManager.auth_user_by_uid(u_id, data.pw)
     
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -99,34 +101,49 @@ async def change_pw(data: OAuth2PasswordRequestForm = Depends()):
         'age': user['age'],
     }
     
-@user_router.put('/change/pw')
-async def change_pw(u_id:str, data:ModifyPwModel):
+    
+@user_router.put('/buyer/change')
+async def change_buyer_info(u_id:str, data: BuyerModifyModel):
     try:
         Util.check_id(u_id)
 
-        user = DB.read_by_id('user', u_id)
-        
-        AuthManager.auth_pw(data.old_pw, user['pw'])
+        AuthManager.auth_user_by_uid(u_id, data.old_pw)
+        AuthManager.auth_user(data.id, data.old_pw)
+
         new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
 
-        if DB.update_by_id('user', u_id, {"pw": new_hashed_pw}) != True:
-            raise HTTPException(status_code = 403, detail = f'Information can not modified')
+        new_data = {
+            'pw': new_hashed_pw,
+            'name': data.name,
+            'gender': data.gender.value,
+            'age': data.age
+        }
+
+        DB.update_by_id('user', u_id, new_data)
     
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
 
-@user_router.put('/buyer/change/info')
-async def buyer_info_change(u_id:str, info: ModifyInfoModel):
-    data = info.dict()
-    data['gender'] = data['gender'].value
-
+    
+@user_router.put('/seller/change')
+async def change_seller_info(u_id:str, data: SellerModifyModel):
     try:
         Util.check_id(u_id)
 
-        DB.update_by_id('user', u_id, data) != True
+        AuthManager.auth_user_by_uid(u_id, data.old_pw)
+        AuthManager.auth_user(data.id, data.old_pw)
+    
+        new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
+
+        new_data = {
+            'pw': new_hashed_pw,
+        }
+
+        DB.update_by_id('user', u_id, new_data)
     
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
+    
     
 
 @user_router.post('/seller/signup')
@@ -155,7 +172,7 @@ async def seller_signup(data: SellerModel):
 @user_router.post('/seller/login')
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = AuthManager.auth_user(data)
+        user = AuthManager.auth_user(data.username, data.password)
         user['R_Token'] = TokenManager.create_r_token(user['_id'], 2)
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
