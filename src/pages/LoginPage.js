@@ -25,6 +25,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // const [storeID, setStoreID] = useState("");
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
 
@@ -41,8 +42,7 @@ function LoginPage() {
       const request = await postLogin(`/seller/login`, formData);
       console.log("request", request);
       if (request.status === 200) {
-        // const currentTime = Date.now(); // 현재 시간 (밀리초)
-        const tokenCreationTime = new Date(request.headers.date).getTime(); // 토큰 생성 시간 (밀리초)
+        const tokenCreationTime = new Date(request.headers.date).getTime();
 
         const userData = {
           u_id: request.data.u_id,
@@ -53,6 +53,8 @@ function LoginPage() {
           r_create_date: tokenCreationTime,
         };
         startTokenRefresh(userData);
+
+        getStoreID(request.data.s_id);
       }
     } catch (error) {
       if (error.response.status === 400) {
@@ -63,14 +65,6 @@ function LoginPage() {
         }
       }
     }
-
-    /**DELETE LATER: 이전 storeID로 storeNum을 받아오는 코드*/
-    // const storeID = document.querySelector("#storeID").value;
-    // // storeID를 localStorage에 저장
-    // localStorage.setItem("storeID", storeID);
-    // getStore(storeID).then((res) =>
-    //   localStorage.setItem("storeNum", res.data.response.num)
-    // );
   };
 
   /** 10초마다 token 재발급 함수 호출 */
@@ -83,12 +77,20 @@ function LoginPage() {
         console.log("data newAToken", data.a_token);
         setRefreshToken(data.r_token, data.r_create_date);
         dispatch(SET_TOKEN(data.a_token, data.a_create_date));
-
-        // navigate(`/main`);
       }, 10000);
     } catch (error) {
       console.log("Error Refreshing Tokens:", error);
     }
+  };
+
+  const getStoreID = async (s_id) => {
+    console.log("s_id", s_id);
+    localStorage.setItem("storeID", s_id);
+    await getStore(s_id).then((res) =>
+      localStorage.setItem("storeNum", res.data.response.num)
+    );
+
+    navigate(`/main`);
   };
 
   return (
