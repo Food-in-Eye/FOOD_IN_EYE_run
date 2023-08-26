@@ -126,9 +126,9 @@ function RegisterPage() {
               </button>
             </section>
             {showIdDuplicateMsg ? (
-              <p style={{ color: "#B9062F" }}>이미 사용 중인 ID입니다.</p>
+              <p style={{ color: "#B9062F" }}>이미 사용 중인 아이디 입니다.</p>
             ) : (
-              showIdUniqueMsg && <p>사용 가능한 ID입니다.</p>
+              showIdUniqueMsg && <p>사용 가능한 아이디 입니다.</p>
             )}
           </div>
           <div className={Register.secondSection}>
