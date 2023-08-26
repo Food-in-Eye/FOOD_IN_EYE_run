@@ -94,9 +94,9 @@ class TokenManagement:
 
     def create_r_token(self, u_id, role):
         if role == 1:
-            EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) # Todo : 테스트 이후 minutes = 60 으로 바꿀 것
+            EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 으로 바꿀 것
         elif role == 2:
-            EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) # Todo : 테스트 이후 minutes = 60 * 2 로 바꿀 것
+            EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 * 2 로 바꿀 것
 
         data = {
             "iss": "FOOD-IN-EYE",
