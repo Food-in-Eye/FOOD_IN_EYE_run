@@ -18,7 +18,7 @@ class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
-    def check_id(self, id:str) -> bool:
+    def check_id_dup(self, id:str) -> bool:
         users = DB.read_all_by_feild('user', 'id', id)
 
         if users:
@@ -38,7 +38,7 @@ class AuthManagement:
             raise HTTPException(status_code = 401, detail = str(e))
 
     def auth_user(self, id, pw):
-        user = self.check_id(id)
+        user = self.check_id_dup(id)
 
         if user:
             if id != user['id']:

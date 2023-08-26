@@ -28,7 +28,7 @@ async def hello():
 @user_router.post('/idcheck')
 async def check_duplicate_id(data: IdModel):
     try:
-        if AuthManager.check_id(data['id']):
+        if AuthManager.check_id_dup(data['id']):
             state = 'unavailable'
         else:
             state = 'available'
@@ -44,7 +44,7 @@ async def check_duplicate_id(data: IdModel):
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     try:
-        if AuthManager.check_id(data.id) == False:
+        if AuthManager.check_id_dup(data.id) == False:
             user = {
                 'id': data.id,
                 'pw': AuthManager.get_hashed_pw(data.pw),
@@ -88,7 +88,7 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 @user_router.post('/info')
 async def get_user_info(u_id:str, data: PwModel):
     try:
-        Util.check_id(u_id)
+        Util.check_id_dup(u_id)
 
         user = AuthManager.auth_user_by_uid(u_id, data.pw)
     
@@ -105,7 +105,7 @@ async def get_user_info(u_id:str, data: PwModel):
 @user_router.put('/buyer/change')
 async def change_buyer_info(u_id:str, data: BuyerModifyModel):
     try:
-        Util.check_id(u_id)
+        Util.check_id_dup(u_id)
 
         AuthManager.auth_user_by_uid(u_id, data.old_pw)
         AuthManager.auth_user(data.id, data.old_pw)
@@ -128,7 +128,7 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel):
 @user_router.put('/seller/change')
 async def change_seller_info(u_id:str, data: SellerModifyModel):
     try:
-        Util.check_id(u_id)
+        Util.check_id_dup(u_id)
 
         AuthManager.auth_user_by_uid(u_id, data.old_pw)
         AuthManager.auth_user(data.id, data.old_pw)
@@ -149,7 +149,7 @@ async def change_seller_info(u_id:str, data: SellerModifyModel):
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
     try:
-        if AuthManager.check_id(data.id) == False:
+        if AuthManager.check_id_dup(data.id) == False:
             user = {
                 "id": data.id,
                 "pw": AuthManager.get_hashed_pw(data.pw),
