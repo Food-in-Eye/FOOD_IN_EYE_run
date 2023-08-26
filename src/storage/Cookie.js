@@ -9,10 +9,13 @@ export const setRefreshToken = (refreshToken, create_date) => {
   //   const today = new Date();
   const expireDate = create_date + TOKEN_TIME_OUT;
 
-  return cookies.set("r_token", refreshToken, {
+  return cookies.set("refresh_token", refreshToken, {
     sameSite: "strict",
     path: "/",
     expires: new Date(expireDate),
+    headers: {
+      "Cache-Control": "no-cache",
+    },
   });
 };
 

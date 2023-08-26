@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const handleJWT = async (data) => {
+export const handleAccessToken = async (data) => {
   const refreshTokenHeaders = {
     headers: {
       Authorization: `Bearer ${data.r_token}`,
@@ -13,6 +13,16 @@ export const handleJWT = async (data) => {
     refreshTokenHeaders,
     data
   );
+
+  return data;
+};
+
+export const handleRefreshToken = async (data) => {
+  const refreshTokenHeaders = {
+    headers: {
+      Authorization: `Bearer ${data.r_token}`,
+    },
+  };
 
   await refreshRefreshToken(
     data.u_id,

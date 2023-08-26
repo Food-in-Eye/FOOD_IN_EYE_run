@@ -6,6 +6,7 @@ import VisualizeGazePage from "./pages/VisualizeGazePage";
 import BenefitManagePage from "./pages/BenefitManagePage";
 import MenuPlacementPage from "./pages/MenuPlacementPage";
 import StoreManagePage from "./pages/StoreManagePage";
+import StoreSettingPage from "./pages/StoreSettingPage";
 import OrderManagePage from "./pages/OrderManagePage";
 import MenuManagePage from "./pages/MenuManagePage";
 import RegisterPage from "./pages/RegisterPage";
@@ -28,6 +29,7 @@ function App() {
         <Route path="/benefit-manage" element={<BenefitManagePage />} />
         <Route path="/menu-placement" element={<MenuPlacementPage />} />
         <Route path="/store-manage" element={<StoreManagePage />} />
+        <Route path="/store-setting" element={<StoreSettingPage />} />
         <Route path="/order-manage" element={<OrderManagePage />} />
         <Route path="/menu-manage" element={<MenuManagePage />} />
         <Route path="/main" element={<MainPage />} />

@@ -1,8 +1,31 @@
 import { configureStore } from "@reduxjs/toolkit";
-import tokenReducer from "./Auth";
+import { authToken } from "./Auth";
 
-export default configureStore({
+// import combineReducers from "redux";
+// import storageSession from "redux-persist/lib/storage/session";
+import storage from "redux-persist/lib/storage";
+import { persistStore, persistReducer } from "redux-persist";
+
+// const reducers = combineReducers({
+//   token: tokenSlice.reducer,
+// });
+
+const persistConfig = {
+  key: "root",
+  storage: storage,
+  whitelist: ["authToken"],
+};
+
+const persistedReducer = persistReducer(persistConfig, authToken);
+
+const store = configureStore({
   reducer: {
-    authToken: tokenReducer,
+    authToken: persistedReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
+
+export const persistor = persistStore(store);
+
+export default store;

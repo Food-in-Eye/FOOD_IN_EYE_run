@@ -1,13 +1,17 @@
 import Login from "../css/Login.module.css";
 import Button from "../css/Button.module.css";
 import { getStore, postLogin } from "../components/API.module";
-import { handleJWT } from "../components/JWT.module";
+import {
+  handleAccessToken,
+  handleRefreshToken,
+} from "../components/JWT.module";
+import RefreshToken from "../components/RefreshToken.module";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { setRefreshToken } from "../storage/Cookie";
-import { SET_TOKEN } from "../store/Auth";
+import { SET_TOKEN, TOKEN_TIME_OUT } from "../store/Auth";
 
 import barChart from "../images/bar-chart.png";
 import bidLandscape from "../images/bid-landscape.png";
@@ -21,11 +25,12 @@ import update from "../images/update.png";
 import shoppingCart from "../images/shopping-cart.png";
 import calendar from "../images/calendar.png";
 
+// export let USER_DATA = {};
+
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // const [storeID, setStoreID] = useState("");
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
 
@@ -44,39 +49,61 @@ function LoginPage() {
       if (request.status === 200) {
         const tokenCreationTime = new Date(request.headers.date).getTime();
 
-        const userData = {
+        const user_data = {
           u_id: request.data.u_id,
-          // s_id: request.data.s_id,
           a_token: request.data.A_Token,
           r_token: request.data.R_Token,
           a_create_date: tokenCreationTime,
           r_create_date: tokenCreationTime,
         };
-        startTokenRefresh(userData);
+        // console.log("USER_DATA", USER_DATA);
+        // await RefreshToken({
+        //   u_id: request.data.u_id,
+        //   a_token: request.data.A_Token,
+        //   r_token: request.data.R_Token,
+        //   a_create_date: tokenCreationTime,
+        //   r_create_date: tokenCreationTime,
+        // });
+        startTokenRefresh(user_data);
 
-        getStoreID(request.data.s_id);
+        if (request.data.s_id) {
+          getStoreID(request.data.s_id);
+        } else {
+          // 가게 초기 설정 화면으로 이동
+          navigate("/store-setting");
+        }
       }
     } catch (error) {
-      if (error.response.status === 400) {
+      if (error.response && error.response.status === 400) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
         } else if (error.response.data.detail === "Nonexistent ID") {
           setShowIdErrorMsg(true);
         }
+      } else {
+        console.log(error);
       }
     }
   };
 
-  /** 10초마다 token 재발급 함수 호출 */
+  /** 10초마다 refreshToken 재발급 + accessToken 만료 시 재발급 함수 호출 */
   const startTokenRefresh = (userData) => {
     try {
       setInterval(async () => {
-        const data = await handleJWT(userData);
+        const currentTime = new Date().getTime();
+        const accessTokenExpireTime = userData.a_create_date + TOKEN_TIME_OUT;
+
+        console.log("accessTokenExpireTime", accessTokenExpireTime);
+        if (accessTokenExpireTime <= currentTime) {
+          const data = await handleAccessToken(userData);
+          console.log("data newAToken", data.a_token);
+          dispatch(SET_TOKEN(data.a_token, data.a_create_date));
+        }
+        const data = await handleRefreshToken(userData);
         console.log("data", data);
         console.log("data newRToken", data.r_token);
-        console.log("data newAToken", data.a_token);
         setRefreshToken(data.r_token, data.r_create_date);
-        dispatch(SET_TOKEN(data.a_token, data.a_create_date));
+        // dispatch(SET_TOKEN(data.a_token, data.a_create_date));
       }, 10000);
     } catch (error) {
       console.log("Error Refreshing Tokens:", error);
