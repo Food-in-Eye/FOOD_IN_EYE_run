@@ -1,6 +1,7 @@
 .login,
 .register,
 .duplicateCheck,
+.nameDuplicateCheck,
 .registerStore {
   display: flex;
   justify-content: center;
@@ -25,6 +26,14 @@
   width: 200px;
   height: 30px;
   margin-top: 25px;
+  margin-left: 10px;
+}
+
+.nameDuplicateCheck {
+  width: 150px;
+  padding: 15px 10px;
+  font-size: 18px;
+  margin-top: 40px;
   margin-left: 10px;
 }
 

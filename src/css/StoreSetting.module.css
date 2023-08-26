@@ -39,6 +39,25 @@
   background-color: #fff;
 }
 
+.storeNameSection {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 75vw;
+
+  background-color: #fff;
+}
+
+.storeNameSection,
+.selectTimeDiv {
+  margin-left: 0;
+}
+
+.storeNameSection input {
+  width: 21vw;
+}
+
 .RegisterForm form,
 .RegisterForm span,
 .RegisterForm input,
@@ -71,6 +90,8 @@ label textarea {
 label textarea {
   min-height: 2vw;
   height: 5vw;
+  padding: 5px;
+  font-size: 18px;
 }
 
 button {

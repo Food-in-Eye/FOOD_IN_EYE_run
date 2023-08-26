@@ -16,28 +16,36 @@ function StoreSettingPage() {
           </section>
           <section className={StoreSet.RegisterForm}>
             <form>
-              <label htmlFor="store_name">
-                <span>가게 이름</span>
-                <input
-                  id="store_name"
-                  type="text"
-                  name="store_name"
-                  placeholder="Ex)한눈에 학식"
-                />
-              </label>
+              <section className={StoreSet.storeNameSection}>
+                <label htmlFor="store_name">
+                  <span>가게 이름</span>
+                  <input
+                    id="store_name"
+                    type="text"
+                    name="store_name"
+                    placeholder="Ex)한눈에 학식"
+                  />
+                </label>
+                <button
+                  className={Button.nameDuplicateCheck}
+                  // onClick={handleNameDuplicate}
+                >
+                  이름 중복 확인
+                </button>
+              </section>
               <div className={StoreSet.selectTimeDiv}>
                 <span>운영 시간</span>
                 <SelectTime />
               </div>
               <label htmlFor="store_intro">
-                <span>가게 한줄 소개</span>
+                <span>가게 한 줄 소개</span>
                 <textarea
                   id="store_intro"
                   type="text"
                   name="store_intro"
                   cols="30"
                   rows="2"
-                  placeholder="가게 한줄 소개를 작성해보세요!"
+                  placeholder="가게 한 줄 소개를 작성해보세요!"
                 />
               </label>
               <label htmlFor="store_notice">
