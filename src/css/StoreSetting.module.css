@@ -2,4 +2,77 @@
   margin: 0 auto;
   padding: 0px;
   box-sizing: border-box;
+  background-color: #e7e7e7;
+}
+
+.body {
+  margin: 3% 10%;
+}
+
+.desc {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.desc h1,
+.desc span {
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+.desc h1 {
+  font-weight: 900;
+}
+
+.desc span {
+  font: 20px/1 "Palanquin Dark";
+  color: #9c9c9c;
+}
+
+.RegisterForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+
+.RegisterForm form,
+.RegisterForm span,
+.RegisterForm input,
+.RegisterForm textarea {
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: auto;
+}
+
+.RegisterForm label,
+.RegisterForm span,
+.RegisterForm input,
+.selectTimeDiv {
+  background: none;
+}
+
+label span,
+.selectTimeDiv span {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+label input,
+label textarea {
+  min-width: 10vw;
+  width: 75vw;
+  border: 1px solid #d2d2d2;
+}
+
+label textarea {
+  min-height: 2vw;
+  height: 5vw;
+}
+
+button {
+  margin-bottom: 10px;
 }

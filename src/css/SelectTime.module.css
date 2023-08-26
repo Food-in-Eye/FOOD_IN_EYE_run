@@ -1,0 +1,24 @@
+.mainDiv {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  /* margin-left: 0px;
+  margin-right: auto; */
+  background-color: #fff;
+}
+.mainDiv span {
+  margin: auto 0;
+}
+
+select {
+  display: block;
+  box-sizing: content-box;
+  min-width: 5vw;
+  width: 21vw;
+  height: 2vw;
+  margin: 0 auto;
+  border-radius: 5px;
+  border-color: #d2d2d2;
+  background-color: #fff;
+}
