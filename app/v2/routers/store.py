@@ -82,6 +82,10 @@ async def create_store(u_id:str, store:StoreModel):
     try:
         Util.check_id(u_id)
 
+        name_dup = DB.read_all_by_feild('store', 'name', data['name'])
+        if name_dup:
+            raise Exception(f'Request name has already exist.')
+        
         store_list = DB.read_all('store')
         if not store_list: # menu 최초 등록
             data['num'] = 1
