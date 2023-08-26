@@ -2,7 +2,12 @@
   margin: 0 auto;
   padding: 0px;
   box-sizing: border-box;
+}
+
+.background {
   background-color: #e7e7e7;
+  padding-top: 30px;
+  padding-bottom: 50px;
 }
 
 .body {
@@ -54,10 +59,6 @@
   margin-left: 0;
 }
 
-.storeNameSection input {
-  width: 21vw;
-}
-
 .RegisterForm form,
 .RegisterForm span,
 .RegisterForm input,
@@ -74,20 +75,20 @@
   background: none;
 }
 
-label span,
+.RegisterForm label span,
 .selectTimeDiv span {
   font-size: 20px;
   font-weight: 700;
 }
 
-label input,
-label textarea {
+.RegisterForm label input,
+.RegisterForm label textarea {
   min-width: 10vw;
   width: 75vw;
   border: 1px solid #d2d2d2;
 }
 
-label textarea {
+.RegisterForm label textarea {
   min-height: 2vw;
   height: 5vw;
   padding: 5px;

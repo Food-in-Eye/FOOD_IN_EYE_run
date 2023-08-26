@@ -97,6 +97,17 @@ export const postLogin = (query, formData) => {
   });
 };
 
+export const postStore = (u_id, data) => {
+  const requestUrl = `${STORE_URL}/store?u_id=${u_id}`;
+
+  return axios.post(requestUrl, JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+};
+
 export const postFood = (s_id, data) => {
   const requestUrl = `${FOODS_URL}/food?s_id=${s_id}`;
 

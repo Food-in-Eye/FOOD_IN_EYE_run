@@ -1,16 +1,18 @@
 import ST from "../css/SelectTime.module.css";
 import { useState } from "react";
 
-function SelectTime() {
+function SelectTime({ onSelectOpenTime, onSelectCloseTime }) {
   const [selectedOpenTime, setSelectOpenTime] = useState(0);
   const [selectedCloseTime, setSelectCloseTime] = useState(0);
 
-  const onSelectOpenTime = (selectedOptions) => {
-    setSelectOpenTime(selectedOptions);
+  const handleSelectOpenTime = (e) => {
+    setSelectOpenTime(e.target.value);
+    onSelectOpenTime(e.target.value);
   };
 
-  const onSelectCloseTime = (selectedOptions) => {
-    setSelectCloseTime(selectedOptions);
+  const handleSelectCloseTime = (e) => {
+    setSelectCloseTime(e.target.value);
+    onSelectCloseTime(e.target.value);
   };
 
   const timeOptions = [];
@@ -30,7 +32,7 @@ function SelectTime() {
         <select
           id="open-time-select"
           value={selectedOpenTime}
-          onChange={onSelectOpenTime}
+          onChange={handleSelectOpenTime}
         >
           <option value="">시간을 선택하세요</option>
           {timeOptions.map((timeOption, index) => (
@@ -47,7 +49,7 @@ function SelectTime() {
         <select
           id="close-time-select"
           value={selectedCloseTime}
-          onChange={onSelectCloseTime}
+          onChange={handleSelectCloseTime}
         >
           <option value="">시간을 선택하세요</option>
           {timeOptions.map((timeOption, index) => (

@@ -64,6 +64,7 @@ function LoginPage() {
         //   a_create_date: tokenCreationTime,
         //   r_create_date: tokenCreationTime,
         // });
+        localStorage.setItem("u_id", request.data.u_id);
         startTokenRefresh(user_data);
 
         if (request.data.s_id) {
