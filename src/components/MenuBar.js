@@ -61,7 +61,7 @@ function MenuBar() {
             </ul>
           </li>
           <li>
-            <a href="./admin" className={style.menubarSub}>
+            <a href="./admin-setting" className={style.menubarSub}>
               설정
             </a>
           </li>

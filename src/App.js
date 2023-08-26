@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminPage from "./pages/AdminPage";
+import AdminSettingPage from "./pages/AdminSettingPage";
 import DetailAnalysisPage from "./pages/DetailAnalysisPage";
 import AnalysisPage from "./pages/AnalysisPage";
 import VisualizeGazePage from "./pages/VisualizeGazePage";
@@ -18,7 +18,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin-setting" element={<AdminSettingPage />} />
         <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/gaze-visualize" element={<VisualizeGazePage />} />

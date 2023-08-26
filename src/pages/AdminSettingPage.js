@@ -1,7 +1,7 @@
 import MenuBar from "../components/MenuBar";
 import Admin from "../css/Admin.module.css";
 
-function AdminPage() {
+function AdminSettingPage() {
   return (
     <div>
       <MenuBar />
@@ -12,4 +12,4 @@ function AdminPage() {
   );
 }
 
-export default AdminPage;
+export default AdminSettingPage;
