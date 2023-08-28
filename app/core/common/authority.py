@@ -1,7 +1,7 @@
 from passlib.context import CryptContext
 from passlib.exc import UnknownHashError
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 
 import os
 from jose import jwt, JWTError
@@ -73,12 +73,13 @@ class TokenManagement:
 
         self.ACCESS_SK = os.environ['JWT_ACCESS_SECRET_KEY']
         self.ACCESS_EXP = 0
-        self.ACCESS_TOKEN = self.create_a_token()
+        self.ACCESS_TOKEN_buyer = self.create_a_token("buyer")
+        self.ACCESS_TOKEN_seller = self.create_a_token("seller")
 
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
 
     
-    def create_a_token(self):
+    def create_a_token(self, scope:str):
         self.ACCESS_EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) #Todo : 테스트 끝난 후에 minutes = 30 으로 수정할 것
         
         data = {
@@ -86,16 +87,16 @@ class TokenManagement:
             "sub": "FOOD-IN-EYE",
             "exp": self.ACCESS_EXP,
             "iat": int(datetime.now().timestamp()),
-            "role": 0
+            "scope": scope
         }
         self.ACCESS_TOKEN = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
         return self.ACCESS_TOKEN
     
 
-    def create_r_token(self, u_id, role):
-        if role == 1:
+    def create_r_token(self, u_id:str, scope:str):
+        if scope == "buyer":
             EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 으로 바꿀 것
-        elif role == 2:
+        elif scope == "seller":
             EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 * 2 로 바꿀 것
 
         data = {
@@ -103,36 +104,34 @@ class TokenManagement:
             "sub": u_id,
             "exp": EXP,
             "iat": int(datetime.now().timestamp()),
-            "role": role
+            "scope": scope
         }
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
 
 
 
-    def recreate_a_token(self):
+    def recreate_a_token(self, scope:str):
         try:
             cur_time = int(datetime.now().timestamp())
             
             if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
                 raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
             
-            return self.create_a_token()
+            return self.create_a_token(scope)
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
         
 
-    def recreate_r_token(self, token:str, u_id:str, role:int):
+    def recreate_r_token(self, payload:dict, u_id:str, scope:str):
         try:
-            payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
-
             cur_time = int(datetime.now().timestamp())
-            exp_time = payload.get("exp", 0)
+            exp_time = payload["exp"]
 
             if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
                 raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
-            return self.create_r_token(u_id, role)
+            return self.create_r_token(u_id, scope)
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
@@ -142,7 +141,7 @@ class TokenManagement:
     def auth_a_token(self, token: str = Depends(oauth2_scheme)):
         try:
             payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
-            return token
+            return dict(payload)
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
@@ -150,10 +149,25 @@ class TokenManagement:
     def auth_r_token(self, token: str = Depends(oauth2_scheme)):
         try:
             payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
-            return token
+            return dict(payload)
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
 
+from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 
+class JWTMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request) -> dict:
+        try:
+            print('hi')
+            # token = request.headers.get("Authorization", "").split(" ")[1]
 
+            # payload = jwt.decode(token, TokenManagement.ACCESS_SK, algorithms=TokenManagement.algorithm)
+            # return dict(payload)
+        
+        except JWTError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+        
+        

@@ -5,7 +5,7 @@ user_router
 from .src.util import Util
 from core.models import *
 from core.common.mongo2 import MongodbController
-from core.common.authority import AuthManagement, TokenManagement
+from core.common.authority import AuthManagement, TokenManagement, JWTMiddleware
 
 from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -18,7 +18,7 @@ PREFIX = 'api/v2/users'
 
 DB = MongodbController('FIE_DB2')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scheme_name="JWT")
-
+user_router.add_middleware(JWTMiddleware)
 
 @user_router.get("/hello")
 async def hello():
@@ -48,7 +48,7 @@ async def buyer_signup(data: BuyerModel):
             user = {
                 'id': data.id,
                 'pw': AuthManager.get_hashed_pw(data.pw),
-                'role': 1,
+                'scope': "buyer",
                 'name': data.name,
                 'gender': data.gender.value,
                 'age': data.age,
@@ -70,7 +70,7 @@ async def buyer_signup(data: BuyerModel):
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
         user = AuthManager.auth_user(data.username, data.password)
-        user['R_Token'] = TokenManager.create_r_token(user['_id'], 1)
+        user['R_Token'] = TokenManager.create_r_token(user['_id'], "buyer")
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
@@ -153,7 +153,7 @@ async def seller_signup(data: SellerModel):
             user = {
                 "id": data.id,
                 "pw": AuthManager.get_hashed_pw(data.pw),
-                "role": 2,
+                "scope": "seller",
                 "s_id": '',
                 "R_Token": ""
             }
@@ -173,7 +173,7 @@ async def seller_signup(data: SellerModel):
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
         user = AuthManager.auth_user(data.username, data.password)
-        user['R_Token'] = TokenManager.create_r_token(user['_id'], 2)
+        user['R_Token'] = TokenManager.create_r_token(user['_id'], "seller")
 
         DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
 
@@ -191,13 +191,13 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
 
 
 @user_router.get('/issue/access')
-async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
+async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
     try:
         user = DB.read_by_id('user', u_id)
-        if user['R_Token'] != r_token:
-            raise HTTPException(status_code = 401, detail = f'Ownership verification failed.')
+        if user['scope'] != payload['scope']:
+            raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
-        response = TokenManager.recreate_a_token()
+        response = TokenManager.recreate_a_token(user['scope'])
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -207,13 +207,13 @@ async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_
     }
 
 @user_router.get('/issue/refresh')
-async def get_refresh_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
+async def get_refresh_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
     try:
         user = DB.read_by_id('user', u_id)
-        if user['R_Token'] != r_token:
-            raise HTTPException(status_code = 401, detail = f'Ownership verification failed.')
+        if user['scope'] != payload['scope']:
+            raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
-        response = TokenManager.recreate_r_token(r_token, u_id, user['role'])
+        response = TokenManager.recreate_r_token(payload, u_id, user['scope'])
         DB.update_by_id('user', user['_id'], {"R_Token": response})
 
     except HTTPException as e:
