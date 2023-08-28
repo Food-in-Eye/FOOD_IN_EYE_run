@@ -43,53 +43,44 @@
 .EditForm {
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
-  width: 60vw;
+  padding: 25px 0;
+  width: 70vw;
   background-color: #fff;
 }
 
-.EditForm label {
-  margin: 0 auto;
+.EditForm form {
+  margin-left: 300px;
 }
 
-.storeNameSection,
-.IDSection {
+.storeNameSection {
   display: flex;
   flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
   width: 50vw;
-  min-width: 30vw;
 }
 
-.PWDiv {
+.storeNameSection button {
+  margin-top: 45px;
+}
+
+.IDSection,
+.PWSection,
+.PWCheckSection {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  width: 40vw;
-  min-width: 30vw;
-  background-color: aqua;
-}
-
-.PWDiv label {
   margin-left: 0px;
   margin-right: auto;
-  background-color: yellow;
 }
 
-/* .PWDiv label {
-  justify-content: center;
-  align-items: center;
-} */
-
 .EditForm label span,
+.EditForm span,
 .EditForm label input {
   margin-top: 5px;
   margin-left: 20px;
   margin-right: auto;
 }
 
-.EditForm label span {
+.EditForm label span,
+.EditForm span {
   font-size: 20px;
   font-weight: 700;
 }
@@ -98,5 +89,82 @@
   min-width: 20pw;
   width: 50vw;
   border: 1px solid #d2d2d2;
-  /* background-color: aquamarine; */
 }
+
+.IDSection p {
+  width: 10vw;
+  padding: 5px 0;
+  margin-left: 20px;
+  margin-right: auto;
+  /* border: 1px solid #000; */
+  border-radius: 5px;
+  font-size: 18px;
+  background: none;
+}
+
+/* .EditForm {
+  display: flex;
+  flex-direction: column;
+  padding: 25px 0;
+  width: 60vw;
+  background-color: #fff;
+}
+
+.EditStoreName {
+  display: flex;
+  flex-direction: column;
+}
+
+.storeNameSection {
+  display: flex;
+  flex-flow: row nowrap;
+  margin-left: 0px;
+  margin-right: auto;
+  width: 50vw;
+  min-width: 30vw;
+}
+
+.PWDiv,
+.PWCheckDiv {
+  display: flex;
+  width: 40vw;
+  min-width: 10vw;
+  
+}
+
+.PWDiv label,
+.PWCheckDiv label {
+  margin-left: 0px;
+  margin-right: auto;
+  
+}
+
+.PWDiv label {
+  justify-content: center;
+  align-items: center;
+}
+
+.EditForm label span,
+.EditForm span,
+.EditForm label input {
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: auto;
+}
+
+.EditForm label span,
+.EditForm span {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.EditForm label input {
+  min-width: 20pw;
+  width: 50vw;
+  border: 1px solid #d2d2d2;
+  
+}
+
+.EditStoreName p {
+  background: none;
+} */

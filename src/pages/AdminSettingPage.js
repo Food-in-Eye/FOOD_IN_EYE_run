@@ -32,131 +32,94 @@ function AdminSettingPage() {
           </section>
           <section className={Admin.EditForm}>
             <form>
-              <div>
-                <section className={Admin.storeNameSection}>
-                  <label htmlFor="store-name">
-                    <span>가게 이름</span>
-                    <input
-                      id="store-name"
-                      type="text"
-                      name="store-name"
-                      placeholder="가게 이름"
-                      // onChange={(e) => {
-                      //   setIdCheck(e.target.value);
-                      //   setShowIdUniqueMsg(false);
-                      //   setShowIdDuplicateMsg(false);
-                      // }}
-                      style={{
-                        width: "350px",
-                        border: showNameUniqueMsg ? "2px solid #52bf8b" : "",
-                      }}
-                    />
-                  </label>
-                  <button
-                    className={Button.duplicateCheck}
-                    // onClick={handleIdDuplicate}
-                  >
-                    이름 중복 확인
-                  </button>
-                </section>
-                {showNameDuplicateMsg ? (
+              <section className={Admin.storeNameSection}>
+                <label htmlFor="store-name">
+                  <span>가게 이름</span>
+                  <input
+                    id="store-name"
+                    type="text"
+                    name="store-name"
+                    placeholder="가게 이름"
+                    // onChange={(e) => {
+                    //   setIdCheck(e.target.value);
+                    //   setShowIdUniqueMsg(false);
+                    //   setShowIdDuplicateMsg(false);
+                    // }}
+                    style={{
+                      width: "350px",
+                      border: showNameUniqueMsg ? "2px solid #52bf8b" : "",
+                    }}
+                  />
+                </label>
+                <button
+                  className={Button.duplicateCheck}
+                  // onClick={handleIdDuplicate}
+                >
+                  이름 중복 확인
+                </button>
+              </section>
+              {showNameDuplicateMsg ? (
+                <p style={{ color: "#B9062F" }}>이미 사용 중인 이름 입니다.</p>
+              ) : (
+                showNameDuplicateMsg && <p>사용 가능한 이름 입니다.</p>
+              )}
+              <section className={Admin.IDSection}>
+                <span>아이디</span>
+                <p>ID값</p>
+              </section>
+              <section className={Admin.PWSection}>
+                <label htmlFor="password">
+                  <span>비밀번호</span>
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    placeholder="비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두 포함이어야 합니다."
+                    // onChange={handlePasswdChange}
+                    style={{
+                      width: "600px",
+                      border: showValidPasswdMsg ? "2px solid #52bf8b" : "",
+                    }}
+                  />
+                </label>
+              </section>
+              {showValidPasswdMsg ? (
+                <p>사용 가능한 비밀번호 입니다.</p>
+              ) : (
+                passwd && (
                   <p style={{ color: "#B9062F" }}>
-                    이미 사용 중인 이름 입니다.
+                    비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두
+                    포함이어야 합니다.
                   </p>
-                ) : (
-                  showNameDuplicateMsg && <p>사용 가능한 이름 입니다.</p>
-                )}
-                <section className={Admin.IDSection}>
-                  <label htmlFor="id">
-                    <span>아이디</span>
-                    <input
-                      id="id"
-                      type="text"
-                      name="id"
-                      placeholder="아이디"
-                      // onChange={(e) => {
-                      //   setIdCheck(e.target.value);
-                      //   setShowIdUniqueMsg(false);
-                      //   setShowIdDuplicateMsg(false);
-                      // }}
-                      style={{
-                        width: "350px",
-                        border: showIdUniqueMsg ? "2px solid #52bf8b" : "",
-                      }}
-                    />
-                  </label>
-                  <button
-                    className={Button.duplicateCheck}
-                    // onClick={handleIdDuplicate}
-                  >
-                    아이디 중복 확인
-                  </button>
-                </section>
-                {showIdDuplicateMsg ? (
-                  <p style={{ color: "#B9062F" }}>
-                    이미 사용 중인 아이디 입니다.
-                  </p>
-                ) : (
-                  showIdUniqueMsg && <p>사용 가능한 아이디 입니다.</p>
-                )}
-              </div>
-              <div className={Admin.PWDiv}>
-                <section>
-                  <label htmlFor="password">
-                    <span>비밀번호</span>
-                    <input
-                      id="password"
-                      type="password"
-                      name="password"
-                      placeholder="비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두 포함이어야 합니다."
-                      // onChange={handlePasswdChange}
-                      style={{
-                        width: "600px",
-                        border: showValidPasswdMsg ? "2px solid #52bf8b" : "",
-                      }}
-                    />
-                  </label>
-                </section>
-                {showValidPasswdMsg ? (
-                  <p>사용 가능한 비밀번호 입니다.</p>
-                ) : (
-                  passwd && (
-                    <p style={{ color: "#B9062F" }}>
-                      비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자
-                      모두 포함이어야 합니다.
-                    </p>
-                  )
-                )}
-                {/* </div>
-              <div className={Admin.PWCheckDiv}> */}
-                <section>
-                  <label htmlFor="password-check">
-                    <span>비밀번호 확인</span>
-                    <input
-                      id="password-check"
-                      type="password"
-                      name="passwordCheck"
-                      placeholder="비밀번호 확인"
-                      // onChange={handlePasswdCheck}
-                      style={{
-                        width: "600px",
-                        border:
-                          showValidPasswdMsg && showPasswdMatchMsg
-                            ? "2px solid #52bf8b"
-                            : "",
-                      }}
-                    />
-                  </label>
-                </section>
-                {!showPasswdMatchMsg && passwdCheck ? (
-                  <p style={{ color: "#B9062F" }}>
-                    비밀번호와 일치하지 않습니다. 다시 한번 입력해주세요.
-                  </p>
-                ) : (
-                  showPasswdMatchMsg &&
-                  passwdCheck && <p>비밀번호와 일치합니다.</p>
-                )}
-              </div>
+                )
+              )}
+              <section className={Admin.PWCheckSection}>
+                <label htmlFor="password-check">
+                  <span>비밀번호 확인</span>
+                  <input
+                    id="password-check"
+                    type="password"
+                    name="passwordCheck"
+                    placeholder="비밀번호 확인"
+                    // onChange={handlePasswdCheck}
+                    style={{
+                      width: "600px",
+                      border:
+                        showValidPasswdMsg && showPasswdMatchMsg
+                          ? "2px solid #52bf8b"
+                          : "",
+                    }}
+                  />
+                </label>
+              </section>
+              {!showPasswdMatchMsg && passwdCheck ? (
+                <p style={{ color: "#B9062F" }}>
+                  비밀번호와 일치하지 않습니다. 다시 한번 입력해주세요.
+                </p>
+              ) : (
+                showPasswdMatchMsg &&
+                passwdCheck && <p>비밀번호와 일치합니다.</p>
+              )}
             </form>
           </section>
         </div>
