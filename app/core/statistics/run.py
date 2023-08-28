@@ -46,5 +46,25 @@ class CallAnalysis:
 
         return data
 
+    @staticmethod
+    async def aoi_stats(today:datetime):
+        load_dotenv()
+        
+        yesterday = today - timedelta(1)
+        query = {'date':{"$gte": yesterday, "$lte": today}}
+        aoi_keys = DataLoader.get_aoi_reports(query)
+        
+        aoi_daily_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/daily"
+        headers = {"Content-Type": "application/json"}
+
+        payload = {
+            "keys": aoi_keys
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(aoi_daily_url, json=payload, headers=headers)
+            data = response.json()
+
+        return data
 
 

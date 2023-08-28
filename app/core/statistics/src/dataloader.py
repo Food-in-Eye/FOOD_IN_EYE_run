@@ -42,3 +42,14 @@ class DataLoader:
 
         except Exception as e:
             print(e)
+
+    def get_aoi_reports(query):
+        result = []
+        try:
+            historys = DB.read_all('history', query, {'aoi_analysis':1})
+            for history in historys:
+                result.append(history['aoi_analysis'])
+            return result
+
+        except Exception as e:
+            print(e)
