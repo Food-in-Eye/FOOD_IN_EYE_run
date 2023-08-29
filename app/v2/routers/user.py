@@ -214,7 +214,7 @@ Token renewal API
 @user_router.get('/issue/access')
 async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
     try:
-        user = DB.read_one('user', u_id)
+        user = DB.read_one('user', {'_id':ObjectId(u_id)})
         if user['scope'] != payload['scope']:
             raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
@@ -229,7 +229,7 @@ async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_
 @user_router.get('/issue/refresh')
 async def get_refresh_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
     try:
-        user = DB.read_one('user', {'_id':u_id})
+        user = DB.read_one('user', {'_id':ObjectId(u_id)})
         if user['scope'] != payload['scope']:
             raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
