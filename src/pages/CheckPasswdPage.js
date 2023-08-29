@@ -22,11 +22,14 @@ function CheckPasswdPage() {
         pw: pwCheck,
       });
 
+      console.log(res);
+
       if (res.data.state === "available") {
         showPasswdErrorMsg === true && setShowPasswdErrorMsg(false);
         setPW(pwCheck);
+        // const uID =
 
-        navigate("/admin-setting");
+        navigate("/admin-setting?uID=${uID}&sID=${sID}");
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {

@@ -46,7 +46,6 @@ function AdminSettingPage() {
                     //   setShowIdDuplicateMsg(false);
                     // }}
                     style={{
-                      width: "350px",
                       border: showNameUniqueMsg ? "2px solid #52bf8b" : "",
                     }}
                   />
