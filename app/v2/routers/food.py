@@ -6,7 +6,7 @@ from PIL import Image
 
 from fastapi import APIRouter, UploadFile, Depends, Request
 from core.models.store import FoodModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from core.common.s3 import Storage
 from .src.util import Util
 
@@ -30,7 +30,7 @@ async def read_all_food(s_id:str):
     try:
         Util.check_id(s_id)
 
-        response = DB.read_all_by_feild('food', 's_id', s_id)
+        response = DB.read_all('food', {'s_id': s_id})
 
     except Exception as e:
         print('ERROR', e)
@@ -51,9 +51,9 @@ async def read_food(id:str):
     """ 해당하는 id의 음식 정보를 받아온다. """
 
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
 
-        response = DB.read_by_id('food', id)
+        response = DB.read_one('food', {'_id': _id})
     except Exception as e:
         print('ERROR', e)
         return {
@@ -72,21 +72,20 @@ async def read_food(id:str):
 async def create_food(s_id:str, food:FoodModel):
     """ 해당하는 id의 음식 정보를 업데이트한다. """
 
-    data = food.dict() # body에 s_id, img_key는 미포함
+    data = food.dict()
 
-    # todo: 실제 존재하는 가게의 id인지 확인하면 좋을 듯 함.(사고 방지)
     data['s_id'] = s_id
     data['img_key'] = None
 
     try:
-        food_list = DB.read_all_by_feild('food', 's_id', s_id)
-        if not food_list: # s_id에 해당하는 food 최초 등록
+        food_list = DB.read_all('food', {'s_id': s_id})
+        if not food_list:
             data['num'] = 1
         else:
             max_num = max(store['num'] for store in food_list)
             data['num'] = max_num + 1
 
-        id = str(DB.create('food', data))
+        id = str(DB.insert_one('food', data))
 
     except Exception as e:
         print('ERROR', e)
@@ -108,8 +107,8 @@ async def update_food(id:str, food:FoodModel):
     data = food.dict()
 
     try:
-        Util.check_id(id)
-        if DB.update_by_id('food', id, data):
+        _id = Util.check_id(id)
+        if DB.replace_one('food', {'_id':_id}, data):
             return {
                 'request': f'PUT {PREFIX}/food?id={id}',
                 'status': 'OK'
@@ -127,9 +126,9 @@ async def update_food(id:str, food:FoodModel):
 @food_router.put('/food/image')
 async def update_food_image(id: str, file: UploadFile):
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
 
-        current = DB.read_by_id('food', id)
+        current = DB.read_one('food', {'_id':_id})
 
         if current['img_key'] is not None:
             storage.delete(current['img_key'])
@@ -146,11 +145,11 @@ async def update_food_image(id: str, file: UploadFile):
             
         image_key = storage.upload(file_content, form='jpg', path='images')
         
-        if DB.update_field_by_id('food', id, 'img_key', image_key):
+        if DB.update_one('food', {'_id': _id}, {'img_key': image_key}):
             return {
                 'request':f'PUT {PREFIX}/food/image?id={id}',
                 'status': 'OK',
-                'img_url': 'https://foodineye.s3.ap-northeast-2.amazonaws.com/' + image_key
+                'img_url': 'https://foodineye2.s3.ap-northeast-2.amazonaws.com/' + image_key
             }
         
     except Exception as e:

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException, Request
 
 
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 
 DB = MongodbController('FIE_DB2')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scheme_name="JWT")

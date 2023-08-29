@@ -11,6 +11,8 @@ class Util:
         return False
 
     @staticmethod
-    def check_id(id:str):
+    def check_id(id:str) -> ObjectId:
         if not ObjectId.is_valid(id):
             raise Exception(f'The id format is not valid. Please check')
+        else:
+            return ObjectId(id)

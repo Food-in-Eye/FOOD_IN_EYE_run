@@ -4,7 +4,7 @@ order_router
 
 from fastapi import APIRouter, Depends, Request
 from core.models import OrderModel, RawGazeModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from core.common.s3 import Storage
 from .src.util import Util
 from .src.meta import Meta
@@ -14,6 +14,7 @@ import os
 import requests
 import asyncio
 import httpx
+import math
 
 from datetime import datetime, timedelta
 
@@ -67,7 +68,7 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
             q_str = q_str + "&" + str
 
     try:
-        response = DB.read_all_by_query('order', query, asc_by, asc)
+        response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
     
     except Exception as e:
         print('ERROR', e)
@@ -89,14 +90,15 @@ async def get_order(id: str, detail: bool=False):
     q_str = ""
     try:
         q_str += f"id={id}"
-        Util.check_id(id)
-        response = DB.read_by_id('order', id)
+        _id = Util.check_id(id)
+        response = DB.read_one('order', {'_id':_id})
         if detail:
             q_str += f"&detail={detail}"
             f_list = response["f_list"]
             new_list = []
             for dict in f_list:
-                food_detail = DB.read_by_id("food", dict["f_id"])
+                _id = Util.check_id(dict["f_id"])
+                food_detail = DB.read_one("food", {'_id':_id})
                 new_list.append({
                     "name": food_detail["name"],
                     "count": dict["count"],
@@ -120,18 +122,18 @@ async def get_order(id: str, detail: bool=False):
 
 @order_router.put("/order/status")
 async def change_status(id: str):
-    ''' 특정 주문 내역의 진행 상태를 변경한다.'''
+    ''' 특정 주문 내역의 진행 상태를 변경한다. '''
     
     try:
-        Util.check_id(id)
-        response = DB.read_by_id('order', id)
+        _id = Util.check_id(id)
+        response = DB.read_one('order', {'_id':_id})
         s = response['status']
 
         # websocket으로 전송 결과를 받기 위함 
         s_id = response['s_id']
         
         if s < 2:
-            DB.update_field_by_id('order', id, 'status', s+1)
+            DB.update_one('order', {'_id':_id}, {'status': s+1})
 
             # websocket으로 전달하기
             await websocket_manager.send_update(id)
@@ -169,20 +171,29 @@ async def new_order(body:OrderModel):
         
         response_list = []
         order_id_list = []
+        store_name_list = []
 
+        total_price = 0           
         for store_order in body.content:
+            store_price = 0
+            for food in store_order.f_list:
+                store_price += food['price'] * food['count']
             order = {
                 "date": datetime.now(),
                 "u_id": body.u_id,
                 "s_id": store_order.s_id,
                 "m_id": store_order.m_id,
-                "status": 0,
-                "f_list": store_order.f_list
+                "s_name": store_order.s_name,
+                "f_list": store_order.f_list,
+                "total_price": store_price,
+                "status": 0
             }
 
-            o_id =  str(DB.create('order', order))         
-            order_id_list.append(o_id)
+            total_price += store_price
 
+            o_id =  str(DB.insert_one('order', order))         
+            order_id_list.append(o_id)
+            store_name_list.append(store_order.s_name)
             response_list.append({
                 "s_id": store_order.s_id,
                 "o_id": o_id
@@ -191,12 +202,15 @@ async def new_order(body:OrderModel):
         history = {
            "u_id": body.u_id,
            "date": datetime.now(),
-           "total_price": body.total_price,
-           "gaze_path": None,
-           "orders": order_id_list
+           "total_price": total_price,
+           "raw_gaze_path": None,
+           "fixation_path": None,
+           "aoi_analysis": None,
+           "orders": order_id_list,
+           "s_names": store_name_list
         }
         
-        h_id = str(DB.create('history', history))
+        h_id = str(DB.insert_one('history', history))
 
         return {
             'request': f'POST {PREFIX}/order',
@@ -221,15 +235,15 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
         gaze_data.append(page.dict())
 
     try:
-        Util.check_id(h_id)
+        _id = Util.check_id(h_id)
         key = storage.upload(gaze_data, 'json', 'C_0714')
 
-        if DB.update_field_by_id('history', h_id, 'gaze_path', key):
+        if DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key}):
             # 임시로 비활성화
-            # asyncio.create_task(preprocess_and_update(key, h_id))
+            asyncio.create_task(preprocess_and_update(key, h_id))
 
             # websocket으로 gaze 요청 그만 보내기
-            websocket_manager.app_connections[h_id]['gaze'] = True
+            # websocket_manager.app_connections[h_id]['gaze'] = True
             
             return {
             'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
@@ -244,24 +258,186 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
-    aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/aoi"
-    payload = {
-        "raw_data_key": raw_data_key
-    }
+    aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/analysis"
     headers = {"Content-Type": "application/json"}
 
-    print('start', filter_url, aoi_url)
     async with httpx.AsyncClient() as client:
+        _id = Util.check_id(h_id)
+        doc = DB.read_one('history', {'_id':_id})
+        payload = {
+        "raw_data_key": raw_data_key,
+        "meta_info": Meta.get_meta_detail(doc['date'])
+        }
         response = await client.post(filter_url, json=payload, headers=headers)
         data = response.json()
-        print(data)  
         fix_key = data["fixation_key"]
-        DB.update_field_by_id('history', h_id, 'fixation_path', fix_key)
-    
-        doc = DB.read_by_id('history', h_id)
-        payload = {'data' : Meta.get_meta_detail(doc['date'])}
-        print(payload)
-        response = await client.post(aoi_url + "?key=" + fix_key, json=payload, headers=headers)
+
+        response = await client.get(aoi_url + f'?key={fix_key}')
         data = response.json()
-        print('aoi result', data)
-        DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
+        aoi_key = data["aoi_key"]
+        print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
+        
+        DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
+
+
+
+@order_router.get("/historys")
+async def get_history_list(u_id: str, batch: int = 1):
+    try:
+        historys = DB.read_all('history', {'u_id':u_id}, asc_by='date', asc=False)
+
+        if batch > 0 and batch < math.ceil(len(historys) / 10) + 1:
+            response_list = []
+
+            batch_items = historys[10*(batch-1):10*batch]
+            for h in batch_items:
+                if 's_names' in h.keys(): s_names = h['s_names']
+                else: s_names = ["nothing", "is", 'here']
+                response_list.append({
+                    "h_id": h['_id'],
+                    "date": h['date'],
+                    "total_price": h['total_price'],
+                    "s_names": s_names
+                })
+        else:
+            raise Exception('requested batch exceeds range')
+        
+        return {
+            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
+            'status': 'OK',
+            'max_batch': math.ceil(len(historys) / 10),
+            'response': response_list
+        }
+     
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+    
+@order_router.get("/history")
+async def get_order_list(id: str):
+    try:
+        _id = Util.check_id(id)     
+        response_list = {}
+
+        history = DB.read_one('history', {'_id':_id})
+
+        food_list = []
+        for o_id in history['orders']:
+            _id = Util.check_id(o_id)  
+            order = DB.read_one('order', {'_id':_id})
+            s_name = order['s_name']
+            for f in order['f_list']:
+                if 'f_name' in f.keys(): f_name = f['f_name']
+                else: f_name = 'unknown'
+                food_list.append({
+                    "s_name": s_name,
+                    "f_name": f_name,
+                    "count": f['count'],
+                    "price": f['price']
+                })
+
+        response_list = {
+            "date": history['date'],
+            "orders": food_list
+        }
+        
+        return {
+            'request': f'GET {PREFIX}/history?id={id}',
+            'status': 'OK',
+            'response': response_list
+        }
+     
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'GET {PREFIX}/history?id={id}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+
+@order_router.get("/store/dates")
+async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str = None):
+    PER_PAGE = 7
+    pipeline = [
+        { "$match": { "s_id": s_id } },
+        { "$project": { "date": { "$dateToString": { "format": "%Y-%m-%d", "date": "$date" } }, "total_price": 1 } },
+        { "$group": { "_id": "$date", "total_price": { "$sum": "$total_price" } } },
+        { "$sort": { "_id": 1 } }
+    ]
+    if (start_date != None) and (end_date != None):
+        pipeline[0]["$match"]["date"] = {
+            "$gte": datetime.strptime(start_date, "%Y-%m-%d"),
+            "$lte": datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+        }
+    try:
+        aggreagted_data = DB.aggregate_pipline('order', pipeline)
+        
+        distinct_dates = []
+        for entry in aggreagted_data:
+            distinct_dates.append({
+                "date": entry["_id"],
+                "total_price": entry["total_price"]
+            })
+
+        total_dates = len(distinct_dates)
+        start_idx = (batch - 1) * PER_PAGE
+        end_idx = start_idx + PER_PAGE
+        paginated_dates = distinct_dates[start_idx:end_idx]
+
+        return {
+            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
+            'status': 'OK',
+            'max_batch': math.ceil(total_dates / PER_PAGE),
+            'response': paginated_dates
+        }
+
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+        
+
+@order_router.get("/store/date")
+async def get_history_list(s_id: str, date: str):
+    try:
+        start_datetime = datetime.strptime(date, "%Y-%m-%d")
+        end_datetime = start_datetime + timedelta(days=1)
+
+        query = {
+            "date": {"$gte": start_datetime, "$lt": end_datetime},
+            "s_id": s_id
+        }
+
+        orders = DB.read_all('order', query, asc_by='date', asc=False)
+
+        result = []
+
+        for o in orders:
+            result.append({
+                'o_id': o['_id'],
+                'date': o['date'],
+                'detail': o['f_list'],
+                'total': o['total_price']
+            })
+        
+        return {
+            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
+            'status': 'OK',
+            'response': result
+        }
+     
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+    

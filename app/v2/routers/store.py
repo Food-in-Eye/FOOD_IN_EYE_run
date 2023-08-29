@@ -2,9 +2,9 @@
 store_router
 """
 
-from fastapi import APIRouter, Depends, Request, Body
+from fastapi import APIRouter, Depends, Request
 from core.models.store import StoreModel, NameModel
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from .src.util import Util
 
 from core.common.authority import TokenManagement
@@ -53,9 +53,9 @@ async def read_store(id:str):
     """ 특정 id의 가게 정보를 받아온다."""
 
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
 
-        response = DB.read_by_id('store', id)
+        response = DB.read_one('store', {'_id':_id})
 
     except Exception as e:
         print('ERROR', e)
@@ -75,7 +75,7 @@ async def read_store(id:str):
 @store_router.post('/namecheck')
 async def check_duplicate_id(data:NameModel):
     try:
-        store = DB.read_all_by_feild('store', 'name', data['name'])
+        store = DB.read_one('store', {'name': data['name']})
 
         if store:
             state = 'unavailable'
@@ -96,7 +96,6 @@ async def check_duplicate_id(data:NameModel):
         'state': state
     }
 
-# ToDo: user id 같이 받아야 할 듯. 
 @store_router.post("/store")
 async def create_store(u_id:str, store:StoreModel):
     """ 입력받은 정보의 가게를 생성한다. (최초 가입시에만 가능) """
@@ -107,24 +106,18 @@ async def create_store(u_id:str, store:StoreModel):
     try:
         Util.check_id(u_id)
 
-        name_dup = DB.read_all_by_feild('store', 'name', data['name'])
+        name_dup = DB.read_one('store', {'name':data['name']})
         if name_dup:
             raise Exception(f'Request name has already exist.')
         
         store_list = DB.read_all('store')
-        if not store_list: # menu 최초 등록
+        if not store_list: # store 최초 등록
             data['num'] = 1
         else:
             max_num = max(store["num"] for store in store_list)
             data['num'] = max_num + 1
 
-        id = str(DB.create('store', data))
-
-        user = DB.read_by_id('user', u_id) # Todo: 코드 수정할 때, 맨 위로 올리기 - 권한 먼저 확인
-        if user['role'] == 2:
-            DB.update_by_id('user', u_id, {"s_id": id})
-        else:
-            raise Exception(f'Request has denied')
+        id = str(DB.insert_one('store', data))
 
     except Exception as e:
         print('ERROR', e)
@@ -147,13 +140,13 @@ async def update_store(id:str, store: StoreModel):
     data['status'] = data['status'].value
     
     try:
-        Util.check_id(id)
+        _id = Util.check_id(id)
 
-        name_dup = DB.read_all_by_feild('store', 'name', data['name'])
+        name_dup = DB.read_one('store', {'name':data['name']})
         if name_dup:
             raise Exception(f'Request name has already exist.')
         
-        if DB.update_by_id('store', id, data):
+        if DB.replace_one('store', {'_id':_id}, data):
             return {
                 'request': f'PUT {PREFIX}/store?id={id}',
                 'status': 'OK'
