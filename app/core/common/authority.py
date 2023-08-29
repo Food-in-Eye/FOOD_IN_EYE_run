@@ -85,7 +85,7 @@ class TokenManagement:
 
 
     def init_a_token(self, scope:str):
-        self.ACCESS_EXP = int((datetime.now() + timedelta(seconds=20)).timestamp())
+        self.ACCESS_EXP = int((datetime.now() + timedelta(minutes=30)).timestamp())
         
         data = {
             "iss": "ACCESS_Token",
@@ -98,9 +98,9 @@ class TokenManagement:
     
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
-            EXP = int((datetime.now() + timedelta(minutes=1)).timestamp())
+            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
         elif scope == "seller":
-            EXP = int((datetime.now() + timedelta(minutes=1*2)).timestamp())
+            EXP = int((datetime.now() + timedelta(minutes=60*2)).timestamp())
 
         data = {
             "iss": "REFRESH_Token",
@@ -117,7 +117,7 @@ class TokenManagement:
         try:
             cur_time = int(datetime.now().timestamp())
             
-            if self.ACCESS_EXP - cur_time > 10:
+            if self.ACCESS_EXP - cur_time > 0:
                 raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
             
             return self.init_a_token(scope)
@@ -130,7 +130,7 @@ class TokenManagement:
             cur_time = int(datetime.now().timestamp())
             exp_time = payload["exp"]
 
-            if (exp_time - cur_time) > 50:
+            if (exp_time - cur_time) > 60 * 10:
                 raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
             return self.init_r_token(u_id, scope)
@@ -163,7 +163,6 @@ class TokenManagement:
 
             payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
             request.state.token_scope = payload.get("scope")
-            print(request.state.token_scope)
         except JWTError as e:
             raise HTTPException(status_code=401, detail=str(e))
         

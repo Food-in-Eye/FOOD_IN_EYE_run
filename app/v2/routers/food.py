@@ -4,7 +4,7 @@ food_router
 import io
 from PIL import Image
 
-from fastapi import APIRouter, UploadFile, Depends, Request
+from fastapi import APIRouter, UploadFile, Depends, Request, HTTPException
 from core.models.store import FoodModel
 from core.common.mongo import MongodbController
 from core.common.s3 import Storage
@@ -69,8 +69,10 @@ async def read_food(id:str):
     }
 
 @food_router.post("/food")
-async def create_food(s_id:str, food:FoodModel):
+async def create_food(s_id:str, food:FoodModel, request:Request):
     """ 해당하는 id의 음식 정보를 업데이트한다. """
+
+    assert TokenManager.is_seller(request), "This request is only allowed for sellers."
 
     data = food.dict()
 
@@ -102,8 +104,11 @@ async def create_food(s_id:str, food:FoodModel):
     }
 
 @food_router.put('/food')
-async def update_food(id:str, food:FoodModel):
+async def update_food(id:str, food:FoodModel, request:Request):
     """ 해당하는 id의 food 정보를 변경한다. """
+
+    assert TokenManager.is_seller(request), "This request is only allowed for sellers."
+
     data = food.dict()
 
     try:
@@ -124,7 +129,11 @@ async def update_food(id:str, food:FoodModel):
 
 
 @food_router.put('/food/image')
-async def update_food_image(id: str, file: UploadFile):
+async def update_food_image(id: str, file: UploadFile, request:Request):
+    """ 해당하는 id의 이미지를 S3에 업로드하고 그 경로를 변경한다. """
+
+    assert TokenManager.is_seller(request), "This request is only allowed for sellers."
+
     try:
         _id = Util.check_id(id)
 

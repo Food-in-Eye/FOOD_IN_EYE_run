@@ -17,14 +17,14 @@ DB = MongodbController('FIE_DB2')
 
 
 @store_router.get("/hello")
-async def hello(request: Request):
+async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
 @store_router.get('/')
 async def read_all_store(request: Request):
     """ DB에 존재하는 모든 식당의 정보를 받아온다 """
 
-    # assert TokenManager.is_buyer(request), "This request is only allowed for buyers."
+    assert TokenManager.is_buyer(request), "This request is only allowed for buyers."
 
     try:
         result = DB.read_all('store')
@@ -32,9 +32,7 @@ async def read_all_store(request: Request):
 
         for r in result:
             response.append(r)
-            
-    except AssertionError as e:
-        raise HTTPException(status_code=403, detail=str(e))
+
     except Exception as e:
         print('ERROR', e)
         raise HTTPException(status_code=403, detail=str(e))
@@ -72,7 +70,11 @@ async def read_store(id:str):
 
 
 @store_router.post('/namecheck')
-async def check_duplicate_id(data:NameModel):
+async def check_duplicate_id(data:NameModel, request:Request):
+    """ store name의 중복 여부를 확인한다. """
+
+    assert TokenManager.is_seller(request), "This request is only allowed for sellers."
+
     try:
         store = DB.read_one('store', {'name': data['name']})
 
@@ -96,8 +98,10 @@ async def check_duplicate_id(data:NameModel):
     }
 
 @store_router.post("/store")
-async def create_store(u_id:str, store:StoreModel):
+async def create_store(u_id:str, store:StoreModel, request:Request):
     """ 입력받은 정보의 가게를 생성한다. (최초 가입시에만 가능) """
+
+    assert TokenManager.is_seller(request), "This request is only allowed for sellers."
 
     data = store.dict()
     data['status'] = data['status'].value
@@ -133,8 +137,11 @@ async def create_store(u_id:str, store:StoreModel):
     }
 
 @store_router.put('/store')
-async def update_store(id:str, store: StoreModel):
+async def update_store(id:str, store: StoreModel, request:Request):
     """ 해당하는 id의 document를 변경한다. """
+
+    assert TokenManager.is_seller(request), "This request is only allowed for sellers."
+
     data = store.dict()
     data['status'] = data['status'].value
     
