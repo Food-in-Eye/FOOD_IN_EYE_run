@@ -5,13 +5,17 @@ menu_router
 import operator
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Request
 from core.models.store import MenuModel
 from core.common.mongo2 import MongodbController
 from .src.util import Util
 from .src.meta import Meta
 
-menu_router = APIRouter(prefix="/menus")
+from core.common.authority import TokenManagement
+TokenManager = TokenManagement()
+
+menu_router = APIRouter(prefix="/menus", dependencies=[Depends(TokenManager.dispatch)])
+
 
 PREFIX = 'api/v2/menus'
 DB = MongodbController('FIE_DB2')

@@ -4,13 +4,16 @@ food_router
 import io
 from PIL import Image
 
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, Depends, Request
 from core.models.store import FoodModel
 from core.common.mongo2 import MongodbController
 from core.common.s3 import Storage
 from .src.util import Util
 
-food_router = APIRouter(prefix="/foods")
+from core.common.authority import TokenManagement
+TokenManager = TokenManagement()
+
+food_router = APIRouter(prefix="/foods", dependencies=[Depends(TokenManager.dispatch)])
 
 PREFIX = 'api/v2/foods'
 DB = MongodbController('FIE_DB2')

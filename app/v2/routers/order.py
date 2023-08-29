@@ -2,7 +2,7 @@
 order_router
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Request
 from core.models import OrderModel, RawGazeModel
 from core.common.mongo2 import MongodbController
 from core.common.s3 import Storage
@@ -18,8 +18,11 @@ import httpx
 from datetime import datetime, timedelta
 
 from .websocket import websocket_manager as websocket_manager
+from core.common.authority import TokenManagement
+TokenManager = TokenManagement()
 
-order_router = APIRouter(prefix="/orders")
+order_router = APIRouter(prefix="/orders", dependencies=[Depends(TokenManager.dispatch)])
+
 
 PREFIX = 'api/v2/orders'
 DB = MongodbController('FIE_DB2')
