@@ -62,6 +62,7 @@
   margin-top: 45px;
 }
 
+.LastStoreNameSection,
 .IDSection,
 .PWSection,
 .PWCheckSection {
@@ -91,6 +92,7 @@
   border: 1px solid #d2d2d2;
 }
 
+.LastStoreNameSection p,
 .IDSection p {
   width: 10vw;
   padding: 5px 0;
@@ -102,69 +104,8 @@
   background: none;
 }
 
-/* .EditForm {
+.submitSet {
   display: flex;
-  flex-direction: column;
-  padding: 25px 0;
-  width: 60vw;
-  background-color: #fff;
-}
-
-.EditStoreName {
-  display: flex;
-  flex-direction: column;
-}
-
-.storeNameSection {
-  display: flex;
-  flex-flow: row nowrap;
-  margin-left: 0px;
-  margin-right: auto;
-  width: 50vw;
-  min-width: 30vw;
-}
-
-.PWDiv,
-.PWCheckDiv {
-  display: flex;
-  width: 40vw;
-  min-width: 10vw;
-  
-}
-
-.PWDiv label,
-.PWCheckDiv label {
-  margin-left: 0px;
-  margin-right: auto;
-  
-}
-
-.PWDiv label {
   justify-content: center;
   align-items: center;
 }
-
-.EditForm label span,
-.EditForm span,
-.EditForm label input {
-  margin-top: 5px;
-  margin-left: 20px;
-  margin-right: auto;
-}
-
-.EditForm label span,
-.EditForm span {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.EditForm label input {
-  min-width: 20pw;
-  width: 50vw;
-  border: 1px solid #d2d2d2;
-  
-}
-
-.EditStoreName p {
-  background: none;
-} */

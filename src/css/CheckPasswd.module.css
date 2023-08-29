@@ -1,0 +1,31 @@
+* {
+  margin: 0 auto;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.backgroundDiv {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #efefef;
+}
+
+.inputForm {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15vw;
+}
+
+.PasswdSection label {
+  text-align: center;
+}
+
+.PasswdSection label input {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}

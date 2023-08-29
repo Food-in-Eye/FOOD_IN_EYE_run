@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminSettingPage from "./pages/AdminSettingPage";
+import CheckPasswdPage from "./pages/CheckPasswdPage";
 import DetailAnalysisPage from "./pages/DetailAnalysisPage";
 import AnalysisPage from "./pages/AnalysisPage";
 import VisualizeGazePage from "./pages/VisualizeGazePage";
@@ -19,6 +20,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/admin-setting" element={<AdminSettingPage />} />
+        <Route path="/check-passwd" element={<CheckPasswdPage />} />
         <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/gaze-visualize" element={<VisualizeGazePage />} />

@@ -7,17 +7,13 @@ import { useState } from "react";
 function AdminSettingPage() {
   const [nameCheck, setNameCheck] = useState("");
   const [name, setName] = useState("");
-  const [idCheck, setIdCheck] = useState("");
-  const [id, setId] = useState("");
   const [passwd, setPasswd] = useState("");
   const [passwdCheck, setPasswdCheck] = useState("");
 
   const [showNameDuplicateMsg, setShowNameDuplicateMsg] = useState(false);
   const [showNameUniqueMsg, setShowNameUniqueMsg] = useState(false);
-  const [showIdDuplicateMsg, setShowIdDuplicateMsg] = useState(false);
-  const [showIdUniqueMsg, setShowIdUniqueMsg] = useState(false);
-  const [showValidPasswdMsg, setShowValidPasswdMsg] = useState(false);
   const [showPasswdMatchMsg, setShowPasswdMatchMsg] = useState(false);
+  const [showValidPasswdMsg, setShowValidPasswdMsg] = useState(false);
 
   const onChangeSetting = (e) => {};
 
@@ -28,10 +24,14 @@ function AdminSettingPage() {
         <div className={Admin.body}>
           <section className={Admin.desc}>
             <h1>Account Settings</h1>
-            <span>가게 이름과 계정 정보를 수정할 수 있습니다.</span>
+            <span>가게 이름과 비밀번호를 수정할 수 있습니다.</span>
           </section>
           <section className={Admin.EditForm}>
             <form>
+              <section className={Admin.LastStoreNameSection}>
+                <span>이전 가게 이름</span>
+                <p>이전 가게 이름</p>
+              </section>
               <section className={Admin.storeNameSection}>
                 <label htmlFor="store-name">
                   <span>가게 이름</span>
@@ -69,16 +69,36 @@ function AdminSettingPage() {
               </section>
               <section className={Admin.PWSection}>
                 <label htmlFor="password">
-                  <span>비밀번호</span>
+                  <span>이전 비밀번호</span>
                   <input
                     id="password"
                     type="password"
                     name="password"
-                    placeholder="비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두 포함이어야 합니다."
+                    placeholder="이전 비밀번호를 입력하세요."
                     // onChange={handlePasswdChange}
                     style={{
                       width: "600px",
-                      border: showValidPasswdMsg ? "2px solid #52bf8b" : "",
+                      border: showPasswdMatchMsg ? "2px solid #52bf8b" : "",
+                    }}
+                  />
+                </label>
+              </section>
+
+              <section className={Admin.PWCheckSection}>
+                <label htmlFor="password-check">
+                  <span>신규 비밀번호</span>
+                  <input
+                    id="password-check"
+                    type="password"
+                    name="passwordCheck"
+                    placeholder="비밀번호는 8자리 이상, 특수문자, 영문자 소문자와 대문자 모두 포함이어야 합니다."
+                    // onChange={handlePasswdCheck}
+                    style={{
+                      width: "600px",
+                      border:
+                        showValidPasswdMsg && showPasswdMatchMsg
+                          ? "2px solid #52bf8b"
+                          : "",
                     }}
                   />
                 </label>
@@ -93,39 +113,13 @@ function AdminSettingPage() {
                   </p>
                 )
               )}
-              <section className={Admin.PWCheckSection}>
-                <label htmlFor="password-check">
-                  <span>비밀번호 확인</span>
-                  <input
-                    id="password-check"
-                    type="password"
-                    name="passwordCheck"
-                    placeholder="비밀번호 확인"
-                    // onChange={handlePasswdCheck}
-                    style={{
-                      width: "600px",
-                      border:
-                        showValidPasswdMsg && showPasswdMatchMsg
-                          ? "2px solid #52bf8b"
-                          : "",
-                    }}
-                  />
-                </label>
-              </section>
-              {!showPasswdMatchMsg && passwdCheck ? (
-                <p style={{ color: "#B9062F" }}>
-                  비밀번호와 일치하지 않습니다. 다시 한번 입력해주세요.
-                </p>
-              ) : (
-                showPasswdMatchMsg &&
-                passwdCheck && <p>비밀번호와 일치합니다.</p>
-              )}
             </form>
           </section>
         </div>
-        <button className={Button.register} onClick={onChangeSetting}>
+        <button className={Button.changeUser} onClick={onChangeSetting}>
           회원 정보 변경하기
         </button>
+        {/* </div> */}
       </div>
     </div>
   );
