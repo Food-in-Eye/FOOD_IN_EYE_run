@@ -3,6 +3,7 @@ from passlib.exc import UnknownHashError
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from bson.objectid import ObjectId
+from v2.routers.src.util import Util
 
 import os
 from jose import jwt, JWTError
@@ -21,12 +22,11 @@ class AuthManagement:
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
     def check_dup(self, id:str) -> dict:
-        users = DB.read_all_by_feild('user', 'id', id)
-
-        if users:
-            return users[0]
-        else:
+        try:
+            user = DB.read_one('user', {'id':id})
+        except:
             return False
+        return user
 
     def get_uid(self, id:str):
         user = self.check_dup(id)
@@ -48,9 +48,10 @@ class AuthManagement:
 
     def auth_user(self, u_id, pw):
         try:  # ToDo : mongo 코드 바뀌면 Exception 바꾸기 - try-excepy 문을 밖으로 빼면 다른 오류들도 잡힘
-            user = DB.read_by_id('user', u_id)
-        except Exception:
-            raise HTTPException(status_code = 401, detail = f'Nonexistent u_ID')
+            u_id = Util.check_id(u_id)
+            user = DB.read_one('user', {'_id':ObjectId(u_id)})
+        except Exception as e:
+            raise HTTPException(status_code = 401, detail = e)
 
         if user:
             self.auth_pw(pw, user['pw'])
@@ -81,6 +82,8 @@ class TokenManagement:
 
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
+
+
     def init_a_token(self, scope:str):
         self.ACCESS_EXP = int((datetime.now() + timedelta(minutes=30)).timestamp())
         
@@ -93,7 +96,6 @@ class TokenManagement:
         self.ACCESS_TOKEN = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
         return self.ACCESS_TOKEN
     
-
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
             EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
@@ -122,7 +124,6 @@ class TokenManagement:
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
-        
 
     def recreate_r_token(self, payload:dict, u_id:str, scope:str):
         try:
@@ -159,9 +160,22 @@ class TokenManagement:
     def dispatch(self, request: Request):
         try:
             token = request.headers.get("Authorization", "").split(" ")[1]
+
             payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
-            request.state.token_payload = payload
+            request.state.token_scope = payload.get("scope")
+            print(request.state.token_scope)
         except JWTError as e:
             raise HTTPException(status_code=401, detail=str(e))
         
         
+    @staticmethod
+    def is_buyer(request: Request) -> bool:
+        if request.state.token_scope == "buyer":
+            return True
+        return False
+    
+    @staticmethod
+    def is_seller(request: Request) -> bool:
+        if request.state.token_scope == "seller":
+            return True
+        return False

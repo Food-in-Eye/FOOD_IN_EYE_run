@@ -4,7 +4,7 @@ user_router
 
 from .src.util import Util
 from core.models import *
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 from core.common.authority import AuthManagement, TokenManagement
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -57,7 +57,7 @@ async def buyer_signup(data: BuyerModel):
                 'age': data.age,
                 'R_Token': ''
             }
-            u_id = str(DB.create('user', user))
+            u_id = str(DB.insert_one('user', user))
         else:
             raise HTTPException(status_code = 409, detail = f'Duplicate ID')
         
@@ -76,7 +76,7 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
         user = AuthManager.auth_user(u_id, data.password)
         user['R_Token'] = TokenManager.init_r_token(u_id, "buyer")
 
-        DB.update_by_id('user', u_id, {"R_Token": user['R_Token']})
+        DB.update_one('user', {'u_id':u_id}, {'R_Token': user['R_Token']})
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -121,7 +121,7 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel):
             'age': data.age
         }
 
-        DB.update_by_id('user', u_id, new_data)
+        DB.update_one('user', {'u_id':u_id}, new_data)
     
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -142,7 +142,7 @@ async def seller_signup(data: SellerModel):
                 "s_id": '',
                 "R_Token": ""
             }
-            u_id = str(DB.create('user', user))
+            u_id = str(DB.insert_one('user', user))
         else:
             raise HTTPException(status_code = 409, detail = f'Duplicate ID')
         
@@ -161,7 +161,7 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
         user = AuthManager.auth_user(u_id, data.password)
         user['R_Token'] = TokenManager.init_r_token(user['_id'], "seller")
 
-        DB.update_by_id('user', u_id, {"R_Token": user['R_Token']})
+        DB.update_one('user', {'u_id':u_id}, {"R_Token": user['R_Token']})
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -201,7 +201,7 @@ async def change_seller_info(u_id:str, data: SellerModifyModel):
             'pw': new_hashed_pw,
         }
 
-        DB.update_by_id('user', u_id, new_data)
+        DB.update_one('user', {'u_id':u_id}, new_data)
     
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -214,7 +214,7 @@ Token renewal API
 @user_router.get('/issue/access')
 async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
     try:
-        user = DB.read_by_id('user', u_id)
+        user = DB.read_one('user', u_id)
         if user['scope'] != payload['scope']:
             raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
@@ -229,12 +229,12 @@ async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_
 @user_router.get('/issue/refresh')
 async def get_refresh_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
     try:
-        user = DB.read_by_id('user', u_id)
+        user = DB.read_one('user', {'_id':u_id})
         if user['scope'] != payload['scope']:
             raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
         response = TokenManager.recreate_r_token(payload, u_id, user['scope'])
-        DB.update_by_id('user', user['_id'], {"R_Token": response})
+        DB.update_one('user', {'u_id':u_id}, {"R_Token": response})
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)

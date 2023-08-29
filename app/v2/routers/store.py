@@ -2,7 +2,7 @@
 store_router
 """
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from core.models.store import StoreModel, NameModel
 from core.common.mongo import MongodbController
 from .src.util import Util
@@ -15,15 +15,16 @@ store_router = APIRouter(prefix="/stores", dependencies=[Depends(TokenManager.di
 PREFIX = 'api/v2/stores'
 DB = MongodbController('FIE_DB2')
 
+
 @store_router.get("/hello")
 async def hello(request: Request):
-    print(request.state.token_payload)
     return {"message": f"Hello '{PREFIX}'"}
 
-
 @store_router.get('/')
-async def read_all_store():
+async def read_all_store(request: Request):
     """ DB에 존재하는 모든 식당의 정보를 받아온다 """
+
+    # assert TokenManager.is_buyer(request), "This request is only allowed for buyers."
 
     try:
         result = DB.read_all('store')
@@ -32,14 +33,12 @@ async def read_all_store():
         for r in result:
             response.append(r)
             
-
+    except AssertionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
     except Exception as e:
         print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+        raise HTTPException(status_code=403, detail=str(e))
+
     
     return {
         'request': f'GET {PREFIX}',
