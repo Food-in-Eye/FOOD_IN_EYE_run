@@ -28,7 +28,7 @@ async def hello():
 @user_router.post('/idcheck')
 async def check_duplicate_id(data: IdModel):
     try:
-        if AuthManager.check_id_dup(data['id']):
+        if AuthManager.check_dup(data.id):
             state = 'unavailable'
         else:
             state = 'available'
@@ -36,15 +36,18 @@ async def check_duplicate_id(data: IdModel):
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'POST {PREFIX}/idcheck',
         'state': state
     }
 
 
+"""
+buyer API
+"""
+
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     try:
-        if AuthManager.check_id_dup(data.id) == False:
+        if AuthManager.check_dup(data.id) == False:
             user = {
                 'id': data.id,
                 'pw': AuthManager.get_hashed_pw(data.pw),
@@ -61,7 +64,6 @@ async def buyer_signup(data: BuyerModel):
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'POST {PREFIX}/buyer/signup',
         'u_id': u_id
     }
 
@@ -69,16 +71,17 @@ async def buyer_signup(data: BuyerModel):
 @user_router.post('/buyer/login')
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = AuthManager.auth_user(data.username, data.password)
-        user['R_Token'] = TokenManager.create_r_token(user['_id'], "buyer")
+        u_id = AuthManager.get_uid(data.username)
 
-        DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
+        user = AuthManager.auth_user(u_id, data.password)
+        user['R_Token'] = TokenManager.init_r_token(u_id, "buyer")
+
+        DB.update_by_id('user', u_id, {"R_Token": user['R_Token']})
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'POST {PREFIX}/buyer/login',
-        'u_id': user['_id'],
+        'u_id': u_id,
         'token_type': "bearer",
         'A_Token': TokenManager.ACCESS_TOKEN,
         'R_Token': user['R_Token']
@@ -90,7 +93,7 @@ async def get_user_info(u_id:str, data: PwModel):
     try:
         Util.check_id(u_id)
 
-        user = AuthManager.auth_user_by_uid(u_id, data.pw)
+        user = AuthManager.auth_user(u_id, data.pw)
     
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
@@ -105,10 +108,9 @@ async def get_user_info(u_id:str, data: PwModel):
 @user_router.put('/buyer/change')
 async def change_buyer_info(u_id:str, data: BuyerModifyModel):
     try:
-        Util.check_id_dup(u_id)
+        Util.check_id(u_id)
 
-        AuthManager.auth_user_by_uid(u_id, data.old_pw)
-        AuthManager.auth_user(data.id, data.old_pw)
+        AuthManager.auth_user(u_id, data.old_pw)
 
         new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
 
@@ -124,45 +126,15 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel):
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
 
-@user_router.post('/seller/info')
-async def get_user_info(u_id:str, data: PwModel):
-    try:
-        Util.check_id(u_id)
 
-        user = AuthManager.auth_user_by_uid(u_id, data.pw)
-    
-    except HTTPException as e:
-        raise HTTPException(status_code = e.status_code, detail = e.detail)
-    return {
-        'id': user['id'],
-        's_id': user['s_id']
-    }
-    
-@user_router.put('/seller/change')
-async def change_seller_info(u_id:str, data: SellerModifyModel):
-    try:
-        Util.check_id_dup(u_id)
-
-        AuthManager.auth_user_by_uid(u_id, data.old_pw)
-        AuthManager.auth_user(data.id, data.old_pw)
-    
-        new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
-
-        new_data = {
-            'pw': new_hashed_pw,
-        }
-
-        DB.update_by_id('user', u_id, new_data)
-    
-    except HTTPException as e:
-        raise HTTPException(status_code = e.status_code, detail = e.detail)
-    
-    
+"""
+seller API
+"""
 
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
     try:
-        if AuthManager.check_id_dup(data.id) == False:
+        if AuthManager.check_dup(data.id) == False:
             user = {
                 "id": data.id,
                 "pw": AuthManager.get_hashed_pw(data.pw),
@@ -177,7 +149,6 @@ async def seller_signup(data: SellerModel):
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'POST {PREFIX}/seller/signup',
         "u_id": u_id
     }
 
@@ -185,15 +156,16 @@ async def seller_signup(data: SellerModel):
 @user_router.post('/seller/login')
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = AuthManager.auth_user(data.username, data.password)
-        user['R_Token'] = TokenManager.create_r_token(user['_id'], "seller")
+        u_id = AuthManager.get_uid(data.username)
 
-        DB.update_by_id('user', user['_id'], {"R_Token": user['R_Token']})
+        user = AuthManager.auth_user(u_id, data.password)
+        user['R_Token'] = TokenManager.init_r_token(user['_id'], "seller")
+
+        DB.update_by_id('user', u_id, {"R_Token": user['R_Token']})
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'POST {PREFIX}/seller/login',
         'u_id': user['_id'],
         's_id': user['s_id'],
         'token_type': "bearer",
@@ -202,6 +174,42 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
+@user_router.post('/seller/info')
+async def get_user_info(u_id:str, data: PwModel):
+    try:
+        Util.check_id(u_id)
+
+        user = AuthManager.auth_user(u_id, data.pw)
+    
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
+    return {
+        'id': user['id'],
+        's_id': user['s_id']
+    }
+    
+@user_router.put('/seller/change')
+async def change_seller_info(u_id:str, data: SellerModifyModel):
+    try:
+        Util.check_id(u_id)
+
+        AuthManager.auth_user(u_id, data.old_pw)
+    
+        new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
+
+        new_data = {
+            'pw': new_hashed_pw,
+        }
+
+        DB.update_by_id('user', u_id, new_data)
+    
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
+
+
+"""
+Token renewal API
+"""
 
 @user_router.get('/issue/access')
 async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_token)):
@@ -215,7 +223,6 @@ async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'GET {PREFIX}/issue/access',
         'A_Token': response
     }
 
@@ -232,20 +239,6 @@ async def get_refresh_token(u_id:str, payload: str = Depends(TokenManager.auth_r
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
     return {
-        'request': f'GET {PREFIX}/issue/refresh',
         'R_Token': response
     }
-
-@user_router.get('/test/a_token')
-async def get_refresh_token(a_token: str = Depends(TokenManager.auth_a_token)):
-    return {
-        'request': f'GET {PREFIX}/test/a_token',
-        'a_token': a_token
-    }
     
-@user_router.get('/test/r_token')
-async def get_refresh_token(r_token: str = Depends(TokenManager.auth_r_token)):
-    return {
-        'request': f'GET {PREFIX}/test/r_token',
-        'r_token': r_token
-    }

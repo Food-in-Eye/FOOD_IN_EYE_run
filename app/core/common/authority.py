@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 from passlib.exc import UnknownHashError
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
+from bson.objectid import ObjectId
 
 import os
 from jose import jwt, JWTError
@@ -19,13 +20,20 @@ class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
-    def check_id_dup(self, id:str) -> dict:
+    def check_dup(self, id:str) -> dict:
         users = DB.read_all_by_feild('user', 'id', id)
 
         if users:
             return users[0]
         else:
             return False
+
+    def get_uid(self, id:str):
+        user = self.check_dup(id)
+
+        if user:
+            return user['_id']
+        raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
 
     def get_hashed_pw(self, pw: str) -> str:
         return self.pw_handler.hash(pw)
@@ -38,31 +46,17 @@ class AuthManagement:
         except UnknownHashError as e:
             raise HTTPException(status_code = 401, detail = str(e))
 
-    def auth_user(self, id, pw):
-        user = self.check_id_dup(id)
+    def auth_user(self, u_id, pw):
+        try:  # ToDo : mongo 코드 바뀌면 Exception 바꾸기 - try-excepy 문을 밖으로 빼면 다른 오류들도 잡힘
+            user = DB.read_by_id('user', u_id)
+        except Exception:
+            raise HTTPException(status_code = 401, detail = f'Nonexistent u_ID')
 
         if user:
-            if id != user['id']:
-                raise HTTPException(status_code = 401, detail = f'Incorrect ID')
             self.auth_pw(pw, user['pw'])
         else:
             raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
         
-        return user
-
-    def auth_user_by_uid(self, u_id, pw):
-        try:  # ToDo : mongo 코드 바뀌면 Exception 바꾸기 - try-excepy 문을 밖으로 빼면 다른 오류들도 잡힘
-            user = DB.read_by_id('user', u_id)
-        except Exception:
-            raise HTTPException(status_code = 401, detail = f'Nonexistent u_ID') 
-
-        if user:
-            if u_id != user['_id']:
-                raise HTTPException(status_code = 401, detail = f'Incorrect ID')
-            self.auth_pw(pw, user['pw'])
-        else:
-            raise HTTPException(status_code = 401, detail = f'Nonexistent ID')
-    
         return user
 
             
@@ -82,17 +76,16 @@ class TokenManagement:
 
         self.ACCESS_SK = os.environ['JWT_ACCESS_SECRET_KEY']
         self.ACCESS_EXP = 0
-        self.ACCESS_TOKEN_buyer = self.create_a_token("buyer")
-        self.ACCESS_TOKEN_seller = self.create_a_token("seller")
+        self.ACCESS_TOKEN_buyer = self.init_a_token("buyer")
+        self.ACCESS_TOKEN_seller = self.init_a_token("seller")
 
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
-    def create_a_token(self, scope:str):
+    def init_a_token(self, scope:str):
         self.ACCESS_EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) #Todo : 테스트 끝난 후에 minutes = 30 으로 수정할 것
         
         data = {
-            "iss": "FOOD-IN-EYE",
-            "sub": "FOOD-IN-EYE",
+            "iss": "ACCESS_Token",
             "exp": self.ACCESS_EXP,
             "iat": int(datetime.now().timestamp()),
             "scope": scope
@@ -101,14 +94,14 @@ class TokenManagement:
         return self.ACCESS_TOKEN
     
 
-    def create_r_token(self, u_id:str, scope:str):
+    def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
             EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 으로 바꿀 것
         elif scope == "seller":
             EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 * 2 로 바꿀 것
 
         data = {
-            "iss": "FOOD-IN-EYE",
+            "iss": "REFRESH_Token",
             "sub": u_id,
             "exp": EXP,
             "iat": int(datetime.now().timestamp()),
@@ -125,7 +118,7 @@ class TokenManagement:
             if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
                 raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
             
-            return self.create_a_token(scope)
+            return self.init_a_token(scope)
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
@@ -139,7 +132,7 @@ class TokenManagement:
             if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
                 raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
-            return self.create_r_token(u_id, scope)
+            return self.init_r_token(u_id, scope)
         
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
