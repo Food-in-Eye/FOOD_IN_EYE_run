@@ -6,7 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 import os
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
+
 
 from core.common.mongo2 import MongodbController
 
@@ -18,7 +19,7 @@ class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
-    def check_id_dup(self, id:str) -> bool:
+    def check_id_dup(self, id:str) -> dict:
         users = DB.read_all_by_feild('user', 'id', id)
 
         if users:
@@ -67,7 +68,15 @@ class AuthManagement:
             
 
 class TokenManagement:
-    def __init__(self) -> None:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.initialize()  # 인스턴스 초기화 메서드 호출
+        return cls._instance
+
+    def initialize(self):
         self.algorithm = "HS256"
         self.token_type = "bearer"
 
@@ -77,7 +86,6 @@ class TokenManagement:
         self.ACCESS_TOKEN_seller = self.create_a_token("seller")
 
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
-
     
     def create_a_token(self, scope:str):
         self.ACCESS_EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) #Todo : 테스트 끝난 후에 minutes = 30 으로 수정할 것
@@ -154,19 +162,12 @@ class TokenManagement:
         except JWTError as e:
             raise HTTPException(status_code = 401, detail = str(e))
 
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
 
-class JWTMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request) -> dict:
+    def dispatch(self, request: Request):
         try:
-            print('hi')
-            # token = request.headers.get("Authorization", "").split(" ")[1]
-
-            # payload = jwt.decode(token, TokenManagement.ACCESS_SK, algorithms=TokenManagement.algorithm)
-            # return dict(payload)
-        
+            token = request.headers.get("Authorization", "").split(" ")[1]
+            payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
+            request.state.token_payload = payload
         except JWTError as e:
             raise HTTPException(status_code=401, detail=str(e))
         

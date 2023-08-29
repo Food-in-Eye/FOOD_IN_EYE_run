@@ -2,21 +2,22 @@
 store_router
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,Request
 from core.models.store import StoreModel
 from core.common.mongo2 import MongodbController
 from .src.util import Util
 
 from core.common.authority import TokenManagement
+TokenManager = TokenManagement()
 
-store_router = APIRouter(prefix="/stores")
+store_router = APIRouter(prefix="/stores", dependencies=[Depends(TokenManager.dispatch)])
 
 PREFIX = 'api/v2/stores'
 DB = MongodbController('FIE_DB2')
-TokenManager = TokenManagement()
 
 @store_router.get("/hello")
-async def hello():
+async def hello(request: Request):
+    print(request.state.token_payload)
     return {"message": f"Hello '{PREFIX}'"}
 
 
@@ -95,7 +96,7 @@ async def create_store(u_id:str, store:StoreModel):
 
         id = str(DB.create('store', data))
 
-        user = DB.read_by_id('user', u_id)
+        user = DB.read_by_id('user', u_id) # Todo: 코드 수정할 때, 맨 위로 올리기 - 권한 먼저 확인
         if user['role'] == 2:
             DB.update_by_id('user', u_id, {"s_id": id})
         else:
@@ -104,13 +105,13 @@ async def create_store(u_id:str, store:StoreModel):
     except Exception as e:
         print('ERROR', e)
         return {
-            'request': f'POST {PREFIX}/store',
+            'request': f'POST {PREFIX}/store?u_id={u_id}',
             'status': 'ERROR',
             'message': f'ERROR {e}'
         }
     
     return {
-        'request': f'POST {PREFIX}/store',
+        'request': f'POST {PREFIX}/store?u_id={u_id}',
         'status': 'OK',
         'document_id': id
     }

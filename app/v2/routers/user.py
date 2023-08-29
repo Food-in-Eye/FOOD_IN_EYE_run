@@ -5,9 +5,9 @@ user_router
 from .src.util import Util
 from core.models import *
 from core.common.mongo2 import MongodbController
-from core.common.authority import AuthManagement, TokenManagement, JWTMiddleware
+from core.common.authority import AuthManagement, TokenManagement
 
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 user_router = APIRouter(prefix="/users")
@@ -18,7 +18,7 @@ PREFIX = 'api/v2/users'
 
 DB = MongodbController('FIE_DB2')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scheme_name="JWT")
-user_router.add_middleware(JWTMiddleware)
+
 
 @user_router.get("/hello")
 async def hello():
@@ -85,10 +85,10 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
-@user_router.post('/info')
+@user_router.post('/buyer/info')
 async def get_user_info(u_id:str, data: PwModel):
     try:
-        Util.check_id_dup(u_id)
+        Util.check_id(u_id)
 
         user = AuthManager.auth_user_by_uid(u_id, data.pw)
     
@@ -124,6 +124,19 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel):
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)
 
+@user_router.post('/seller/info')
+async def get_user_info(u_id:str, data: PwModel):
+    try:
+        Util.check_id(u_id)
+
+        user = AuthManager.auth_user_by_uid(u_id, data.pw)
+    
+    except HTTPException as e:
+        raise HTTPException(status_code = e.status_code, detail = e.detail)
+    return {
+        'id': user['id'],
+        's_id': user['s_id']
+    }
     
 @user_router.put('/seller/change')
 async def change_seller_info(u_id:str, data: SellerModifyModel):
