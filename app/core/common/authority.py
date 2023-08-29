@@ -82,7 +82,7 @@ class TokenManagement:
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
     def init_a_token(self, scope:str):
-        self.ACCESS_EXP = int((datetime.now() + timedelta(seconds=20)).timestamp()) #Todo : 테스트 끝난 후에 minutes = 30 으로 수정할 것
+        self.ACCESS_EXP = int((datetime.now() + timedelta(minutes=30)).timestamp())
         
         data = {
             "iss": "ACCESS_Token",
@@ -96,9 +96,9 @@ class TokenManagement:
 
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
-            EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 으로 바꿀 것
+            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
         elif scope == "seller":
-            EXP = int((datetime.now() + timedelta(minutes=1)).timestamp()) # Todo : 테스트 이후 minutes = 60 * 2 로 바꿀 것
+            EXP = int((datetime.now() + timedelta(minutes=60*2)).timestamp())
 
         data = {
             "iss": "REFRESH_Token",
@@ -115,7 +115,7 @@ class TokenManagement:
         try:
             cur_time = int(datetime.now().timestamp())
             
-            if self.ACCESS_EXP - cur_time > 10: # Todo: 테스트 후에는 0 으로 설정(0초)
+            if self.ACCESS_EXP - cur_time > 0:
                 raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
             
             return self.init_a_token(scope)
@@ -129,7 +129,7 @@ class TokenManagement:
             cur_time = int(datetime.now().timestamp())
             exp_time = payload["exp"]
 
-            if (exp_time - cur_time) > 10: # Todo: 테스트 후에는 60 * 10 으로 설정(10분)
+            if (exp_time - cur_time) > 60 * 10:
                 raise HTTPException(status_code = 403, detail =f'Signature renewal has denied.')
 
             return self.init_r_token(u_id, scope)

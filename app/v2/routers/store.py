@@ -2,8 +2,8 @@
 store_router
 """
 
-from fastapi import APIRouter, Depends,Request
-from core.models.store import StoreModel
+from fastapi import APIRouter, Depends, Request, Body
+from core.models.store import StoreModel, NameModel
 from core.common.mongo2 import MongodbController
 from .src.util import Util
 
@@ -72,6 +72,30 @@ async def read_store(id:str):
     }
 
 
+@store_router.post('/namecheck')
+async def check_duplicate_id(data:NameModel):
+    try:
+        store = DB.read_all_by_feild('store', 'name', data['name'])
+
+        if store:
+            state = 'unavailable'
+        else:
+            state = 'available'
+
+    except Exception as e:
+        print('ERROR', e)
+        return {
+            'request': f'POST {PREFIX}/store/namecheck',
+            'status': 'ERROR',
+            'message': f'ERROR {e}'
+        }
+    
+    return {
+        'request': f'POST {PREFIX}/store/namecheck',
+        'status': 'OK',
+        'state': state
+    }
+
 # ToDo: user id 같이 받아야 할 듯. 
 @store_router.post("/store")
 async def create_store(u_id:str, store:StoreModel):
@@ -124,6 +148,10 @@ async def update_store(id:str, store: StoreModel):
     
     try:
         Util.check_id(id)
+
+        name_dup = DB.read_all_by_feild('store', 'name', data['name'])
+        if name_dup:
+            raise Exception(f'Request name has already exist.')
         
         if DB.update_by_id('store', id, data):
             return {
