@@ -6,7 +6,7 @@ import { getStore, putStore } from "../components/API.module";
 import { useState, useEffect } from "react";
 
 function StoreManagePage() {
-  const sID = localStorage.getItem("storeID");
+  const sID = localStorage.getItem("s_id");
 
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
@@ -24,7 +24,7 @@ function StoreManagePage() {
         setLoading(true);
 
         const request = await getStore(sID);
-        console.log(request.data.response);
+        console.log(request);
         setStore(request.data.response);
 
         if (request.data.response.status === 1) {

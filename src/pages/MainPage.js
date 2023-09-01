@@ -25,11 +25,15 @@ import {
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
 import { SocketProvider } from "../components/SocketContext.module";
+import { startTokenRefresh } from "../components/TokenManager.module";
+import { useLocation } from "react-router-dom";
 
 function MainPage() {
   const wsUrl = `ws://localhost/api/v2/websockets/ws`;
-  const sID = localStorage.getItem("storeID");
+  const sID = localStorage.getItem("s_id");
   const [socket, setSocket] = useState(null);
+
+  const location = useLocation();
 
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
   const [value, onChange] = useState(new Date());
@@ -40,6 +44,10 @@ function MainPage() {
   useEffect(() => {
     connectWS(sID);
   }, [sID]);
+
+  // useEffect (() => {
+
+  // })
 
   const connectWS = useCallback(async (storeID) => {
     try {
