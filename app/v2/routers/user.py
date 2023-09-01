@@ -218,7 +218,7 @@ async def get_access_token(u_id:str, payload: str = Depends(TokenManager.auth_r_
         if user['scope'] != payload['scope']:
             raise HTTPException(status_code = 401, detail = f'Scope verification failed.')
         
-        response = TokenManager.recreate_a_token(user['scope'])
+        response = TokenManager.recreate_a_token(user['scope'], payload)
 
     except HTTPException as e:
         raise HTTPException(status_code = e.status_code, detail = e.detail)

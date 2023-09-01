@@ -1,30 +1,37 @@
-class StatusCode:
-    HTTP_500 = 500
-    HTTP_400 = 400
-    HTTP_401 = 401
-    HTTP_403 = 403
-    HTTP_404 = 404
-    HTTP_405 = 405
 
 class APIException(Exception):
-    status_code: int
-    code: str
-    msg: str
-    detail: str
-    ex: Exception
+    status_dict = {
+        200.0 : "OK",
+        204.0 :	"No content",
 
-    def __init__(
-        self,
-        *,
-        status_code: int = StatusCode.HTTP_500,
-        code: str = "000000",
-        msg: str = None,
-        detail: str = None,
-        ex: Exception = None,
-    ):
-        self.status_code = status_code
-        self.code = code
-        self.msg = msg
-        self.detail = detail
-        self.ex = ex
-        super().__init__(ex)
+        400.0 : "Bad request",
+
+        401.0 : "Access denied",
+        401.1 : "Logon failed",
+        401.6 : "Token ",
+
+        403.0 : "Forbidden",
+        403.1 : "Execute access forbidden.",
+        403.2 : "Read access forbidden.",
+        403.3 : "Write access forbidden.",
+        403.6 : "Signature renewal forbidden.",
+
+        404.0 : "Not found",
+
+        405.0 : "Method not allowed",
+
+        409.0 : "Conflict",
+        409.1 : "Duplicate ID.",
+        409.2 : "Duplicate NAME."
+    }
+
+    def __init__(self):
+        self.DEFAULT_CODE = 500,
+        self.DEFAULT_DETAIL = "Internal server error" 
+
+    def get_status(self, ex:float) -> (int, str):
+        detail = self.status_dict.get(ex)
+
+        if detail != '':
+            return int(ex), detail
+        return self.DEFAULT_CODE, self.DEFAULT_DETAIL

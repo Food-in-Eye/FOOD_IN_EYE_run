@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 from v2.routers.src.util import Util
 
 import os
-from jose import jwt, JWTError
+from jose import jwt, ExpiredSignatureError
 from datetime import datetime, timedelta
 from fastapi import HTTPException, Request
 
@@ -76,7 +76,6 @@ class TokenManagement:
         self.token_type = "bearer"
 
         self.ACCESS_SK = os.environ['JWT_ACCESS_SECRET_KEY']
-        self.ACCESS_EXP = 0
         self.ACCESS_TOKEN_buyer = self.init_a_token("buyer")
         self.ACCESS_TOKEN_seller = self.init_a_token("seller")
 
@@ -85,11 +84,11 @@ class TokenManagement:
 
 
     def init_a_token(self, scope:str):
-        self.ACCESS_EXP = int((datetime.now() + timedelta(minutes=30)).timestamp())
+        exp_time = int((datetime.now() + timedelta(minutes=30)).timestamp())
         
         data = {
             "iss": "ACCESS_Token",
-            "exp": self.ACCESS_EXP,
+            "exp": exp_time,
             "iat": int(datetime.now().timestamp()),
             "scope": scope
         }
@@ -113,16 +112,17 @@ class TokenManagement:
 
 
 
-    def recreate_a_token(self, scope:str):
+    def recreate_a_token(self, payload:dict, scope:str):
         try:
             cur_time = int(datetime.now().timestamp())
+            exp_time = payload["exp"]
             
-            if self.ACCESS_EXP - cur_time > 0:
+            if exp_time - cur_time > 0:
                 raise HTTPException(status_code = 403, detail =f'Signature renewal denied.')
             
             return self.init_a_token(scope)
         
-        except JWTError as e:
+        except ExpiredSignatureError as e:
             raise HTTPException(status_code = 401, detail = str(e))
 
     def recreate_r_token(self, payload:dict, u_id:str, scope:str):
@@ -135,7 +135,7 @@ class TokenManagement:
 
             return self.init_r_token(u_id, scope)
         
-        except JWTError as e:
+        except ExpiredSignatureError as e:
             raise HTTPException(status_code = 401, detail = str(e))
         
 
@@ -145,7 +145,7 @@ class TokenManagement:
             payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
             return dict(payload)
         
-        except JWTError as e:
+        except ExpiredSignatureError as e:
             raise HTTPException(status_code = 401, detail = str(e))
         
     def auth_r_token(self, token: str = Depends(oauth2_scheme)):
@@ -153,7 +153,7 @@ class TokenManagement:
             payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
             return dict(payload)
         
-        except JWTError as e:
+        except ExpiredSignatureError as e:
             raise HTTPException(status_code = 401, detail = str(e))
 
 
@@ -163,7 +163,7 @@ class TokenManagement:
 
             payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
             request.state.token_scope = payload.get("scope")
-        except JWTError as e:
+        except ExpiredSignatureError as e:
             raise HTTPException(status_code=401, detail=str(e))
         
         
