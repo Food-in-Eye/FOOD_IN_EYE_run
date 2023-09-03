@@ -3,8 +3,11 @@ import Button from "../css/Button.module.css";
 import Admin from "../css/AdminSetting.module.css";
 
 import { useState } from "react";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function AdminSettingPage() {
+  useTokenRefresh();
+
   const [nameCheck, setNameCheck] = useState("");
   const [name, setName] = useState("");
   const [passwd, setPasswd] = useState("");

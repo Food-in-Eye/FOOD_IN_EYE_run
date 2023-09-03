@@ -6,9 +6,12 @@ import { getOrderHistory } from "../components/API.module";
 import { useEffect, useState } from "react";
 import Pagination from "react-js-pagination";
 import "../css/Paging.css";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function OrderManagePage() {
-  const sID = localStorage.getItem("storeID");
+  useTokenRefresh();
+
+  const sID = localStorage.getItem("s_id");
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 7;

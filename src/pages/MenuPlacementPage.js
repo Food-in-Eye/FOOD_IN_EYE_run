@@ -6,9 +6,12 @@ import arrow from "../images/right_arrow.jpeg";
 
 import { getFoods, postMenu } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function MenuPlacementPage() {
-  const sID = localStorage.getItem("storeID");
+  useTokenRefresh();
+
+  const sID = localStorage.getItem("s_id");
   const [storeOpen, setStoreOpen] = useState(false);
   const [storeClosed, setStoreClosed] = useState(false);
   const [menuList, setMenuList] = useState([]);

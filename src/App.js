@@ -36,7 +36,7 @@ function App() {
         <Route path="/menu-manage" element={<MenuManagePage />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </Router>
   );

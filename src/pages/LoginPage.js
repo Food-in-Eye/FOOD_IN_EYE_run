@@ -4,6 +4,8 @@ import { getStore, postLogin } from "../components/API.module";
 import { handleRefreshToken, handleError } from "../components/JWT.module";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { startTokenRefresh } from "../components/TokenRefreshService";
+import { useAuth } from "../components/AuthContext";
 
 import barChart from "../images/bar-chart.png";
 import bidLandscape from "../images/bid-landscape.png";
@@ -19,6 +21,7 @@ import calendar from "../images/calendar.png";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
@@ -39,16 +42,23 @@ function LoginPage() {
         formData.get("password")
       );
       const request = await postLogin(`/seller/login`, formData);
-      console.log("request", request);
+
+      console.log("##request", request);
       if (request.status === 200) {
+        const tokenCreationTime = new Date(request.headers.date).getTime();
+
         localStorage.setItem("u_id", request.data.u_id);
         localStorage.setItem("s_id", request.data.s_id);
         localStorage.setItem("a_token", request.data.A_Token);
         localStorage.setItem("r_token", request.data.R_Token);
+        localStorage.setItem("r_token_create_time", tokenCreationTime);
+        getStoreNum(localStorage.getItem("s_id"));
 
         console.log("loginpage a_token", localStorage.getItem("a_token"));
         console.log("loginpage r_token", localStorage.getItem("r_token"));
-        handleRefreshToken();
+
+        startTokenRefresh();
+        login();
 
         if (request.data.s_id) {
           navigate("/main");
@@ -68,6 +78,11 @@ function LoginPage() {
         handleError(error);
       }
     }
+  };
+
+  const getStoreNum = async (s_id) => {
+    const res = await getStore(s_id);
+    localStorage.setItem("storeNum", res.data.response.num);
   };
 
   return (

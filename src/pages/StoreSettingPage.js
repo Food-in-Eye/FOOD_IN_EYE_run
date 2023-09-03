@@ -5,8 +5,10 @@ import StoreSet from "../css/StoreSetting.module.css";
 import SelectTime from "../components/SelectTime.module";
 import { postStore } from "../components/API.module";
 import { useNavigate } from "react-router-dom";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function StoreSettingPage() {
+  useTokenRefresh();
   // const navigate = useNavigate();
 
   const uID = localStorage.getItem("u_id");

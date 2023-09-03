@@ -5,8 +5,11 @@ import heatmap from "heatmap.js";
 
 import { useState, useEffect } from "react";
 import { getGaze, getFilteredGaze } from "../components/API.module";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function VisualizeGazePage() {
+  useTokenRefresh();
+
   const pages = ["store_list", "store_menu", "menu_detail"];
   const [pageList, setPageList] = useState([]);
   const [fileList, setFileList] = useState([]);

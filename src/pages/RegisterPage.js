@@ -3,11 +3,13 @@ import Button from "../css/Button.module.css";
 import { postUser } from "../components/API.module";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 import littleLogo from "../images/little-logo.png";
 import mainLogo from "../images/foodineye.png";
 
 function RegisterPage() {
+  useTokenRefresh();
   const navigate = useNavigate();
 
   const [idCheck, setIdCheck] = useState("");

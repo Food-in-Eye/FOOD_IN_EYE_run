@@ -4,8 +4,11 @@ import MenuBar from "../components/MenuBar";
 import { postPWCheck } from "../components/API.module";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function CheckPasswdPage() {
+  useTokenRefresh();
+
   const navigate = useNavigate();
   const uID = localStorage.getItem("u_id");
 
