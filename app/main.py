@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.error.exception import APIException
+from core.error.exception import APIException,CustomException
 
 from v2.api import v2_router
 
@@ -19,23 +19,42 @@ app.include_router(v2_router)
 
 exmanager = APIException()
 
-# @app.exception_handler(Exception)
-# async def http_exception_handler(request:Request, ex:Exception):
-#     if type(ex) == float:
+@app.exception_handler(CustomException)
+async def http_exception_handler(request:Request, ex:CustomException):
+    status_code, detail = exmanager.get_status(ex)
 
-#     raise HTTPException(status_code=int(ex), detail=)
-#     return JSONResponse(
-#         status_code = int(e),
-#         content = {"detail" : e.detail}
-#     )
+    print(f'ERROR {ex.status_code}, {detail}')
+    return JSONResponse(
+        status_code = status_code, 
+        content = {'detail' : detail}
+    )
+    
+    # 아래 코드로 동작 시 에러 발생
+    # if ex_status_code != 500:
+    #     raise HTTPException(status_code=ex_status_code, detail=ex_detail)
+    # raise HTTPException(status_code=500, detail=ex)
 
 @app.exception_handler(AssertionError)
-async def http_exception_handler(request:Request, e:AssertionError):
-    return JSONResponse(
-        status_code = 403,
-        content = {"detail" : str(e)}
-    )
+async def assert_exception_handler(request:Request, ex:AssertionError):
+    status_code, detail = exmanager.get_status_assert(ex)
 
+    print(f'ERROR {ex.args[0]}, {detail}')
+    return JSONResponse(
+        status_code = status_code, 
+        content = {'detail' : detail}
+    )
+# @app.exception_handler(AssertionError)
+# async def http_exception_handler(request:Request, e:AssertionError):
+#     ex_status_code, ex_detail = exmanager.get_status(e)
+
+#     if ex_status_code != 500:
+#         return JSONResponse(
+#             status_code = ex_status_code,
+#             content = {"detail" : ex_detail}
+#         )
+
+        # 아래 코드로 동작 시 에러 발생
+        # raise HTTPException(status_code=ex_status_code, detail=ex_detail)
 
 
 @app.get("/")
