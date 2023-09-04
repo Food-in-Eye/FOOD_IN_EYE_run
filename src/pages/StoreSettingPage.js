@@ -9,7 +9,7 @@ import useTokenRefresh from "../components/useTokenRefresh";
 
 function StoreSettingPage() {
   useTokenRefresh();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const uID = localStorage.getItem("u_id");
 
@@ -23,6 +23,23 @@ function StoreSettingPage() {
   const handleNameDuplicate = async (e) => {
     e.preventDefault();
     /**가게 이름 중복 체크 코드 추가 */
+    try {
+      console.log(nameCheck);
+      const res = await postStore(`/namecheck`, {
+        name: nameCheck,
+      });
+
+      console.log(res);
+      if (res.data.state === "available") {
+        setShowNameDuplicateMsg(false);
+        setName(nameCheck);
+      } else if (res.data.state === "unavailable") {
+        setShowNameDuplicateMsg(true);
+      }
+    } catch (error) {
+      console.log("Error checking store name duplicate:", error);
+    }
+
     setName(nameCheck);
   };
 
@@ -43,13 +60,20 @@ function StoreSettingPage() {
     const notice = document.querySelector("#store_notice").value;
 
     try {
-      await postStore(uID, {
+      const res = await postStore(`/store?u_id=${uID}`, {
         name: name,
         desc: desc,
         schedule: `${selectedOpenTime} - ${selectedCloseTime}`,
         notice: notice,
         status: 1,
-      }).then((res) => console.log(res));
+      });
+
+      console.log(res);
+
+      if (res.status === 200) {
+        localStorage.setItem("s_id", res.data.document_id);
+        navigate("/main");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -81,9 +105,9 @@ function StoreSettingPage() {
                     style={{
                       width: "21vw",
                       border:
-                        showNameDuplicateMsg === true
-                          ? "2px solid #52bf8b"
-                          : "",
+                        name &&
+                        showNameDuplicateMsg === false &&
+                        "2px solid #52bf8b",
                     }}
                   />
                 </label>
@@ -94,10 +118,8 @@ function StoreSettingPage() {
                   이름 중복 확인
                 </button>
               </section>
-              {showNameDuplicateMsg ? (
+              {nameCheck && showNameDuplicateMsg && (
                 <p style={{ color: "#B9062F" }}>이미 사용 중인 이름 입니다.</p>
-              ) : (
-                showNameDuplicateMsg && <p>사용 가능한 이름 입니다.</p>
               )}
               <div className={StoreSet.selectTimeDiv}>
                 <span>운영 시간</span>

@@ -52,7 +52,6 @@ function LoginPage() {
         localStorage.setItem("a_token", request.data.A_Token);
         localStorage.setItem("r_token", request.data.R_Token);
         localStorage.setItem("r_token_create_time", tokenCreationTime);
-        getStoreNum(localStorage.getItem("s_id"));
 
         console.log("loginpage a_token", localStorage.getItem("a_token"));
         console.log("loginpage r_token", localStorage.getItem("r_token"));
@@ -61,6 +60,7 @@ function LoginPage() {
         login();
 
         if (request.data.s_id) {
+          getStoreNum(localStorage.getItem("s_id"));
           navigate("/main");
         } else {
           // 가게 초기 설정 화면으로 이동
@@ -82,6 +82,7 @@ function LoginPage() {
 
   const getStoreNum = async (s_id) => {
     const res = await getStore(s_id);
+
     localStorage.setItem("storeNum", res.data.response.num);
   };
 
