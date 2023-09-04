@@ -7,7 +7,7 @@ from core.models import *
 from core.common.mongo import MongodbController
 from core.common.authority import AuthManagement, TokenManagement
 from core.error.exception import CustomException
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 user_router = APIRouter(prefix="/users")
@@ -197,7 +197,7 @@ async def get_access_token(u_id:str, token: str = Depends(TokenManager.auth_r_to
     user = DB.read_one('user', {'_id':ObjectId(u_id)})
 
     if user['R_Token'] != token:
-        raise CustomException(status_code=422.6)
+        raise CustomException(status_code=422.62)
     
     payload = TokenManager.get_payload('refresh', token)
     response = TokenManager.recreate_a_token(payload, user['scope'])
@@ -211,7 +211,7 @@ async def get_refresh_token(u_id:str, token: str = Depends(TokenManager.auth_r_t
     user = DB.read_one('user', {'_id':ObjectId(u_id)})
 
     if user['R_Token'] != token:
-        raise CustomException(status_code=422.6)
+        raise CustomException(status_code=422.62)
     
     payload = TokenManager.get_payload('refresh', token)
     response = TokenManager.recreate_r_token(payload, u_id, user['scope'])

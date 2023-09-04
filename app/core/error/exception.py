@@ -23,6 +23,7 @@ class APIException(Exception):
         403.2 : "Read access forbidden.",
         403.3 : "Write access forbidden.",
         403.6 : "Token renewal forbidden.",
+        403.7 : "Status is already finish.",
 
         404.0 : "Not found",
 
@@ -33,9 +34,11 @@ class APIException(Exception):
         409.2 : "Duplicate NAME.",
 
         422.0 : "Unprocessable Entity",
-        422.6 : "Token(ownership) verification failed.",
+        # .6 : Token  ERROR
+        422.61 : "A_Token mismatch.",
+        422.62 : "R_Token mismatch.",
 
-        503.0 : "Service unavailable.",
+        503.0 : "Service unavailable",
         # .5 : MongDB ERROR
         503.51 : "No DataBase exists.",
         503.52 : "No collection exists.",
@@ -44,6 +47,8 @@ class APIException(Exception):
         503.55 : "Failed to READ document.",
         503.56 : "Failed to DELETE document.",
         503.57 : "Modified_count is not 1.",
+        # .6 : utill ERROR
+        503.61 : "The id format is not valid. Please check"
     }
 
     def __init__(self):

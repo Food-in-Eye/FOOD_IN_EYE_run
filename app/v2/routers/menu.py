@@ -47,7 +47,7 @@ async def read_menu(id:str):
     
     return {
         "_id": id,
-        "s_id": response['store_id'],
+        "s_id": response['s_id'],
         "date": response['date'],
         "f_list" : response['f_list']
     }
@@ -102,7 +102,7 @@ async def read_menu_with_foods(id:str):
     
     return {
         "_id": id,
-        "s_id": response['store_id'],
+        "s_id": response['s_id'],
         "date": response['date'],
         "f_list" : response['f_list']
     }
