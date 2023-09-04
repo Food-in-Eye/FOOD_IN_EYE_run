@@ -58,15 +58,15 @@ async def read_store(id:str):
 
 
 @store_router.post('/namecheck')
-async def check_duplicate_id(data:NameModel, request:Request):
+async def check_duplicate_name(data:NameModel, request:Request):
     """ store name의 중복 여부를 확인한다. """
     assert TokenManager.is_seller(request.state.token_scope), 403.1 
-
-    store = DB.read_one('store', {'name': data.name})
-
-    if store:
-        state = 'unavailable'
-    else:
+    print(data.name)
+    try:
+        store = DB.read_one('store', {'name': data.name})
+        if store:
+            state = 'unavailable'
+    except CustomException:
         state = 'available'
 
     return {
@@ -83,8 +83,9 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
 
     Util.check_id(u_id)
 
-    name_dup = DB.read_one('store', {'name':data['name']})
-    if name_dup:
+    name_data = NameModel(name=store.name)
+    state = await check_duplicate_name(name_data, request)
+    if state == 'unavailable':
         raise CustomException(409.2)
     
     store_list = DB.read_all('store')
@@ -111,8 +112,9 @@ async def update_store(id:str, store: StoreModel, request:Request):
     
     _id = Util.check_id(id)
 
-    name_dup = DB.read_one('store', {'name':data['name']})
-    if name_dup:
+    name_data = NameModel(name=store.name)
+    state = await check_duplicate_name(name_data, request)
+    if state == 'unavailable':
         raise CustomException(409.2)
     
     if DB.replace_one('store', {'_id':_id}, data) == False:
