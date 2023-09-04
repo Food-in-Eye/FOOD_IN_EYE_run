@@ -167,8 +167,10 @@ class TokenManagement:
         
     @staticmethod
     def is_buyer(scope:str) -> bool:
+        print(scope)
         if scope == "buyer":
             return True
+        return False
     
     @staticmethod
     def is_seller(scope:str) -> bool:
