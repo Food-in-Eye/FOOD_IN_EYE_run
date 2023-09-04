@@ -117,11 +117,6 @@ export const getFilteredGaze = (query) => {
 
 export const putStore = (s_id, data) => {
   const requestUrl = `${STORE_URL}/store?id=${s_id}`;
-
-  console.log(
-    "!!!!!!!!putStore_apiInstance headers",
-    apiInstance.defaults.headers
-  );
   return apiInstance.put(requestUrl, JSON.stringify(data));
 };
 
@@ -151,8 +146,8 @@ export const postLogin = (query, formData) => {
   });
 };
 
-export const postStore = (u_id, data) => {
-  const requestUrl = `${STORE_URL}/store?u_id=${u_id}`;
+export const postStore = (query, data) => {
+  const requestUrl = `${STORE_URL}${query}`;
 
   return apiInstance.post(requestUrl, JSON.stringify(data));
 };

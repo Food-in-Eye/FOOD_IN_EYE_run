@@ -1,7 +1,7 @@
 import Check from "../css/CheckPasswd.module.css";
 import Button from "../css/Button.module.css";
 import MenuBar from "../components/MenuBar";
-import { postPWCheck } from "../components/API.module";
+import { postUser } from "../components/API.module";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useTokenRefresh from "../components/useTokenRefresh";
@@ -19,22 +19,28 @@ function CheckPasswdPage() {
   const onCheck = async (e) => {
     e.preventDefault();
 
-    /**api 및 response 확인 필요 */
     try {
-      const res = await postPWCheck(uID, {
+      const res = await postUser(`/seller/info?u_id=${uID}`, {
         pw: pwCheck,
       });
 
       console.log(res);
 
-      if (res.data.state === "available") {
+      if (res.status === 200) {
         showPasswdErrorMsg === true && setShowPasswdErrorMsg(false);
         setPW(pwCheck);
-        // const uID =
 
-        navigate("/admin-setting?uID=${uID}&sID=${sID}");
+        const responseData = {
+          id: res.data.id,
+          s_id: res.data.s_id,
+        };
+
+        navigate(
+          `/admin-setting?id=${responseData.id}&s_id=${responseData.s_id}`
+        );
       }
     } catch (error) {
+      console.log(error);
       if (error.response && error.response.status === 401) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
@@ -68,7 +74,9 @@ function CheckPasswdPage() {
             </label>
           </section>
           {showPasswdErrorMsg && (
-            <p>ID와 맞지 않는 비밀번호 입니다. 다시 입력해주세요.</p>
+            <p className={Check.errorMsg}>
+              비밀번호가 다릅니다. 다시 입력해주세요.
+            </p>
           )}
 
           <button className={Button.Check} onClick={onCheck}>
