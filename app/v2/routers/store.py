@@ -81,7 +81,7 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
     data = store.dict()
     data['status'] = data['status'].value
 
-    Util.check_id(u_id)
+    u_id = Util.check_id(u_id)
 
     name_data = NameModel(name=store.name)
     state = await check_duplicate_name(name_data, request)
@@ -96,6 +96,8 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
         data['num'] = max_num + 1
 
     id = str(DB.insert_one('store', data))
+    
+    DB.update_one('user', {'_id':u_id}, {'s_id': id})
     
     return {
         'document_id': id
