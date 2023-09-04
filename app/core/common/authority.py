@@ -45,11 +45,8 @@ class AuthManagement:
         raise CustomException(status_code=401.1)
         
     def auth_user(self, u_id, pw):
-        try:  # ToDo : mongo 코드 바뀌면 Exception 바꾸기 - try-excepy 문을 밖으로 빼면 다른 오류들도 잡힘
-            u_id = Util.check_id(u_id)
-            user = DB.read_one('user', {'_id':ObjectId(u_id)})
-        except Exception as e:
-            raise CustomException(status_code=401.1)
+        u_id = Util.check_id(u_id)
+        user = DB.read_one('user', {'_id':ObjectId(u_id)})
 
         if user:
             self.auth_pw(pw, user['pw'])
@@ -163,7 +160,7 @@ class TokenManagement:
             else:
                 raise CustomException(status_code=403.1)
         except IndexError:
-            raise CustomException(status_code=401.6)
+            raise CustomException(status_code=401.61)
         except ExpiredSignatureError:
             raise CustomException(status_code=401.62)
         
@@ -172,12 +169,10 @@ class TokenManagement:
     def is_buyer(scope:str) -> bool:
         if scope == "buyer":
             return True
-        # raise CustomException(status_code=403.1)
     
     @staticmethod
     def is_seller(scope:str) -> bool:
         if scope == "seller":
             return True
         return False
-        # raise CustomException(status_code=403.1)
     

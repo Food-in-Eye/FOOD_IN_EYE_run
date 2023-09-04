@@ -27,7 +27,7 @@ async def read_all_store(request: Request):
     print(request)
     """ DB에 존재하는 모든 식당의 정보를 받아온다 """
 
-    assert TokenManager.is_buyer(request), 403.1
+    TokenManager.is_buyer(request)
 
     try:
         result = DB.read_all('store')

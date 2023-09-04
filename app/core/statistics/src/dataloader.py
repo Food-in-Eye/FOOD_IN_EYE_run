@@ -1,5 +1,6 @@
 
 from core.common.mongo import MongodbController
+from core.error.exception import CustomException
 
 DB = MongodbController('FIE_DB2')
 
@@ -18,7 +19,7 @@ class DataLoader:
             print(result)
             return result
 
-        except Exception as e:
+        except CustomException as e:
             print(e)
     
     @staticmethod
@@ -32,7 +33,7 @@ class DataLoader:
             print(result)
             return result
 
-        except Exception as e:
+        except CustomException as e:
             print(e)
 
     def get_orders(query):
@@ -43,5 +44,5 @@ class DataLoader:
                 order['date'] = order['date'].strftime('%Y-%m-%d %H:%M:%S')
             return orders
 
-        except Exception as e:
+        except CustomException as e:
             print(e)

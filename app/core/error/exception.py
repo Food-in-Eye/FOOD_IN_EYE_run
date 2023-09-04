@@ -1,7 +1,8 @@
 
 class CustomException(Exception):
-    def __init__(self, status_code:float):
+    def __init__(self, status_code:float, detail:str = ""):
         self.status_code = status_code
+        self.detail = detail
 
 
 class APIException(Exception):
@@ -14,7 +15,7 @@ class APIException(Exception):
         401.0 : "Access denied",
         401.1 : "Logon failed.",
         # .6 : Token / User ERROR
-        401.61 : "Token has not exist.",
+        401.61 : "Not authenticated.",
         401.62 : "Token has expired.",
 
         403.0 : "Forbidden",
@@ -32,7 +33,17 @@ class APIException(Exception):
         409.2 : "Duplicate NAME.",
 
         422.0 : "Unprocessable Entity",
-        422.6 : "Token(ownership) verification failed."
+        422.6 : "Token(ownership) verification failed.",
+
+        503.0 : "Service unavailable.",
+        # .5 : MongDB ERROR
+        503.51 : "No DataBase exists.",
+        503.52 : "No collection exists.",
+        503.53 : "Failed to CREATE new document.",
+        503.54 : "Failed to UPDATE document.",
+        503.55 : "Failed to READ document.",
+        503.56 : "Failed to DELETE document.",
+        503.57 : "Modified_count is not 1.",
     }
 
     def __init__(self):
@@ -41,7 +52,10 @@ class APIException(Exception):
 
     def get_status(self, ex:CustomException) -> (int, str):
         if ex.status_code in self.STATUS_DICT:
-            detail = self.STATUS_DICT.get(ex.status_code)
+            if ex.detail != "":
+                detail = ex.detail
+            else:
+                detail = self.STATUS_DICT.get(ex.status_code)
 
             if detail != '':
                 return int(ex.status_code), detail
