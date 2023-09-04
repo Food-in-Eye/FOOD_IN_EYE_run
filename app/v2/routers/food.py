@@ -60,7 +60,7 @@ async def read_food(id:str):
 @food_router.post("/food")
 async def create_food(s_id:str, food:FoodModel, request:Request):
     """ 해당하는 id의 음식 정보를 업데이트한다. """
-    assert TokenManager.is_seller(request), 403.1
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
 
     data = food.dict()
 
@@ -84,7 +84,7 @@ async def create_food(s_id:str, food:FoodModel, request:Request):
 @food_router.put('/food')
 async def update_food(id:str, food:FoodModel, request:Request):
     """ 해당하는 id의 food 정보를 변경한다. """
-    assert TokenManager.is_seller(request), 403.1
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
 
     data = food.dict()
 
@@ -97,7 +97,7 @@ async def update_food(id:str, food:FoodModel, request:Request):
 @food_router.put('/food/image')
 async def update_food_image(id: str, file: UploadFile, request:Request):
     """ 해당하는 id의 이미지를 S3에 업로드하고 그 경로를 변경한다. """
-    assert TokenManager.is_seller(request), 403.1
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
 
     _id = Util.check_id(id)
 

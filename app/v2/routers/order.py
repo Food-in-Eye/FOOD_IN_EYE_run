@@ -5,6 +5,8 @@ order_router
 from fastapi import APIRouter, Depends, Request
 from core.models import OrderModel, RawGazeModel
 from core.common.mongo import MongodbController
+from core.error.exception import CustomException
+from core.common.authority import TokenManagement
 from core.common.s3 import Storage
 from .src.util import Util
 from .src.meta import Meta
@@ -19,7 +21,7 @@ import math
 from datetime import datetime, timedelta
 
 from .websocket import websocket_manager as websocket_manager
-from core.common.authority import TokenManagement
+
 TokenManager = TokenManagement()
 
 order_router = APIRouter(prefix="/orders", dependencies=[Depends(TokenManager.dispatch)])
@@ -67,20 +69,10 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         for str in q_str_list:
             q_str = q_str + "&" + str
 
-    try:
-        response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
-    
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}{q_str}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+
+    response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
     
     return {
-        'request': f'GET {PREFIX}{q_str}',
-        'status': 'OK',
         'response': response
     }
 
@@ -88,75 +80,61 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
 async def get_order(id: str, detail: bool=False):
     ''' 특정 id에 대한 주문내역을 찾아서 반환'''
     q_str = ""
-    try:
-        q_str += f"id={id}"
-        _id = Util.check_id(id)
-        response = DB.read_one('order', {'_id':_id})
-        if detail:
-            q_str += f"&detail={detail}"
-            f_list = response["f_list"]
-            new_list = []
-            for dict in f_list:
-                _id = Util.check_id(dict["f_id"])
-                food_detail = DB.read_one("food", {'_id':_id})
-                new_list.append({
-                    "name": food_detail["name"],
-                    "count": dict["count"],
-                    "price": food_detail["price"]
-                })
-            response["f_list"] = new_list
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/order?{q_str}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    q_str += f"id={id}"
+    _id = Util.check_id(id)
+    response = DB.read_one('order', {'_id':_id})
+    if detail:
+        q_str += f"&detail={detail}"
+        f_list = response["f_list"]
+        new_list = []
+        for dict in f_list:
+            _id = Util.check_id(dict["f_id"])
+            food_detail = DB.read_one("food", {'_id':_id})
+            new_list.append({
+                "name": food_detail["name"],
+                "count": dict["count"],
+                "price": food_detail["price"]
+            })
+        response["f_list"] = new_list
     
     return {
-        'request': f'GET {PREFIX}/order?{q_str}',
-        'status': 'OK',
-        'response': response
+        "_id": id,
+        "date": response['date'],
+        "u_id": response['u_id'],
+        "s_id": response['s_id'],
+        "m_id": response['m_id'],
+        "status": response['status'],
+        "f_list": response['f_list']
     }
 
 @order_router.put("/order/status")
-async def change_status(id: str):
+async def change_status(id: str, request:Request):
     ''' 특정 주문 내역의 진행 상태를 변경한다. '''
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+
+    _id = Util.check_id(id)
+    response = DB.read_one('order', {'_id':_id})
+    s = response['status']
+
+    # websocket으로 전송 결과를 받기 위함 
+    s_id = response['s_id']
     
-    try:
-        _id = Util.check_id(id)
-        response = DB.read_one('order', {'_id':_id})
-        s = response['status']
+    if s < 2:
+        DB.update_one('order', {'_id':_id}, {'status': s+1})
 
-        # websocket으로 전송 결과를 받기 위함 
-        s_id = response['s_id']
-        
-        if s < 2:
-            DB.update_one('order', {'_id':_id}, {'status': s+1})
+        # websocket으로 전달하기
+        await websocket_manager.send_update(id)
 
-            # websocket으로 전달하기
-            await websocket_manager.send_update(id)
-
-        else:
-            raise Exception('status is already finish')
-
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'PUT {PREFIX}/order?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    else:
+        raise CustomException(403.7)
     
     return {
-        'request': f'PUT {PREFIX}/order?id={id}',
-        'status': 'OK',
-        'message': f'status is now {s+1}'
+        'status': {s+1}
     }
 
 @order_router.post("/order")
-async def new_order(body:OrderModel):
+async def new_order(body:OrderModel, request:Request):
     ''' app으로 부터 주문을 받고 처리한다.        
         [check 할 사항들]
         1. 사용자로부터 주문을 받아 가게별 주문으로 나누어 order DB에 저장한다. (O)
@@ -166,66 +144,58 @@ async def new_order(body:OrderModel):
         
         모든 과정이 마무리되면 OK 응답을 보낸다.
     '''
-    try:
-        # u_id 채크도 나중에 추가할 것
-        
-        response_list = []
-        order_id_list = []
-        store_name_list = []
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
 
-        total_price = 0           
-        for store_order in body.content:
-            store_price = 0
-            for food in store_order.f_list:
-                store_price += food['price'] * food['count']
-            order = {
-                "date": datetime.now(),
-                "u_id": body.u_id,
-                "s_id": store_order.s_id,
-                "m_id": store_order.m_id,
-                "s_name": store_order.s_name,
-                "f_list": store_order.f_list,
-                "total_price": store_price,
-                "status": 0
-            }
+    # u_id 채크도 나중에 추가할 것
+    
+    response_list = []
+    order_id_list = []
+    store_name_list = []
 
-            total_price += store_price
-
-            o_id =  str(DB.insert_one('order', order))         
-            order_id_list.append(o_id)
-            store_name_list.append(store_order.s_name)
-            response_list.append({
-                "s_id": store_order.s_id,
-                "o_id": o_id
-            })
-
-        history = {
-           "u_id": body.u_id,
-           "date": datetime.now(),
-           "total_price": total_price,
-           "raw_gaze_path": None,
-           "fixation_path": None,
-           "aoi_analysis": None,
-           "orders": order_id_list,
-           "s_names": store_name_list
+    total_price = 0           
+    for store_order in body.content:
+        store_price = 0
+        for food in store_order.f_list:
+            store_price += food['price'] * food['count']
+        order = {
+            "date": datetime.now(),
+            "u_id": body.u_id,
+            "s_id": store_order.s_id,
+            "m_id": store_order.m_id,
+            "s_name": store_order.s_name,
+            "f_list": store_order.f_list,
+            "total_price": store_price,
+            "status": 0
         }
-        
-        h_id = str(DB.insert_one('history', history))
 
-        return {
-            'request': f'POST {PREFIX}/order',
-            'status': 'OK',
-            'h_id': h_id,
-            'response': response_list
+        total_price += store_price
+
+        o_id =  str(DB.insert_one('order', order))         
+        order_id_list.append(o_id)
+        store_name_list.append(store_order.s_name)
+        response_list.append({
+            "s_id": store_order.s_id,
+            "o_id": o_id
+        })
+
+    history = {
+        "u_id": body.u_id,
+        "date": datetime.now(),
+        "total_price": total_price,
+        "raw_gaze_path": None,
+        "fixation_path": None,
+        "aoi_analysis": None,
+        "orders": order_id_list,
+        "s_names": store_name_list
+    }
+    
+    h_id = str(DB.insert_one('history', history))
+
+    return {
+        'h_id': h_id,
+        'response': response_list
         }
             
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/order',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
 
 @order_router.post("/order/gaze")
 async def new_order(h_id: str, body: list[RawGazeModel]):

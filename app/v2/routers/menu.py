@@ -29,7 +29,7 @@ async def hello():
 @menu_router.get("/q")
 async def read_menus_of_store(s_id:str, request:Request):
     """ 주어진 가게 아이디의 모든 메뉴판들을 불러온다. """
-    assert TokenManager.is_seller(request), 403.1
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
 
     Util.check_id(s_id)
     response = DB.read_all('menu', {'s_id': s_id}) 
@@ -55,7 +55,7 @@ async def read_menu(id:str):
 @menu_router.post("/menu")
 async def create_menu(s_id:str, menu:MenuModel, request:Request):
     """ 해당하는 가게에 새로운 메뉴판을 설정한다. """
-    assert TokenManager.is_seller(request), 403.1
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
     
     data = menu.dict()
     
