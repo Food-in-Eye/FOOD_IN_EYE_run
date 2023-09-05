@@ -231,7 +231,7 @@ async def new_order(h_id: str, body: list[RawGazeModel]):
 
     try:
         Util.check_id(h_id)
-        key = storage.upload(gaze_data, 'json', 'C_0725')
+        key = storage.upload(gaze_data, 'json', 'C_0714')
 
         if DB.update_field_by_id('history', h_id, 'raw_gaze_path', key):
             # 임시로 비활성화
@@ -271,13 +271,13 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         DB.update_field_by_id('history', h_id, 'fixation_path', fix_key)
         # print(fix_key)
     
-        # doc = DB.read_by_id('history', h_id)
-        # payload = {'data' : Meta.get_meta_detail(doc['date'])}
-        # print(payload)
-        # response = await client.post(aoi_url + "?key=" + fix_key, json=payload, headers=headers)
-        # data = response.json()
-        # print('aoi result', data)
-        # DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
+        doc = DB.read_by_id('history', h_id)
+        payload = {'data' : Meta.get_meta_detail(doc['date'])}
+        print(payload)
+        response = await client.post(aoi_url + "?key=" + fix_key, json=payload, headers=headers)
+        data = response.json()
+        print('aoi result', data)
+        DB.update_field_by_id('history', h_id, 'aoi_path', data["fixation_key"])
 
 @order_router.get("/historys")
 async def get_history_list(u_id: str, batch: int = 1):

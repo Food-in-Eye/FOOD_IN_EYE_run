@@ -1,4 +1,5 @@
 from bson.objectid import ObjectId
+from core.error.exception import CustomException
 
 class Util:
 
@@ -11,6 +12,8 @@ class Util:
         return False
 
     @staticmethod
-    def check_id(id:str):
+    def check_id(id:str) -> ObjectId:
         if not ObjectId.is_valid(id):
-            raise Exception(f'The id format is not valid. Please check')
+            raise CustomException(503.61, f'The id format is not valid. Please check')
+        else:
+            return ObjectId(id)

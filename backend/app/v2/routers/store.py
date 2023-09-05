@@ -2,45 +2,39 @@
 store_router
 """
 
-from fastapi import APIRouter
-from core.models.store import StoreModel
-from core.common.mongo2 import MongodbController
+from fastapi import APIRouter, Depends, Request, HTTPException
+from core.models.store import StoreModel, NameModel
+from core.common.mongo import MongodbController
+from core.common.authority import TokenManagement
+from core.error.exception import CustomException
 from .src.util import Util
 
-store_router = APIRouter(prefix="/stores")
+
+TokenManager = TokenManagement()
+
+store_router = APIRouter(prefix="/stores", dependencies=[Depends(TokenManager.dispatch)])
 
 PREFIX = 'api/v2/stores'
-DB = MongodbController('FIE_DB')
+DB = MongodbController('FIE_DB2')
+
 
 @store_router.get("/hello")
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
-
 @store_router.get('/')
-async def read_all_store():
+async def read_all_store(request: Request):
     """ DB에 존재하는 모든 식당의 정보를 받아온다 """
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1  
 
-    try:
-        result = DB.read_all('store')
-        response = []
+    result = DB.read_all('store')
+    response = []
 
-        for r in result:
-            response.append(r)
-            
-
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
-    
+    for r in result:
+        response.append(r)
+  
     return {
-        'request': f'GET {PREFIX}',
-        'status': 'OK',
-        'response': response
+        'response' : response
     }
 
 
@@ -48,80 +42,82 @@ async def read_all_store():
 async def read_store(id:str):
     """ 특정 id의 가게 정보를 받아온다."""
 
-    try:
-        Util.check_id(id)
+    _id = Util.check_id(id)
 
-        response = DB.read_by_id('store', id)
+    response = DB.read_one('store', {'_id':_id})
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/store?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
-    
     return {
-        'request': f'GET {PREFIX}/store?id={id}',
-        'status': 'OK',
-        'response': response
+        "_id": response['_id'],
+        "name": response['name'],
+        "desc": response['desc'],
+        "schedule": response['schedule'],
+        "notice": response['notice'],
+        "status": response['status'],
+        "num": response['num']
     }
 
 
-# ToDo: user id 같이 받아야 할 듯. 
+@store_router.post('/namecheck')
+async def check_duplicate_name(data:NameModel, request:Request):
+    """ store name의 중복 여부를 확인한다. """
+    assert TokenManager.is_seller(request.state.token_scope), 403.1 
+    print(data.name)
+    try:
+        store = DB.read_one('store', {'name': data.name})
+        if store:
+            state = 'unavailable'
+    except CustomException:
+        state = 'available'
+
+    return {
+        'state': state
+    }
+
 @store_router.post("/store")
-async def create_store(store:StoreModel):
+async def create_store(u_id:str, store:StoreModel, request:Request):
     """ 입력받은 정보의 가게를 생성한다. (최초 가입시에만 가능) """
+    assert TokenManager.is_seller(request.state.token_scope), 403.1 
 
     data = store.dict()
     data['status'] = data['status'].value
 
-    try:
-        store_list = DB.read_all('store')
-        if not store_list: # store 최초 등록
-            data['num'] = 1
-        else:
-            max_num = max(store["num"] for store in store_list)
-            data['num'] = max_num + 1
+    u_id = Util.check_id(u_id)
 
-        id = str(DB.create('store', data))
+    name_data = NameModel(name=store.name)
+    state = await check_duplicate_name(name_data, request)
+    if state == 'unavailable':
+        raise CustomException(409.2)
+    
+    store_list = DB.read_all('store')
+    if not store_list: # store 최초 등록
+        data['num'] = 1
+    else:
+        max_num = max(store["num"] for store in store_list)
+        data['num'] = max_num + 1
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/store',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    id = str(DB.insert_one('store', data))
+    
+    DB.update_one('user', {'_id':u_id}, {'s_id': id})
     
     return {
-        'request': f'POST {PREFIX}/store',
-        'status': 'OK',
         'document_id': id
     }
 
 @store_router.put('/store')
-async def update_store(id:str, store: StoreModel):
+async def update_store(id:str, store: StoreModel, request:Request):
     """ 해당하는 id의 document를 변경한다. """
+
+    assert TokenManager.is_seller(request.state.token_scope), 403.1 
+
     data = store.dict()
     data['status'] = data['status'].value
     
-    try:
-        Util.check_id(id)
-        
-        if DB.update_by_id('store', id, data):
-            return {
-                'request': f'PUT {PREFIX}/store?id={id}',
-                'status': 'OK'
-            }
-        
-        else:
-            raise Exception(f'Update failed...')
+    _id = Util.check_id(id)
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'PUT {PREFIX}/store?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    name_data = NameModel(name=store.name)
+    state = await check_duplicate_name(name_data, request)
+    if state == 'unavailable':
+        raise CustomException(409.2)
+    
+    if DB.replace_one('store', {'_id':_id}, data) == False:
+        raise CustomException(503.54)

@@ -1,6 +1,6 @@
 from bson.objectid import ObjectId
 from datetime import datetime
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 
 class Meta:
     DB = MongodbController('FIE_DB2')
@@ -13,7 +13,7 @@ class Meta:
                 'date': datetime.now(),
                 'content': content
             }
-            new_id = Meta.DB.create('temp', meta)
+            new_id = Meta.DB.insert_one('temp', meta)
             return new_id
         
         except:
@@ -25,7 +25,7 @@ class Meta:
             주어진 날짜 기준에서의 Meta data를 불러온다.
         '''
         try:
-            data_list = Meta.DB.read_all_by_query('temp', {}, 'date', False)
+            data_list = Meta.DB.read_all('temp', asc_by='date', asc=False)
             
         except:
             return None  
@@ -44,9 +44,10 @@ class Meta:
 
             s_id_list = content.keys()
             m_id_list = content.values()
-
-            store_documents = Meta.DB.read_all_by_id('store', Meta.to_ObjectId_list(s_id_list))
-            menu_documents = Meta.DB.read_all_by_id('menu', Meta.to_ObjectId_list(m_id_list))
+            query = {'_id': {'$in':  Meta.to_ObjectId_list(s_id_list)}}
+            store_documents = Meta.DB.read_all('store', query)
+            query = {'_id': {'$in':  Meta.to_ObjectId_list(m_id_list)}}
+            menu_documents = Meta.DB.read_all('menu', query)
             
             new_dict = {}
             for i in range(len(s_id_list)):

@@ -2,7 +2,7 @@
 WebSocket
 """
 
-from core.common.mongo2 import MongodbController
+from core.common.mongo import MongodbController
 
 from fastapi import WebSocket, WebSocketDisconnect
 import json
@@ -60,10 +60,10 @@ class ConnectionManager:
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             order_dict = {}
-            history = DB.read_by_id('history', h_id)
+            history = DB.read_one('history', {'_id': h_id})
             
             for o_id in history['orders']:
-                order = DB.read_by_id('order', o_id)
+                order = DB.read_one('order', {'_id': o_id})
                 order_dict[o_id] = order['s_id']
 
             self.app_connections[h_id] = {
@@ -259,7 +259,7 @@ class ConnectionManager:
         app_client = await self.get_app_websocekt(o_id)
 
         if app_client:
-            response = DB.read_by_id('order', o_id)
+            response = DB.read_one('order', {'_id': o_id})
             status = response['status']
             if status < 3:
                 result['status'] = status
@@ -277,7 +277,7 @@ class ConnectionManager:
             - return : X
         """
         result = {"type": "request", "result": "gaze_omission"}
-        history = DB.read_by_id('history', h_id)
+        history = DB.read_one('history', {'_id': h_id})
         
         if history['gaze_path'] == None:
             while self.app_connections[h_id]['gaze'] != True:
@@ -293,7 +293,7 @@ class ConnectionManager:
 
 def check_client_in_db(db:str, id:str):
     try:
-        if DB.read_by_id(db, id):
+        if DB.read_one(db, {'_id': id}):
             return True
     except Exception:
         pass
