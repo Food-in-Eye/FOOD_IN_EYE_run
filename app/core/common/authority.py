@@ -77,7 +77,7 @@ class TokenManagement:
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
     def init_a_token(self, scope:str):
-        exp_time = int((datetime.now() + timedelta(seconds=30)).timestamp())
+        exp_time = int((datetime.now() + timedelta(minutes=30)).timestamp())
         
         data = {
             "iss": "ACCESS_Token",
@@ -95,9 +95,9 @@ class TokenManagement:
     
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
-            EXP = int((datetime.now() + timedelta(minutes=1)).timestamp())
+            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
         elif scope == "seller":
-            EXP = int((datetime.now() + timedelta(minutes=1*2)).timestamp())
+            EXP = int((datetime.now() + timedelta(minutes=60*2)).timestamp())
 
         data = {
             "iss": "REFRESH_Token",
