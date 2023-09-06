@@ -127,7 +127,7 @@ async def change_status(id: str, request:Request):
         await websocket_manager.send_update(id)
 
     else:
-        raise CustomException(403.7)
+        raise CustomException(403.71)
     
     return {
         'status': {s+1}
@@ -198,7 +198,8 @@ async def new_order(body:OrderModel, request:Request):
             
 
 @order_router.post("/order/gaze")
-async def new_order(h_id: str, body: list[RawGazeModel]):
+async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
 
     gaze_data = []
     for page in body:
@@ -252,85 +253,65 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
 
 
 @order_router.get("/historys")
-async def get_history_list(u_id: str, batch: int = 1):
-    try:
-        historys = DB.read_all('history', {'u_id':u_id}, asc_by='date', asc=False)
+async def get_history_list(u_id: str, request:Request, batch: int = 1):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
 
-        if batch > 0 and batch < math.ceil(len(historys) / 10) + 1:
-            response_list = []
+    historys = DB.read_all('history', {'u_id':u_id}, asc_by='date', asc=False)
 
-            batch_items = historys[10*(batch-1):10*batch]
-            for h in batch_items:
-                if 's_names' in h.keys(): s_names = h['s_names']
-                else: s_names = ["nothing", "is", 'here']
-                response_list.append({
-                    "h_id": h['_id'],
-                    "date": h['date'],
-                    "total_price": h['total_price'],
-                    "s_names": s_names
-                })
-        else:
-            raise Exception('requested batch exceeds range')
-        
-        return {
-            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
-            'status': 'OK',
-            'max_batch': math.ceil(len(historys) / 10),
-            'response': response_list
-        }
-     
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    if batch > 0 and batch < math.ceil(len(historys) / 10) + 1:
+        response_list = []
+
+        batch_items = historys[10*(batch-1):10*batch]
+        for h in batch_items:
+            if 's_names' in h.keys(): s_names = h['s_names']
+            else: s_names = ["nothing", "is", 'here']
+            response_list.append({
+                "h_id": h['_id'],
+                "date": h['date'],
+                "total_price": h['total_price'],
+                "s_names": s_names
+            })
+    else:
+        raise CustomException(403.72)
+    
+    return {
+        'max_batch': math.ceil(len(historys) / 10),
+        'response': response_list
+    }
     
 @order_router.get("/history")
-async def get_order_list(id: str):
-    try:
-        _id = Util.check_id(id)     
-        response_list = {}
+async def get_order_list(id: str, request:Request):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
 
-        history = DB.read_one('history', {'_id':_id})
+    _id = Util.check_id(id)     
 
-        food_list = []
-        for o_id in history['orders']:
-            _id = Util.check_id(o_id)  
-            order = DB.read_one('order', {'_id':_id})
-            s_name = order['s_name']
-            for f in order['f_list']:
-                if 'f_name' in f.keys(): f_name = f['f_name']
-                else: f_name = 'unknown'
-                food_list.append({
-                    "s_name": s_name,
-                    "f_name": f_name,
-                    "count": f['count'],
-                    "price": f['price']
-                })
+    history = DB.read_one('history', {'_id':_id})
 
-        response_list = {
-            "date": history['date'],
-            "orders": food_list
-        }
-        
-        return {
-            'request': f'GET {PREFIX}/history?id={id}',
-            'status': 'OK',
-            'response': response_list
-        }
-     
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/history?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    food_list = []
+    for o_id in history['orders']:
+        _id = Util.check_id(o_id)  
+        order = DB.read_one('order', {'_id':_id})
+        s_name = order['s_name']
+        for f in order['f_list']:
+            if 'f_name' in f.keys(): f_name = f['f_name']
+            else: f_name = 'unknown'
+            food_list.append({
+                "s_name": s_name,
+                "f_name": f_name,
+                "count": f['count'],
+                "price": f['price']
+            })
+    
+    return {
+        'date': history['date'],
+        'orders': food_list
+    }
+
 
 @order_router.get("/store/dates")
-async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str = None):
+async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = None, end_date:str = None):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+    
     PER_PAGE = 7
     pipeline = [
         { "$match": { "s_id": s_id } },
@@ -343,71 +324,52 @@ async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str
             "$gte": datetime.strptime(start_date, "%Y-%m-%d"),
             "$lte": datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
         }
-    try:
-        aggreagted_data = DB.aggregate_pipline('order', pipeline)
-        
-        distinct_dates = []
-        for entry in aggreagted_data:
-            distinct_dates.append({
-                "date": entry["_id"],
-                "total_price": entry["total_price"]
-            })
 
-        total_dates = len(distinct_dates)
-        start_idx = (batch - 1) * PER_PAGE
-        end_idx = start_idx + PER_PAGE
-        paginated_dates = distinct_dates[start_idx:end_idx]
+    aggreagted_data = DB.aggregate_pipline('order', pipeline)
+    
+    distinct_dates = []
+    for entry in aggreagted_data:
+        distinct_dates.append({
+            "date": entry["_id"],
+            "total_price": entry["total_price"]
+        })
 
-        return {
-            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
-            'status': 'OK',
-            'max_batch': math.ceil(total_dates / PER_PAGE),
-            'response': paginated_dates
-        }
+    total_dates = len(distinct_dates)
+    start_idx = (batch - 1) * PER_PAGE
+    end_idx = start_idx + PER_PAGE
+    paginated_dates = distinct_dates[start_idx:end_idx]
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    return {
+        'max_batch': math.ceil(total_dates / PER_PAGE),
+        'response': paginated_dates
+    }
         
 
 @order_router.get("/store/date")
-async def get_history_list(s_id: str, date: str):
-    try:
-        start_datetime = datetime.strptime(date, "%Y-%m-%d")
-        end_datetime = start_datetime + timedelta(days=1)
+async def get_history_list(request:Request, s_id: str, date: str):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
 
-        query = {
-            "date": {"$gte": start_datetime, "$lt": end_datetime},
-            "s_id": s_id
-        }
+    start_datetime = datetime.strptime(date, "%Y-%m-%d")
+    end_datetime = start_datetime + timedelta(days=1)
 
-        orders = DB.read_all('order', query, asc_by='date', asc=False)
+    query = {
+        "date": {"$gte": start_datetime, "$lt": end_datetime},
+        "s_id": s_id
+    }
 
-        result = []
+    orders = DB.read_all('order', query, asc_by='date', asc=False)
 
-        for o in orders:
-            result.append({
-                'o_id': o['_id'],
-                'date': o['date'],
-                'detail': o['f_list'],
-                'total': o['total_price']
-            })
-        
-        return {
-            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
-            'status': 'OK',
-            'response': result
-        }
-     
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    result = []
+
+    for o in orders:
+        result.append({
+            'o_id': o['_id'],
+            'date': o['date'],
+            'detail': o['f_list'],
+            'total': o['total_price']
+        })
     
+    return {
+        'response': result
+    }
+     
