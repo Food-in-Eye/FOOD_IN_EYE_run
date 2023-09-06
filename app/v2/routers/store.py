@@ -64,10 +64,9 @@ async def check_duplicate_name(data:NameModel, request:Request):
 
     try:
         store = DB.read_one('store', {'name': data.name})
-
         if store:
             state = 'unavailable'
-    except Exception:
+    except CustomException:
         state = 'available'
 
     return {
@@ -82,10 +81,10 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
     data = store.dict()
     data['status'] = data['status'].value
 
-    Util.check_id(u_id)
+    u_id = Util.check_id(u_id)
 
     name_data = NameModel(name=store.name)
-    state = await check_duplicate_name(name_data)
+    state = await check_duplicate_name(name_data, request)
     if state == 'unavailable':
         raise CustomException(409.2)
     
@@ -97,6 +96,8 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
         data['num'] = max_num + 1
 
     id = str(DB.insert_one('store', data))
+    
+    DB.update_one('user', {'_id':u_id}, {'s_id': id})
     
     return {
         'document_id': id

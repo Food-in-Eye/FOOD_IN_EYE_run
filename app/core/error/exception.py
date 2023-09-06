@@ -23,7 +23,9 @@ class APIException(Exception):
         403.2 : "Read access forbidden.",
         403.3 : "Write access forbidden.",
         403.6 : "Token renewal forbidden.",
-        403.7 : "Status is already finish.",
+        # .7 : order_router ERROR
+        403.71 : "Status is already finish.",
+        403.72 : "Batch is out of range.",
 
         404.0 : "Not found",
 
