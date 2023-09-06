@@ -136,7 +136,7 @@ class TokenManagement:
             if token == self.ACCESS_TOKEN_buyer or token == self.ACCESS_TOKEN_seller:
                 payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
                 return token
-            raise CustomException(status_code=422.6)
+            raise CustomException(status_code=422.61)
 
         except ExpiredSignatureError:
             raise CustomException(status_code=401.62)
