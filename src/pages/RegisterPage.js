@@ -45,7 +45,6 @@ function RegisterPage() {
   };
 
   const isPasswordValid = (password) => {
-    // 비밀번호 조건: 8자리 이상, 대문자, 소문자, 특수문자 모두 포함
     const passwordPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
     return passwordPattern.test(password);
@@ -81,7 +80,7 @@ function RegisterPage() {
         console.error("Error registering:", error);
       }
 
-      navigate(`/`);
+      navigate(`/login`);
     } else {
       alert("회원가입 조건을 만족하지 않습니다. 다시 시도해주세요.");
     }

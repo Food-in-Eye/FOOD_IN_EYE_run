@@ -22,7 +22,6 @@ function StoreSettingPage() {
 
   const handleNameDuplicate = async (e) => {
     e.preventDefault();
-    /**가게 이름 중복 체크 코드 추가 */
     try {
       console.log(nameCheck);
       const res = await postStore(`/namecheck`, {
