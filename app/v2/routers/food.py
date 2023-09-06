@@ -89,7 +89,7 @@ async def update_food(id:str, food:FoodModel, request:Request):
     data = food.dict()
 
     _id = Util.check_id(id)
-    if DB.replace_one('food', {'_id':_id}, data) == False:
+    if DB.update_one('food', {'_id':_id}, data) == False:
         raise CustomException(503.54)
 
 
