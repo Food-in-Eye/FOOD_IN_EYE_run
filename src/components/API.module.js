@@ -132,6 +132,12 @@ export const putOrderStatus = (o_id) => {
   return apiInstance.put(requestUrl);
 };
 
+export const putUser = (query, data) => {
+  const requestUrl = `${USER_URL}${query}`;
+
+  return apiInstance.put(requestUrl, JSON.stringify(data));
+};
+
 export const postUser = (query, data) => {
   const requestUrl = `${USER_URL}${query}`;
 

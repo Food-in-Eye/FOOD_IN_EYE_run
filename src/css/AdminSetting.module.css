@@ -104,6 +104,7 @@
   padding: 5px 0;
   margin-left: 20px;
   margin-right: auto;
+  white-space: nowrap;
   /* border: 1px solid #000; */
   border-radius: 5px;
   font-size: 18px;
@@ -114,4 +115,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.pSection {
+  margin-top: -5px;
+  margin-left: 10px;
+  margin-bottom: 5px;
+  background: none;
+}
+
+.pSection p {
+  white-space: nowrap;
+  background: none;
 }

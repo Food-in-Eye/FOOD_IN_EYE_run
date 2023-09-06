@@ -13,7 +13,7 @@ function CheckPasswdPage() {
   const uID = localStorage.getItem("u_id");
 
   const [pwCheck, setPWCheck] = useState("");
-  const [pw, setPW] = useState("");
+  // const [pw, setPW] = useState("");
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
 
   const onCheck = async (e) => {
@@ -28,16 +28,16 @@ function CheckPasswdPage() {
 
       if (res.status === 200) {
         showPasswdErrorMsg === true && setShowPasswdErrorMsg(false);
-        setPW(pwCheck);
+        // setPW(pwCheck);
 
         const responseData = {
           id: res.data.id,
           s_id: res.data.s_id,
         };
 
-        navigate(
-          `/admin-setting?id=${responseData.id}&s_id=${responseData.s_id}`
-        );
+        localStorage.setItem("id", responseData.id);
+
+        navigate(`/admin-setting`);
       }
     } catch (error) {
       console.log(error);
