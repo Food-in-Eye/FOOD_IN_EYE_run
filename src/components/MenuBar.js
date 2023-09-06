@@ -1,15 +1,28 @@
 import style from "../css/MenuBar.module.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 function MenuBar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const onLogout = (e, userID) => {
+  const onLogout = (e) => {
     e.preventDefault();
 
-    localStorage.removeItem("storeID");
+    localStorage.removeItem("u_id");
+    localStorage.removeItem("s_id");
+    localStorage.removeItem("a_token");
+    localStorage.removeItem("r_token");
+    localStorage.removeItem("r_token_create_time");
     localStorage.removeItem("storeNum");
-    navigate(`/`);
+
+    logout();
+
+    console.log("logout u_id", localStorage.getItem("u_id"));
+    console.log("logout a_token", localStorage.getItem("a_token"));
+    console.log("logout r_token", localStorage.getItem("r_token"));
+
+    navigate(`/login`);
   };
 
   return (
@@ -61,7 +74,7 @@ function MenuBar() {
             </ul>
           </li>
           <li>
-            <a href="./admin" className={style.menubarSub}>
+            <a href="./check-passwd" className={style.menubarSub}>
               설정
             </a>
           </li>

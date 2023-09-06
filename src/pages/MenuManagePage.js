@@ -13,9 +13,12 @@ import {
   postFood,
 } from "../components/API.module";
 import { useState, useEffect, useRef, useCallback } from "react";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function MenuManagePage() {
-  const sID = localStorage.getItem("storeID");
+  useTokenRefresh();
+
+  const sID = localStorage.getItem("s_id");
 
   /** api에서 불러올 menuList */
   const [menuList, setMenuList] = useState([]);

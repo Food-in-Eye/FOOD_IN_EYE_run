@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminPage from "./pages/AdminPage";
+import AdminSettingPage from "./pages/AdminSettingPage";
+import CheckPasswdPage from "./pages/CheckPasswdPage";
 import DetailAnalysisPage from "./pages/DetailAnalysisPage";
 import AnalysisPage from "./pages/AnalysisPage";
 import VisualizeGazePage from "./pages/VisualizeGazePage";
 import BenefitManagePage from "./pages/BenefitManagePage";
 import MenuPlacementPage from "./pages/MenuPlacementPage";
 import StoreManagePage from "./pages/StoreManagePage";
+import StoreSettingPage from "./pages/StoreSettingPage";
 import OrderManagePage from "./pages/OrderManagePage";
 import MenuManagePage from "./pages/MenuManagePage";
 import RegisterPage from "./pages/RegisterPage";
@@ -17,7 +19,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin-setting" element={<AdminSettingPage />} />
+        <Route path="/check-passwd" element={<CheckPasswdPage />} />
         <Route path="/analysis-detail" element={<DetailAnalysisPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/gaze-visualize" element={<VisualizeGazePage />} />
@@ -28,11 +31,12 @@ function App() {
         <Route path="/benefit-manage" element={<BenefitManagePage />} />
         <Route path="/menu-placement" element={<MenuPlacementPage />} />
         <Route path="/store-manage" element={<StoreManagePage />} />
+        <Route path="/store-setting" element={<StoreSettingPage />} />
         <Route path="/order-manage" element={<OrderManagePage />} />
         <Route path="/menu-manage" element={<MenuManagePage />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </Router>
   );

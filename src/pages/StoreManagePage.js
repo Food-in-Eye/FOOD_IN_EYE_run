@@ -4,9 +4,11 @@ import Button from "../css/Button.module.css";
 import { getStore, putStore } from "../components/API.module";
 
 import { useState, useEffect } from "react";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function StoreManagePage() {
-  const sID = localStorage.getItem("storeID");
+  useTokenRefresh();
+  const sID = localStorage.getItem("s_id");
 
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
@@ -24,7 +26,6 @@ function StoreManagePage() {
         setLoading(true);
 
         const request = await getStore(sID);
-        console.log(request.data.response);
         setStore(request.data.response);
 
         if (request.data.response.status === 1) {
@@ -39,7 +40,7 @@ function StoreManagePage() {
     };
 
     fetchStore();
-  }, []);
+  }, [sID]);
 
   const [descValue, setDescValue] = useState(store.desc);
   const [scheduleValue, setScheduleValue] = useState(store.schedule);

@@ -25,10 +25,13 @@ import {
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
 import { SocketProvider } from "../components/SocketContext.module";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function MainPage() {
+  useTokenRefresh();
+
   const wsUrl = `ws://localhost/api/v2/websockets/ws`;
-  const sID = localStorage.getItem("storeID");
+  const sID = localStorage.getItem("s_id");
   const [socket, setSocket] = useState(null);
 
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
