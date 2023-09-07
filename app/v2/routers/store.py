@@ -46,6 +46,8 @@ async def read_store(id:str):
 
     response = DB.read_one('store', {'_id':_id})
     print(response) # 확인용 print문은 나중에 지우기~ 혹시 모르니까 주석 옆에 달아두면 나중에 놓칠일도 적을거같습니다.
+    # m_id는 왜 빠져있었죠? response를 아래처럼 바꾼 이유도 알려주시길.
+
     return {
         "_id": response['_id'],
         "name": response['name'],
