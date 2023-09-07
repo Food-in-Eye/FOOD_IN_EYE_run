@@ -199,8 +199,7 @@ async def get_access_token(u_id:str, token: str = Depends(TokenManager.auth_r_to
     if user['R_Token'] != token:
         raise CustomException(status_code=422.62)
     
-    payload = TokenManager.get_payload('refresh', token)
-    response = TokenManager.recreate_a_token(payload, user['scope'])
+    response = TokenManager.recreate_a_token(user['scope'])
 
     return {
         'A_Token': response
@@ -213,8 +212,7 @@ async def get_refresh_token(u_id:str, token: str = Depends(TokenManager.auth_r_t
     if user['R_Token'] != token:
         raise CustomException(status_code=422.62)
     
-    payload = TokenManager.get_payload('refresh', token)
-    response = TokenManager.recreate_r_token(payload, u_id, user['scope'])
+    response = TokenManager.recreate_r_token(token, u_id, user['scope'])
 
     DB.update_one('user', {'_id':ObjectId(u_id)}, {"R_Token": response})
 

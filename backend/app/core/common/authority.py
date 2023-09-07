@@ -57,8 +57,6 @@ class AuthManagement:
     
 
 
-            
-
 class TokenManagement:
     _instance = None
 
@@ -88,7 +86,12 @@ class TokenManagement:
             "scope": scope
         }
 
-        return jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
+        if scope == 'buyer':
+            self.ACCESS_TOKEN_buyer = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
+            return self.ACCESS_TOKEN_buyer
+        elif scope == 'seller':
+            self.ACCESS_TOKEN_seller = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
+            return self.ACCESS_TOKEN_seller
     
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
@@ -107,16 +110,23 @@ class TokenManagement:
 
 
 
-    def recreate_a_token(self, payload:dict, scope:str):
-        cur_time = int(datetime.now().timestamp())
-        exp_time = payload["exp"]
-        
-        if exp_time - cur_time > 0:
-            raise CustomException(status_code=403.6)
-        
-        return self.init_a_token(scope)
+    def recreate_a_token(self, scope:str):
+        if scope == 'buyer':
+            a_token = self.ACCESS_TOKEN_buyer
+        elif scope == 'seller':
+            a_token = self.ACCESS_TOKEN_seller
 
-    def recreate_r_token(self, payload:dict, u_id:str, scope:str):
+        try:
+            self.get_payload('access', a_token)
+
+        except CustomException as e:
+            return self.init_a_token(scope)
+        
+        raise CustomException(status_code=403.6)
+
+    def recreate_r_token(self, token:str, u_id:str, scope:str):
+        payload = self.get_payload('refresh', token)
+
         cur_time = int(datetime.now().timestamp())
         exp_time = payload["exp"]
 
@@ -128,41 +138,37 @@ class TokenManagement:
 
     def get_payload(self, field:str, token:str):
         SK = self.ACCESS_SK if field == 'access' else self.REFRESH_SK
-
-        return jwt.decode(token, SK, algorithms=self.algorithm)
+        try:
+            return jwt.decode(token, SK, algorithms=self.algorithm)
+            
+        except ExpiredSignatureError:
+            raise CustomException(status_code=401.62)
+    
 
     def auth_a_token(self, token: str = Depends(oauth2_scheme)):
-        try:
-            if token == self.ACCESS_TOKEN_buyer or token == self.ACCESS_TOKEN_seller:
-                payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
-                return token
-            raise CustomException(status_code=422.6)
+        if token == self.ACCESS_TOKEN_buyer or token == self.ACCESS_TOKEN_seller:
+            self.get_payload('access', token)
 
-        except ExpiredSignatureError:
-            raise CustomException(status_code=401.62)
-        
-    def auth_r_token(self, token: str = Depends(oauth2_scheme)):
-        try:
-            payload = jwt.decode(token, self.REFRESH_SK, algorithms=self.algorithm)
             return token
-        
-        except ExpiredSignatureError:
-            raise CustomException(status_code=401.62)
+        raise CustomException(status_code=422.61)
 
+    def auth_r_token(self, token: str = Depends(oauth2_scheme)):
+        self.get_payload('refresh', token)
+
+        return token
+        
 
     def dispatch(self, request: Request):
         try:
             token = request.headers.get("Authorization", "").split(" ")[1]
 
             if token == self.ACCESS_TOKEN_buyer or token == self.ACCESS_TOKEN_seller:
-                payload = jwt.decode(token, self.ACCESS_SK, algorithms=self.algorithm)
+                payload = self.get_payload('access', token)
                 request.state.token_scope = payload.get("scope")
             else:
                 raise CustomException(status_code=403.1)
         except IndexError:
             raise CustomException(status_code=401.61)
-        except ExpiredSignatureError:
-            raise CustomException(status_code=401.62)
         
         
     @staticmethod
