@@ -4,9 +4,11 @@ import Button from "../css/Button.module.css";
 import { getStore, putStore } from "../components/API.module";
 
 import { useState, useEffect } from "react";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function StoreManagePage() {
-  const sID = localStorage.getItem("storeID");
+  useTokenRefresh();
+  const sID = localStorage.getItem("s_id");
 
   const [store, setStore] = useState({});
   const [loading, setLoading] = useState(null);
@@ -24,17 +26,12 @@ function StoreManagePage() {
         setLoading(true);
 
         const request = await getStore(sID);
-        console.log(request.data.response);
-        setStore(request.data.response);
-        // localStorage.setItem(
-        //   "storeNum",
-        //   request.data.response.num
-        //   // JSON.stringify(request.data.response._id)
-        // );
+        console.log("request", request);
+        setStore(request.data);
 
-        if (request.data.response.status === 1) {
+        if (request.data.status === 1) {
           setIsOpenButtonClicked(true);
-        } else if (request.data.response.status === 2) {
+        } else if (request.data.status === 2) {
           setIsCloseButtonClicked(true);
         }
       } catch (error) {
@@ -44,7 +41,7 @@ function StoreManagePage() {
     };
 
     fetchStore();
-  }, []);
+  }, [sID]);
 
   const [descValue, setDescValue] = useState(store.desc);
   const [scheduleValue, setScheduleValue] = useState(store.schedule);
@@ -98,6 +95,8 @@ function StoreManagePage() {
   const handleOpenBtnClick = () => {
     setIsOpenButtonClicked(true);
     setIsCloseButtonClicked(false);
+    localStorage.setItem("storeOpen", true);
+    localStorage.setItem("storeClosed", false);
 
     putStore(sID, {
       ...store,
@@ -114,6 +113,8 @@ function StoreManagePage() {
   const handleCloseBtnClick = () => {
     setIsCloseButtonClicked(true);
     setIsOpenButtonClicked(false);
+    localStorage.setItem("storeOpen", false);
+    localStorage.setItem("storeClosed", true);
 
     putStore(sID, {
       ...store,

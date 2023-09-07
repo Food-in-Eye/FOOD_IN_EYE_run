@@ -6,7 +6,7 @@ import Main from "../css/Main.module.css";
 import Bar from "../css/UnderBar.module.css";
 import Button from "../css/Button.module.css";
 import MenuBar from "../components/MenuBar";
-import Table from "../components/Table.module";
+import MenuTable from "../components/MenuTable.module";
 import ShortCuts from "../components/ShortCutForPages.module";
 
 import orderReceive from "../images/order_received.png";
@@ -25,10 +25,13 @@ import {
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
 import { SocketProvider } from "../components/SocketContext.module";
+import useTokenRefresh from "../components/useTokenRefresh";
 
 function MainPage() {
+  useTokenRefresh();
+
   const wsUrl = `ws://localhost/api/v2/websockets/ws`;
-  const sID = localStorage.getItem("storeID");
+  const sID = localStorage.getItem("s_id");
   const [socket, setSocket] = useState(null);
 
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
@@ -72,14 +75,21 @@ function MainPage() {
       setLoading(true);
 
       const ordersResponse = await getOrders(ordersQuery);
+      console.log("ordersResponse", ordersResponse);
       const orders = ordersResponse.data.response;
-      const foodIds = orders.map((order) => order.f_list[0].f_id);
+      console.log("orders", orders);
+      const foodIds = orders.reduce((acc, order) => {
+        if (order.f_list) {
+          const fIds = order.f_list.map((item) => item.f_id);
+          acc.push(...fIds);
+        }
+        return acc;
+      }, []);
       const foodsResponse = await Promise.all(
-        foodIds.map((fID) => getFood(fID))
+        foodIds.map((fID) => fID && getFood(fID))
       );
-      const foods = await Promise.all(
-        foodsResponse.map((res) => res.data.response)
-      );
+
+      const foods = await Promise.all(foodsResponse.map((res) => res.data));
 
       const orderListWithFoods = orders
         .filter((order, index) => foods[index])
@@ -139,11 +149,14 @@ function MainPage() {
     } else if (newOrders[index].status === 1) {
       newOrders[index].status = 2;
     }
-    // 완료 시 더이상 버튼 못누르게 비활성화나 warning 메시지 띄우기
 
     try {
       await putOrderStatus(newOrders[index]._id);
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        error.response.data.detail === "Status is already finish." &&
+          alert("완료된 주문입니다.");
+      }
       console.log(error);
     }
 
@@ -275,7 +288,7 @@ function MainPage() {
               <section className={Main.orderDetail}>
                 <h3>주문 내역</h3>
                 <div className={Main.orderContents}>
-                  <Table data={orderData} />
+                  <MenuTable data={orderData} />
                 </div>
               </section>
             </div>

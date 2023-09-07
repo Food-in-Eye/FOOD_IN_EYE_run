@@ -1,32 +1,45 @@
 import style from "../css/MenuBar.module.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 function MenuBar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const onLogout = (e, userID) => {
+  const onLogout = (e) => {
     e.preventDefault();
 
-    localStorage.removeItem("storeID");
+    localStorage.removeItem("u_id");
+    localStorage.removeItem("s_id");
+    localStorage.removeItem("a_token");
+    localStorage.removeItem("r_token");
+    localStorage.removeItem("r_token_create_time");
     localStorage.removeItem("storeNum");
-    navigate(`/`);
+
+    logout();
+
+    console.log("logout u_id", localStorage.getItem("u_id"));
+    console.log("logout a_token", localStorage.getItem("a_token"));
+    console.log("logout r_token", localStorage.getItem("r_token"));
+
+    navigate(`/login`);
   };
 
   return (
     <section className={style.header}>
       <h2>LOGO</h2>
       <div className={style.dropMenu}>
-        <ul>
+        <ul className={style.menubarHeader}>
           <li>
-            <a href="./main" className={style.menubar_head}>
+            <a href="./main" className={style.menubarSub}>
               Home
             </a>
           </li>
           <li>
-            <a href="#!" className={style.menubar_head}>
+            <a href="#!" className={style.menubarSub}>
               관리
             </a>
-            <ul>
+            <ul className={style.menubarSubOfSub}>
               <li>
                 <a href="./store-manage">가게 관리</a>
               </li>
@@ -34,7 +47,7 @@ function MenuBar() {
                 <a href="./menu-manage">메뉴 관리</a>
               </li>
               <li>
-                <a href="./order-manage">주문 관리</a>
+                <a href="./order-manage">누적 주문 관리</a>
               </li>
               <li>
                 <a href="./menu-placement">메뉴판 배치</a>
@@ -42,10 +55,10 @@ function MenuBar() {
             </ul>
           </li>
           <li>
-            <a href="#!" className={style.menubar_head}>
+            <a href="#!" className={style.menubarSub}>
               분석
             </a>
-            <ul>
+            <ul className={style.menubarSubOfSub}>
               <li>
                 <a href="./analysis">전체 메뉴분석</a>
               </li>
@@ -55,10 +68,13 @@ function MenuBar() {
               <li>
                 <a href="./gaze-visualize">Gaze 시각화</a>
               </li>
+              <li>
+                <a href="./gaze-visualize-no-background">Gaze 시각화(배경x)</a>
+              </li>
             </ul>
           </li>
           <li>
-            <a href="./admin" className={style.menubar_head}>
+            <a href="./check-passwd" className={style.menubarSub}>
               설정
             </a>
           </li>

@@ -1,28 +1,59 @@
 table {
   border-collapse: collapse;
   width: 100%;
-  padding: 10%;
+  /* padding: 5%; */
 }
 
 th,
 td {
-  padding: 10px;
+  padding-bottom: 10px;
   text-align: center;
+  align-items: center;
 }
 
-th {
-  border-bottom: 1px solid #ddd;
+th,
+.orderTH {
+  border-bottom: 3px solid #313030;
 }
 
-td {
+.orderTH {
+  font-size: 23px;
+}
+
+tr {
+  height: 50%;
+}
+
+.menuTD {
+  height: 20px;
   padding-left: 40px;
   padding-right: 20px;
+}
+
+tbody .orderTD {
+  height: 100px;
+  font-size: 20px;
+  padding: 0 10px;
+  background-color: #e9e9e9;
 }
 
 tfoot {
   border-top: 1px solid #ddd;
 }
 
-tfoot td:first-child {
+tfoot td {
+  height: 10px;
   font-weight: bold;
+}
+
+.orderTimeCell {
+  width: 20%;
+}
+
+.orderMenusCell {
+  width: 50%;
+}
+
+.orderPriceCell {
+  width: 30%;
 }

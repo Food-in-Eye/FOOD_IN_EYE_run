@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/Table.module.css";
+import TableStyle from "../css/Table.module.css";
 import { useTable } from "react-table";
 
 function OrderHistoryTable({ data }) {
@@ -58,7 +58,11 @@ function OrderHistoryTable({ data }) {
           return (
             <tr {...row.getRowProps()}>
               {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                return (
+                  <td {...cell.getCellProps()} className={TableStyle.menuTD}>
+                    {cell.render("Cell")}
+                  </td>
+                );
               })}
             </tr>
           );
