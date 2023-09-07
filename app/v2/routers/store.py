@@ -53,7 +53,8 @@ async def read_store(id:str):
         "schedule": response['schedule'],
         "notice": response['notice'],
         "status": response['status'],
-        "num": response['num']
+        "num": response['num'],
+        "m_id": response['m_id']
     }
 
 '''
