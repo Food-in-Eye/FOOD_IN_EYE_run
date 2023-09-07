@@ -9,6 +9,11 @@ from v2.api import v2_router
 app = FastAPI()
 app.include_router(v2_router)
 
+'''
+현재 이 페이지에 주석처리 되어있는 코드들은 어떤 이유로 남겨져 있는지 궁금합니다.
+만약 이제는 더 필요가 없다거나 과거 테스트 용이였다면 지우고, 적절한 이유가 있다면 주석을 추가해 주시길 바랍니다.
+'''
+
 # app.add_middleware(
 #     CORSMiddleware,
 #     allow_origins=["http://localhost:8000"],              # 허용된 오리진(도메인) 목록

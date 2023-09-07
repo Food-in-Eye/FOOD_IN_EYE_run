@@ -69,9 +69,8 @@ async def create_menu(s_id:str, menu:MenuModel, request:Request):
 
     new_id = str(DB.insert_one('menu', new_menu))
 
-    if DB.update_one('store', {'_id': _id}, {'m_id': new_id}) == False:
+    if DB.update_one('store', {'_id': _id}, {'m_id': new_id}):
         update_meta(s_id, new_id)
-        raise CustomException(503.53)
     
 
 @menu_router.get('/menu/foods')

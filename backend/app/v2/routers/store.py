@@ -45,7 +45,7 @@ async def read_store(id:str):
     _id = Util.check_id(id)
 
     response = DB.read_one('store', {'_id':_id})
-    print(response)
+    print(response) # 확인용 print문은 나중에 지우기~ 혹시 모르니까 주석 옆에 달아두면 나중에 놓칠일도 적을거같습니다.
     return {
         "_id": response['_id'],
         "name": response['name'],
@@ -56,7 +56,9 @@ async def read_store(id:str):
         "num": response['num']
     }
 
-
+'''
+ 왜 에러가 났는데 사용가능??????? 아래 코드 설명 필요
+'''
 @store_router.post('/namecheck')
 async def check_duplicate_name(data:NameModel, request:Request):
     """ store name의 중복 여부를 확인한다. """
@@ -102,6 +104,13 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
     return {
         'document_id': id
     }
+
+'''
+이 코드 오류가 없는가??
+이유: 이미 있는 정보를 변경하는데 예를들어 '파스타' 가게가 잇고, 이 가게의 설명을 바꾸기 위해 사용했다고 합시다.
+     파스타 가게 이름은 그대로 두고 가게 설명만 바꾸더라도 저기에서 이름 중복을 체크할 것으로 보여짐
+     파스타 가게는 이미 있는게 맞으니까..? 오류가 나지 않을까??
+'''
 
 @store_router.put('/store')
 async def update_store(id:str, store: StoreModel, request:Request):
