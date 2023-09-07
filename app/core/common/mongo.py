@@ -56,7 +56,7 @@ class MongodbController:
 
         result = coll.replace_one(query, data)
         if result.acknowledged is False:
-            raise CustomException(503.54, f'Failed to UPDATE document with id \'{id}\'')
+            raise CustomException(503.54, f'Failed to UPDATE document')
         
         if result.modified_count != 1:
             raise CustomException(503.57, f'modified_count is not 1')
@@ -72,7 +72,7 @@ class MongodbController:
         result = coll.update_one(query, {'$set':fields})
 
         if result.acknowledged is False:
-            raise CustomException(503.54, f'Failed to UPDATE document with id \'{id}\'')
+            raise CustomException(503.54, f'Failed to UPDATE document')
         
         if result.modified_count > 1:
             raise CustomException(503.57, f'modified_count is not 1')
@@ -86,7 +86,7 @@ class MongodbController:
 
         result = coll.find_one(query)
         if result is None:
-            raise CustomException(503.55, f'Failed to READ document with id \'{id}\'')
+            raise CustomException(503.55, f'Failed to READ document')
         
         return objectIdToStr(result)
     
@@ -104,7 +104,7 @@ class MongodbController:
             result.sort([(asc_by, 1 if asc else -1)])
 
         if result is None:
-            raise CustomException(503.55, f'Failed to READ document with id \'{id}\'')
+            raise CustomException(503.55, f'Failed to READ document')
         
         response = []
         for r in result:

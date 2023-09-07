@@ -36,6 +36,7 @@ storage = Storage('foodineye2')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
+# 아래 코드는 사용성 조사 필요. 안쓴다면 삭제 예정
 @order_router.get("/q")
 async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: str=None, asc: bool=True):
     ''' 특정 조건을 만족하는 주문 내역 전체를 반환한다.
@@ -76,6 +77,10 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         'response': response
     }
 
+'''
+mongoDB오류를 catch해서 밖에서 한다면. 여기도 변경할 수 있는게 좀 있음.
+예를 들면, 주문목록을 불러올 수 있다. 음식을 부러올 수 없다 등.. 근데 이쯤되니 너무 많아서 넣지말까 고민이긴 합니다.
+'''
 @order_router.get("/order")
 async def get_order(id: str, detail: bool=False):
     ''' 특정 id에 대한 주문내역을 찾아서 반환'''
@@ -133,6 +138,10 @@ async def change_status(id: str, request:Request):
         'status': {s+1}
     }
 
+'''
+아래의 주석에서 해결된건 좀 지우죠
+그리고 u_id체크 이제는 할 수 있을 것 같은데?
+'''
 @order_router.post("/order")
 async def new_order(body:OrderModel, request:Request):
     ''' app으로 부터 주문을 받고 처리한다.        
@@ -196,7 +205,9 @@ async def new_order(body:OrderModel, request:Request):
         'response': response_list
         }
             
-
+'''
+여기 커스텀 오류 추가해야함 내일 상의
+'''
 @order_router.post("/order/gaze")
 async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     assert TokenManager.is_buyer(request.state.token_scope), 403.1
@@ -226,6 +237,9 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     except:
         return {'success': False}
 
+'''
+여기는 로깅 필요
+'''
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
