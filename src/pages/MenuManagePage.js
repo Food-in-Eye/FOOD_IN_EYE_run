@@ -11,6 +11,7 @@ import {
   getFoods,
   putFoods,
   postFood,
+  putFoodImg,
 } from "../components/API.module";
 import { useState, useEffect, useRef, useCallback } from "react";
 import useTokenRefresh from "../components/useTokenRefresh";
@@ -22,8 +23,6 @@ function MenuManagePage() {
 
   /** api에서 불러올 menuList */
   const [menuList, setMenuList] = useState([]);
-  const [loading, setLoading] = useState(null);
-  const [error, setError] = useState(null);
 
   const [editMenu, setEditMenu] = useState(false);
   const [editMenuImg, setEditMenuImg] = useState(false);
@@ -34,13 +33,9 @@ function MenuManagePage() {
   const selectedMenuIdRef = useRef();
 
   useEffect(() => {
-    setError(null);
-    setLoading(true);
-
     getFoods(sID)
       .then((res) => setMenuList(res.data.response))
-      .catch((e) => setError(e))
-      .finally(() => setLoading(false));
+      .catch((e) => console.log(e));
   }, []);
 
   const handleMenuClick = useCallback(
@@ -53,14 +48,15 @@ function MenuManagePage() {
 
       getFood(selectedMenuIdRef.current)
         .then((res) => {
-          setSelectedMenu(res.data.response);
-          if (res.data.response.img_key) {
+          console.log("res getFood", res);
+          setSelectedMenu(res.data);
+          if (res.data.img_key) {
             setSelectedMenuImgURL(
-              `https://foodineye2.s3.ap-northeast-2.amazonaws.com/${res.data.response.img_key}`
+              `https://foodineye2.s3.ap-northeast-2.amazonaws.com/${res.data.img_key}`
             );
           }
         })
-        .catch((e) => setError(e));
+        .catch((e) => console.log(e));
     },
     [selectedMenuIdRef]
   );
@@ -89,11 +85,13 @@ function MenuManagePage() {
       origin: "메뉴에 대한 원산지 정보를 입력하세요",
     })
       .then(async (res) => {
+        console.log("postFood", res);
         const newMenu = await getFood(res.data.document_id);
-        setMenuList([...menuList, newMenu.data.response]);
+        console.log("newMenu", newMenu);
+        setMenuList([...menuList, newMenu.data]);
       })
       .catch((e) => {
-        setError(e);
+        console.log(e);
       });
   };
 
@@ -148,7 +146,7 @@ function MenuManagePage() {
         setMenuList(updatedMenuList);
       })
       .catch((e) => {
-        setError(e);
+        console.log(e);
       });
   });
 
@@ -176,30 +174,19 @@ function MenuManagePage() {
       if (croppedImage.length !== 0) {
         formData.append("file", croppedImage);
 
-        axios
-          .put(`/api/v2/foods/food/image?id=${selectedMenu._id}`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
+        await putFoodImg(`/food/image?id=${selectedMenu._id}`, formData)
           .then((res) => {
-            // console.log(res.data);
-            // console.log(res.data.img_url);
             setSelectedMenuImgURL(res.data.img_url);
             setEditMenuImg(false);
             setInputImage(null);
             setCroppedImage(null);
           })
           .catch((e) => {
-            // for (let key of formData.keys()) {
-            //   console.log(key, ":", formData.get(key));
-            // }
-
-            // for (let value of formData.values()) {
-            //   console.log(value);
-            // }
-
-            console.log("put에러: ", e);
+            if (e.response.status === 503) {
+              console.log(e.response.data.detail);
+            } else {
+              console.log(e);
+            }
           });
       } else {
         setEditMenuImg(false);
@@ -246,7 +233,9 @@ function MenuManagePage() {
         <div className={Menu.inner}>
           <section className="menus">
             <div className={Menu.menus}>
-              <h1>Menu</h1>
+              <div className={Menu.title}>
+                <h1>Menu</h1>
+              </div>
               <div className={Bar.line}>
                 <div className={Bar.circle}></div>
               </div>

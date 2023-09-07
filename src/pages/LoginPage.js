@@ -68,12 +68,14 @@ function LoginPage() {
         }
       }
     } catch (error) {
-      if (error.response && error.response.status === 400) {
+      if (error.response.status === 400) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
         } else if (error.response.data.detail === "Nonexistent ID") {
           setShowIdErrorMsg(true);
         }
+      } else if (error.response.status === 401) {
+        console.log(error.response.data.detail);
       } else {
         handleError(error);
       }
@@ -82,8 +84,7 @@ function LoginPage() {
 
   const getStoreNum = async (s_id) => {
     const res = await getStore(s_id);
-
-    localStorage.setItem("storeNum", res.data.response.num);
+    localStorage.setItem("storeNum", res.data.num);
   };
 
   return (

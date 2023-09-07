@@ -1,6 +1,5 @@
 import axios from "axios";
 import { handleAccessToken } from "./JWT.module";
-import { useNavigate } from "react-router-dom";
 
 const USER_URL = "/api/v2/users";
 const STORE_URL = "/api/v2/stores";
@@ -29,6 +28,7 @@ const apiFormDataInstance = axios.create({
 });
 
 async function retryOriginalRequest(error) {
+  console.log("토큰 만료 시 a_token 재발급 및 재요청");
   try {
     await handleAccessToken();
 
@@ -55,16 +55,15 @@ apiInstance.interceptors.request.use((config) => {
 apiInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      const detail = error.response.data.detail;
-
-      if (detail === "Signature has expired.") {
+    if (error.response.status === 401) {
+      if (error.response.data.detail === "Token has expired.") {
         return retryOriginalRequest(error);
-      } else if (detail === "Signature verification failed.") {
-        const navigate = useNavigate();
-        navigate("/");
-        return Promise.reject(error);
       }
+    } else if (
+      (error.response.status === 403) |
+      (error.response.status === 422)
+    ) {
+      console.log(error.response.data.detail);
     }
     return Promise.reject(error);
   }
@@ -124,6 +123,12 @@ export const putFoods = (f_id, data) => {
   const requestUrl = `${FOODS_URL}/food?id=${f_id}`;
 
   return apiInstance.put(requestUrl, JSON.stringify(data));
+};
+
+export const putFoodImg = (query, formData) => {
+  const requestUrl = `${FOODS_URL}${query}`;
+
+  return apiFormDataInstance.put(requestUrl, formData);
 };
 
 export const putOrderStatus = (o_id) => {

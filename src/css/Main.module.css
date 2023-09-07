@@ -114,6 +114,7 @@
   margin-top: 10%;
   max-height: 100%;
   overflow-y: auto;
+  background-color: #fff;
 }
 
 .orderDashboard .orders .orderTodays li {

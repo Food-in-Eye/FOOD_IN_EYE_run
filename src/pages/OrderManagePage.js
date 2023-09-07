@@ -123,6 +123,9 @@ function OrderManagePage() {
   const handleDateRange = async (e) => {
     e.preventDefault();
 
+    setSelectedOrderIndex(null);
+    setOrderHistory([]);
+
     const res = await getOrderHistory(
       `dates?s_id=${sID}&start_date=${startDate}&end_date=${endDate}`
     );
@@ -138,27 +141,31 @@ function OrderManagePage() {
         <div className={Order.historyHead}>
           <h3>누적 주문 내역</h3>
           <form onSubmit={handleDateRange}>
-            <label>
-              시작일
-              <input
-                type="date"
-                name="dates"
-                id="startDate"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </label>
-            <label>
-              종료일
-              <input
-                type="date"
-                name="dates"
-                id="endDate"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </label>
-            <input type="submit" value="조회" className={Button.checkDate} />
+            <div className={Order.CheckDate}>
+              <label>
+                시작일
+                <input
+                  type="date"
+                  name="dates"
+                  id="startDate"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </label>
+              <label>
+                종료일
+                <input
+                  type="date"
+                  name="dates"
+                  id="endDate"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </label>
+              <button type="submit" className={Order.submitCheckedDate}>
+                조회
+              </button>
+            </div>
           </form>
         </div>
         <div className={Order.historyBody}>

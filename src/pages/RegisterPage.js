@@ -77,7 +77,11 @@ function RegisterPage() {
           pw: passwd,
         }).then((res) => console.log(res));
       } catch (error) {
-        console.error("Error registering:", error);
+        if (error.response.status === 409) {
+          console.log(error.response.data.detail);
+        } else {
+          console.error("Error registering:", error);
+        }
       }
 
       navigate(`/login`);

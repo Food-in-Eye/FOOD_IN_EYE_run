@@ -27,16 +27,8 @@ export const handleRefreshToken = () => {
 };
 
 export const handleError = async (error) => {
-  if (error.response && error.response.status === 401) {
-    const detail = error.response.data.detail;
-
-    if (detail === "Signature verification failed.") {
-      console.log("Refresh Token이 인증된 값이 아닙니다.");
-    } else if (detail === "Signature has expired.") {
-      console.log("Token이 만료되었습니다. 재로그인 해주세요.");
-    } else if (detail === "Ownership verification failed.") {
-      console.log("Refresh Token이 저장한 토큰값과 일치하지 않습니다.");
-    }
+  if (error.response.status === 401) {
+    console.log(error.response.data.detail);
 
     stopTokenRefresh();
     setTimeout(() => {
@@ -49,13 +41,10 @@ export const handleError = async (error) => {
 
       window.location.href = "/login";
     }, 10000);
-  } else if (error.response && error.response.status === 403) {
-    const detail = error.response.data.detail;
-    if (detail === "Signature renewal has denied.") {
-      console.log("Token이 아직 만료되지 않았습니다.");
-    } else {
-      console.log(error);
-    }
+  } else if (error.response.status === 403) {
+    console.log(error.response.data.detail);
+  } else if (error.response.status === 422) {
+    console.log(error.response.data.detail);
   } else {
     console.log(error);
   }

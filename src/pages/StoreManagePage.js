@@ -26,11 +26,12 @@ function StoreManagePage() {
         setLoading(true);
 
         const request = await getStore(sID);
-        setStore(request.data.response);
+        console.log("request", request);
+        setStore(request.data);
 
-        if (request.data.response.status === 1) {
+        if (request.data.status === 1) {
           setIsOpenButtonClicked(true);
-        } else if (request.data.response.status === 2) {
+        } else if (request.data.status === 2) {
           setIsCloseButtonClicked(true);
         }
       } catch (error) {

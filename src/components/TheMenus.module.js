@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import TM from "../css/TheMenus.module.css";
 import { getMenus, getFoods } from "./API.module";
 
-function TheMenus({ isEditMode, menuItems, setMenuItems }) {
-  const sID = localStorage.getItem("storeID");
+function TheMenus({ isEditMode, menuItems, setMenuItems, newMenuID }) {
+  const sID = localStorage.getItem("s_id");
   const [foodCount, setFoodCount] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -11,19 +11,21 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
   const getMenuItems = useCallback(async () => {
     try {
       const res = await getMenus(`/q?s_id=${sID}`);
+      console.log("The Menus", res);
+      console.log("newMenuID", newMenuID);
       const mID =
-        res.data.response.length > 0 ? res.data.response[0]._id : null;
+        newMenuID ||
+        (res.data.response.length > 0 ? res.data.response[0]._id : null);
       const resMenu = await getMenus(`/menu/foods?id=${mID}`);
 
-      const resFood = await getFoods(sID);
+      console.log("resMenu", resMenu);
 
-      if (
-        resMenu &&
-        resMenu.data &&
-        resMenu.data.response &&
-        resMenu.data.response.f_list
-      ) {
-        setMenuItems(resMenu.data.response.f_list);
+      const resFood = await getFoods(sID);
+      console.log("resFood", resFood);
+
+      if (resMenu && resMenu.data && resMenu.data.f_list) {
+        console.log("resMenu.data", resMenu.data);
+        setMenuItems(resMenu.data.f_list);
       } else {
         setMenuItems([]);
       }
@@ -32,7 +34,7 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
     } catch (error) {
       console.error(`menu-items GET error: ${error}`);
     }
-  }, [sID, setMenuItems]);
+  }, [sID, setMenuItems, , newMenuID]);
 
   useEffect(() => {
     if (!isEditMode) {
@@ -51,12 +53,21 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
       setIsDragOver(false);
 
       const data = e.dataTransfer.getData("text/plain");
-      const draggedMenuItem = JSON.parse(data);
+      let draggedMenuItem = JSON.parse(data);
+      console.log("draggedMenuItem", draggedMenuItem);
       const targetIndex = index;
 
       setMenuItems((prevMenuItems) => {
         const updatedMenuItems = [...prevMenuItems];
+        draggedMenuItem = {
+          f_id: draggedMenuItem._id,
+          ...draggedMenuItem,
+        };
+
+        delete draggedMenuItem._id;
+        console.log("final draggedMenuItem", draggedMenuItem);
         updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
+        console.log("spliced updatedMenuItems", updatedMenuItems);
 
         return updatedMenuItems;
       });

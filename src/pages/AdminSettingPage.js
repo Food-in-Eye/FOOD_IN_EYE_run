@@ -37,10 +37,11 @@ function AdminSettingPage() {
     const getStoreName = async () => {
       try {
         const res = await getStore(storeId);
-        setStore(res.data.response);
-        setName(res.data.response.name);
+        console.log("getStore", res);
+        setStore(res.data);
+        setName(res.data.name);
       } catch (error) {
-        console.error("가게 이름 가져오는 중 에러 발생:", error);
+        console.error("가게 이름 가져오는 중 에러 발생:", error.response);
       }
     };
 
@@ -108,7 +109,14 @@ function AdminSettingPage() {
             ...store,
             name: newName,
           }).catch((error) => {
-            console.error("가게 이름 업데이트 중 오류 발생:", error);
+            if (error.response.state === 409) {
+              console.log(error.response.data.detail);
+            } else if (error.response.state === 503) {
+              console.log(error.response.data.detail);
+            }
+            else {
+              console.error("가게 이름 업데이트 중 오류 발생:", error);
+            }
           });
 
           navigate(`/main`);
@@ -116,6 +124,9 @@ function AdminSettingPage() {
       }
     } catch (error) {
       /** TODO: 에러 처리 필요, pw 중복 제거 */
+      if (error.response.state === 401) {
+        console.log(error.response.data.detail);
+      } else {
       console.error(error);
     }
   };

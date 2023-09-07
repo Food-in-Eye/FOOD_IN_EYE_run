@@ -36,7 +36,13 @@ function StoreSettingPage() {
         setShowNameDuplicateMsg(true);
       }
     } catch (error) {
-      console.log("Error checking store name duplicate:", error);
+      if (error.response.status === 409) {
+        console.log(error.response.data.detail);
+      } else if (error.response.status === 503) {
+        console.log(error.response.data.detail);
+      } else {
+        console.log("Error checking store name duplicate:", error);
+      }
     }
 
     setName(nameCheck);

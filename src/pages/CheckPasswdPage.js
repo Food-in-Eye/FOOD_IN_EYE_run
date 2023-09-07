@@ -41,7 +41,7 @@ function CheckPasswdPage() {
       }
     } catch (error) {
       console.log(error);
-      if (error.response && error.response.status === 401) {
+      if (error.response.status === 401) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
         } else {

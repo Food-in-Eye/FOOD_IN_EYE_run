@@ -75,14 +75,21 @@ function MainPage() {
       setLoading(true);
 
       const ordersResponse = await getOrders(ordersQuery);
+      console.log("ordersResponse", ordersResponse);
       const orders = ordersResponse.data.response;
-      const foodIds = orders.map((order) => order.f_list[0].f_id);
+      console.log("orders", orders);
+      const foodIds = orders.reduce((acc, order) => {
+        if (order.f_list) {
+          const fIds = order.f_list.map((item) => item.f_id);
+          acc.push(...fIds);
+        }
+        return acc;
+      }, []);
       const foodsResponse = await Promise.all(
-        foodIds.map((fID) => getFood(fID))
+        foodIds.map((fID) => fID && getFood(fID))
       );
-      const foods = await Promise.all(
-        foodsResponse.map((res) => res.data.response)
-      );
+
+      const foods = await Promise.all(foodsResponse.map((res) => res.data));
 
       const orderListWithFoods = orders
         .filter((order, index) => foods[index])
@@ -142,11 +149,14 @@ function MainPage() {
     } else if (newOrders[index].status === 1) {
       newOrders[index].status = 2;
     }
-    // 완료 시 더이상 버튼 못누르게 비활성화나 warning 메시지 띄우기
 
     try {
       await putOrderStatus(newOrders[index]._id);
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        error.response.data.detail === "Status is already finish." &&
+          alert("완료된 주문입니다.");
+      }
       console.log(error);
     }
 
