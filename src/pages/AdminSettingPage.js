@@ -113,8 +113,7 @@ function AdminSettingPage() {
               console.log(error.response.data.detail);
             } else if (error.response.state === 503) {
               console.log(error.response.data.detail);
-            }
-            else {
+            } else {
               console.error("가게 이름 업데이트 중 오류 발생:", error);
             }
           });
@@ -127,7 +126,8 @@ function AdminSettingPage() {
       if (error.response.state === 401) {
         console.log(error.response.data.detail);
       } else {
-      console.error(error);
+        console.error(error);
+      }
     }
   };
 
