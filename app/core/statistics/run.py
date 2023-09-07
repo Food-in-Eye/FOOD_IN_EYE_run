@@ -67,4 +67,29 @@ class CallAnalysis:
 
         return data
 
+    async def daily_summary():
+        # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today = datetime(2023, 8, 19)
+        sale_report = await CallAnalysis.sale_stats(today)
+        aoi_report = await CallAnalysis.aoi_stats(today)
+        
+        result = {
+            'date': today,
+            'update_date': datetime.now(),
+            'msg': 'for test Scheduler...'
+        }
+        
+        for store in sale_report.keys():
+            result[store]= {
+                'sale_summary': sale_report[store],
+                'aoi_summary': aoi_report[store]
+            }
+        try:
+            object_id = DB.insert_one('daily', result)
+            return str(object_id)
+
+        except Exception as e:
+            print(e)
+            return False
+        
 
