@@ -73,9 +73,7 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
 
     response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
     
-    return {
-        'response': response
-    }
+    return response
 
 '''
 mongoDB오류를 catch해서 밖에서 한다면. 여기도 변경할 수 있는게 좀 있음.
@@ -205,7 +203,7 @@ async def new_order(body:OrderModel, request:Request):
 
     return {
         'h_id': h_id,
-        'response': response_list
+        'order_list': response_list
         }
             
 '''
@@ -293,7 +291,7 @@ async def get_history_list(u_id: str, request:Request, batch: int = 1):
     
     return {
         'max_batch': math.ceil(len(historys) / 10),
-        'response': response_list
+        'history_list': response_list
     }
     
 @order_router.get("/history")
@@ -304,7 +302,7 @@ async def get_order_list(id: str, request:Request):
 
     history = DB.read_one('history', {'_id':_id})
 
-    food_list = []
+    order_list = []
     for o_id in history['orders']:
         _id = Util.check_id(o_id)  
         order = DB.read_one('order', {'_id':_id})
@@ -312,7 +310,7 @@ async def get_order_list(id: str, request:Request):
         for f in order['f_list']:
             if 'f_name' in f.keys(): f_name = f['f_name']
             else: f_name = 'unknown'
-            food_list.append({
+            order_list.append({
                 "s_name": s_name,
                 "f_name": f_name,
                 "count": f['count'],
@@ -321,7 +319,7 @@ async def get_order_list(id: str, request:Request):
     
     return {
         'date': history['date'],
-        'orders': food_list
+        'order_list': order_list
     }
 
 
@@ -358,7 +356,7 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
 
     return {
         'max_batch': math.ceil(total_dates / PER_PAGE),
-        'response': paginated_dates
+        'order_list': paginated_dates
     }
         
 
@@ -386,7 +384,5 @@ async def get_history_list(request:Request, s_id: str, date: str):
             'total': o['total_price']
         })
     
-    return {
-        'response': result
-    }
+    return result
      

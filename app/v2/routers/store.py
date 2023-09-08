@@ -33,9 +33,7 @@ async def read_all_store(request: Request):
     for r in result:
         response.append(r)
   
-    return {
-        'response' : response
-    }
+    return response
 
 
 @store_router.get('/store')
@@ -45,19 +43,8 @@ async def read_store(id:str):
     _id = Util.check_id(id)
 
     response = DB.read_one('store', {'_id':_id})
-    print(response) # 확인용 print문은 나중에 지우기~ 혹시 모르니까 주석 옆에 달아두면 나중에 놓칠일도 적을거같습니다.
-    # m_id는 왜 빠져있었죠? response를 아래처럼 바꾼 이유도 알려주시길.
 
-    return {
-        "_id": response['_id'],
-        "name": response['name'],
-        "desc": response['desc'],
-        "schedule": response['schedule'],
-        "notice": response['notice'],
-        "status": response['status'],
-        "num": response['num'],
-        "m_id": response['m_id']
-    }
+    return response
 
 '''
  왜 에러가 났는데 사용가능??????? 아래 코드 설명 필요

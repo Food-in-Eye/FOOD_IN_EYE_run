@@ -33,9 +33,7 @@ async def read_all_food(s_id:str):
 
     response = DB.read_all('food', {'s_id': s_id})
 
-    return {
-        'response': response
-    }
+    return response
 
 @food_router.get("/food")
 async def read_food(id:str):
@@ -45,17 +43,7 @@ async def read_food(id:str):
 
     response = DB.read_one('food', {'_id': _id})
     
-    return {
-        "_id": id,
-        "s_id": response['s_id'],
-        "name": response['name'],
-        "price": response['price'],
-        "img_key": response['img_key'],
-        "desc": response['desc'],
-        "allergy": response['allergy'],
-        "origin": response['origin'],
-		"num": response['num']
-    }
+    return response
 
 @food_router.post("/food")
 async def create_food(s_id:str, food:FoodModel, request:Request):
