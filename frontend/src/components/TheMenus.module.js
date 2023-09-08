@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import TM from "../css/TheMenus.module.css";
-import { getMenus, getFoods } from "./API.module";
+import { getStore, getMenus, getFoods } from "./API.module";
 
-function TheMenus({ isEditMode, menuItems, setMenuItems, newMenuID }) {
+function TheMenus({ isEditMode, menuItems, setMenuItems }) {
   const sID = localStorage.getItem("s_id");
   const [foodCount, setFoodCount] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -10,12 +10,9 @@ function TheMenus({ isEditMode, menuItems, setMenuItems, newMenuID }) {
 
   const getMenuItems = useCallback(async () => {
     try {
-      const res = await getMenus(`/q?s_id=${sID}`);
-      console.log("The Menus", res);
-      console.log("newMenuID", newMenuID);
-      const mID =
-        newMenuID ||
-        (res.data.response.length > 0 ? res.data.response[0]._id : null);
+      const resStore = await getStore(sID);
+      const mID = resStore.data.m_id;
+
       const resMenu = await getMenus(`/menu/foods?id=${mID}`);
 
       console.log("resMenu", resMenu);
@@ -34,7 +31,7 @@ function TheMenus({ isEditMode, menuItems, setMenuItems, newMenuID }) {
     } catch (error) {
       console.error(`menu-items GET error: ${error}`);
     }
-  }, [sID, setMenuItems, , newMenuID]);
+  }, [sID, setMenuItems]);
 
   useEffect(() => {
     if (!isEditMode) {

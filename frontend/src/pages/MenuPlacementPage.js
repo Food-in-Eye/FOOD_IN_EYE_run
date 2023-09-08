@@ -12,7 +12,6 @@ function MenuPlacementPage() {
   useTokenRefresh();
 
   const sID = localStorage.getItem("s_id");
-  const [mID, setMID] = useState("");
   const [storeOpen, setStoreOpen] = useState(false);
   const [storeClosed, setStoreClosed] = useState(false);
   const [menuList, setMenuList] = useState([]);
@@ -55,9 +54,9 @@ function MenuPlacementPage() {
     };
 
     try {
-      await postMenu(sID, data).then((res) => setMID(res.data.m_id));
+      await postMenu(sID, data).then((res) => console.log(res));
     } catch (error) {
-      if (error.response.status === 503) {
+      if (error.response.state === 503) {
         console.log(error.response.data.detail);
       }
       console.log(error);
@@ -119,7 +118,6 @@ function MenuPlacementPage() {
               isEditMode={isEditMode}
               menuItems={menuItems}
               setMenuItems={setMenuItems}
-              newMenuID={mID}
             />
           </div>
         </div>

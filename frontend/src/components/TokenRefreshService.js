@@ -13,8 +13,7 @@ export const startTokenRefresh = () => {
   const currentTime = new Date().getTime();
 
   // refresh token이 만료될 때까지 남은 시간 계산
-  // const timeUntilExpiration = 7200000 - (currentTime - rTokenCreateTime);
-  const timeUntilExpiration = 600000 - (currentTime - rTokenCreateTime); // 10분
+  const timeUntilExpiration = 7200000 - (currentTime - rTokenCreateTime);
 
   // 만료 시간 이전에 재발급 요청을 하도록 설정
   if (timeUntilExpiration > 0) {

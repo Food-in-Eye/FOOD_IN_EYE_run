@@ -204,10 +204,6 @@ function AdminSettingPage() {
                     }}
                     style={{
                       width: "600px",
-                      border:
-                        passwd && !showPasswdMatchMsg
-                          ? "2px solid #52bf8b"
-                          : "",
                     }}
                   />
                 </label>
