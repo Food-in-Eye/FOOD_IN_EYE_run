@@ -136,24 +136,11 @@ async def change_status(id: str, request:Request):
         'status': {s+1}
     }
 
-'''
-아래의 주석에서 해결된건 좀 지우죠
-그리고 u_id체크 이제는 할 수 있을 것 같은데?
-'''
+
 @order_router.post("/order")
 async def new_order(body:OrderModel, request:Request):
-    ''' app으로 부터 주문을 받고 처리한다.        
-        [check 할 사항들]
-        1. 사용자로부터 주문을 받아 가게별 주문으로 나누어 order DB에 저장한다. (O)
-        2. 주문에 해당하는 가게에 websocket을 통해 메시지를 보낸다.
-        3. 주문에 대한 데이터를 history DB에 추가한다. 
-            -> (주문자 정보, 주문 날짜, 주문 총 가격, 시선데이터 경로, 주문 식별자 리스트)
-        
-        모든 과정이 마무리되면 OK 응답을 보낸다.
-    '''
+    ''' app으로 부터 주문을 받고 처리한다. '''
     assert TokenManager.is_buyer(request.state.token_scope), 403.1
-
-    # u_id 채크도 나중에 추가할 것
     
     response_list = []
     order_id_list = []

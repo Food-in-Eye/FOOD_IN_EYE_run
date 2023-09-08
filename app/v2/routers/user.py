@@ -28,7 +28,7 @@ async def hello():
 
 @user_router.post('/idcheck')
 async def check_duplicate_id(data: IdModel):
-    if AuthManager.check_dup(data.id):
+    if AuthManager.check_dup('user', {'id':data.id}):
         state = 'unavailable'
     else:
         state = 'available'
@@ -48,7 +48,7 @@ buyer API
 '''
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
-    if AuthManager.check_dup(data.id) == False:
+    if AuthManager.check_dup('user', {'id':data.id}) == False:
         user = {
             'id': data.id,
             'pw': AuthManager.get_hashed_pw(data.pw),
@@ -71,10 +71,12 @@ async def buyer_signup(data: BuyerModel):
 async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     u_id = AuthManager.get_uid(data.username)
 
+    _id = Util.check_id(u_id)
+
     user = AuthManager.auth_user(u_id, data.password)
     user['R_Token'] = TokenManager.init_r_token(u_id, "buyer")
 
-    DB.update_one('user', {'_id':ObjectId(u_id)}, {'R_Token': user['R_Token']})
+    DB.update_one('user', {'_id':_id}, {'R_Token': user['R_Token']})
 
     return {
         'u_id': u_id,
@@ -88,8 +90,6 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 async def get_buyer_info(u_id:str, data: PwModel, token:str = Depends(TokenManager.auth_a_token)):
     scope = TokenManager.get_payload('access', token).get("scope")
     assert TokenManager.is_buyer(scope), 403.1    
-
-    Util.check_id(u_id)
     
     user = AuthManager.auth_user(u_id, data.pw)
     
@@ -106,8 +106,11 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel, token:str = Depend
     scope = TokenManager.get_payload('access', token).get("scope")
     assert TokenManager.is_buyer(scope), 403.1
 
-    Util.check_id(u_id)
+    _id = Util.check_id(u_id)
 
+    if u_id != AuthManager.get_uid(data.id):
+        raise CustomException(401.1)
+    
     AuthManager.auth_user(u_id, data.old_pw)
     new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
 
@@ -118,7 +121,7 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel, token:str = Depend
         'age': data.age
     }
 
-    DB.update_one('user', {'_id':ObjectId(u_id)}, new_data)
+    DB.update_one('user', {'_id':_id}, new_data)
 
 
 """
@@ -127,7 +130,7 @@ seller API
 
 @user_router.post('/seller/signup')
 async def seller_signup(data: SellerModel):
-    if AuthManager.check_dup(data.id) == False:
+    if AuthManager.check_dup('user', {'id':data.id}) == False:
         user = {
             "id": data.id,
             "pw": AuthManager.get_hashed_pw(data.pw),
@@ -148,10 +151,12 @@ async def seller_signup(data: SellerModel):
 async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     u_id = AuthManager.get_uid(data.username)
 
+    _id = Util.check_id(u_id)
+
     user = AuthManager.auth_user(u_id, data.password)
     user['R_Token'] = TokenManager.init_r_token(user['_id'], "seller")
 
-    DB.update_one('user', {'_id':ObjectId(u_id)}, {"R_Token": user['R_Token']})
+    DB.update_one('user', {'_id':_id}, {"R_Token": user['R_Token']})
 
     return {
         'u_id': user['_id'],
@@ -167,8 +172,6 @@ async def get_seller_info(u_id:str, data: PwModel, token:str = Depends(TokenMana
     scope = TokenManager.get_payload('access', token).get("scope")
     assert TokenManager.is_seller(scope), 403.1
 
-    Util.check_id(u_id)
-
     user = AuthManager.auth_user(u_id, data.pw)
 
     return {
@@ -181,8 +184,11 @@ async def change_seller_info(u_id:str, data: SellerModifyModel, token:str = Depe
     scope = TokenManager.get_payload('access', token).get("scope")
     assert TokenManager.is_seller(scope), 403.1
 
-    Util.check_id(u_id)
+    _id = Util.check_id(u_id)
 
+    if u_id != AuthManager.get_uid(data.id):
+        raise CustomException(401.1)
+    
     AuthManager.auth_user(u_id, data.old_pw)
     new_hashed_pw = AuthManager.get_hashed_pw(data.new_pw)
 
@@ -190,7 +196,7 @@ async def change_seller_info(u_id:str, data: SellerModifyModel, token:str = Depe
         'pw': new_hashed_pw,
     }
 
-    DB.update_one('user', {'_id':ObjectId(u_id)}, new_data)
+    DB.update_one('user', {'_id':_id}, new_data)
 
 
 """
@@ -199,7 +205,9 @@ Token renewal API
 
 @user_router.get('/issue/access')
 async def get_access_token(u_id:str, token: str = Depends(TokenManager.auth_r_token)):
-    user = DB.read_one('user', {'_id':ObjectId(u_id)})
+    _id = Util.check_id(u_id)
+    
+    user = DB.read_one('user', {'_id':_id})
 
     if user['R_Token'] != token:
         raise CustomException(status_code=422.62)
@@ -212,14 +220,16 @@ async def get_access_token(u_id:str, token: str = Depends(TokenManager.auth_r_to
 
 @user_router.get('/issue/refresh')
 async def get_refresh_token(u_id:str, token: str = Depends(TokenManager.auth_r_token)):
-    user = DB.read_one('user', {'_id':ObjectId(u_id)})
+    _id = Util.check_id(u_id)
+
+    user = DB.read_one('user', {'_id':_id})
 
     if user['R_Token'] != token:
         raise CustomException(status_code=422.62)
     
     response = TokenManager.recreate_r_token(token, u_id, user['scope'])
 
-    DB.update_one('user', {'_id':ObjectId(u_id)}, {"R_Token": response})
+    DB.update_one('user', {'_id':_id}, {"R_Token": response})
 
     return {
         'R_Token': response

@@ -22,15 +22,15 @@ class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
-    def check_dup(self, id:str) -> dict:
+    def check_dup(self, collection:str, field:str) -> dict:
         try:
-            user = DB.read_one('user', {'id':id})
+            user = DB.read_one(collection, field)
         except:
             return False
         return user
 
-    def get_uid(self, id:str):
-        user = self.check_dup(id)
+    def get_uid(self, id:str):        
+        user = self.check_dup('user', {'id':id})
 
         if user:
             return user['_id']
