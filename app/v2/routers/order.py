@@ -187,6 +187,9 @@ async def new_order(body:OrderModel, request:Request):
             "o_id": o_id
         })
 
+        # store에게 주문이 생성되었다고 알림
+        await websocket_manager.send_create(store_order.s_id)
+
     history = {
         "u_id": body.u_id,
         "date": datetime.now(),
@@ -198,7 +201,7 @@ async def new_order(body:OrderModel, request:Request):
         "s_names": store_name_list
     }
     
-    h_id = str(DB.insert_one('history', history))
+    h_id = str(DB.insert_one('history', history)) 
 
     return {
         'h_id': h_id,
