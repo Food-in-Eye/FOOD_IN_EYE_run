@@ -61,7 +61,7 @@ async def create_menu(s_id:str, menu:MenuModel, request:Request):
 
     new_menu = {
         's_id': s_id,
-        'date': datetime.now(),
+        'date': Util.get_cur_time().now(),
         'f_list': data['f_list']
     }
 

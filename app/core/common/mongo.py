@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from bson.objectid import ObjectId
-from datetime import datetime
 
 from core.error.exception import CustomException
 
