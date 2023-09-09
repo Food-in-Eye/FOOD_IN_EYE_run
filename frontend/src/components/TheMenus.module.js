@@ -27,7 +27,7 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
         setMenuItems([]);
       }
 
-      setFoodCount(resFood.data.response.length);
+      setFoodCount(resFood.data.food_list.length);
     } catch (error) {
       console.error(`menu-items GET error: ${error}`);
     }

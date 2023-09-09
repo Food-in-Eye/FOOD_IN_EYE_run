@@ -39,6 +39,7 @@ function MainPage() {
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(null);
   const [orderData, setOrderData] = useState([]);
+  const [selectedOrderIndex, setSelectedOrderIndex] = useState(false);
 
   useEffect(() => {
     connectWS(sID);
@@ -76,7 +77,7 @@ function MainPage() {
 
       const ordersResponse = await getOrders(ordersQuery);
       console.log("ordersResponse", ordersResponse);
-      const orders = ordersResponse.data.response;
+      const orders = ordersResponse.data.order_list;
       console.log("orders", orders);
       const foodIds = orders.reduce((acc, order) => {
         if (order.f_list) {
@@ -123,7 +124,7 @@ function MainPage() {
     Promise.all(promises)
       .then((foodLists) => {
         const data = order.f_list.map((f, index) => {
-          const foodItem = foodLists[index].data.response.find(
+          const foodItem = foodLists[index].data.food_list.find(
             (item) => item._id === f.f_id
           );
           return {
@@ -235,11 +236,21 @@ function MainPage() {
                   <hr />
                   {orderList &&
                     orderList.map((order, index) => (
-                      <div key={index}>
+                      <div
+                        key={index}
+                        className={
+                          selectedOrderIndex === index
+                            ? Main.selectedOrderDiv
+                            : ""
+                        }
+                      >
                         <div>
-                          <li onClick={() => handleOrderClick(order)}>{`${
-                            orderList.length - index
-                          }. ${
+                          <li
+                            onClick={() => {
+                              handleOrderClick(order);
+                              setSelectedOrderIndex(index);
+                            }}
+                          >{`${orderList.length - index}. ${
                             order.foodName.length > 8
                               ? order.foodName.substring(0, 8) + "..."
                               : order.foodName

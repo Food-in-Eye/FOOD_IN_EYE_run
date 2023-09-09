@@ -31,16 +31,17 @@ function OrderManagePage() {
     // getHistory(sID);
   };
 
-  useEffect(() => {
-    getHistory(sID, currentPage);
-  }, [currentPage]);
-
   const getHistory = (sID, batch) => {
     getOrderHistory(`dates?s_id=${sID}&batch=${batch}`).then((res) => {
       setPageCount(res.data.max_batch);
-      setOrderHistoryList(res.data.response);
+
+      setOrderHistoryList(res.data.order_list);
     });
   };
+
+  useEffect(() => {
+    getHistory(sID, currentPage);
+  }, [currentPage]);
 
   /**현재 페이지에 해당하는 주문 목록만 렌더링 */
   const renderOrderList = () => {
@@ -96,7 +97,7 @@ function OrderManagePage() {
 
   const fetchOrderDetails = async (date) => {
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
-    const orderDetails = res.data.response;
+    const orderDetails = res.data.order_list;
     const orderData = orderDetails.map((data) => ({
       orderTime: data.date.slice(11, 19),
       // DELETE LATER: 이전 주문 중 f_name이 없는 data를 위한 f_id 남겨놓은 상태
@@ -129,7 +130,7 @@ function OrderManagePage() {
     const res = await getOrderHistory(
       `dates?s_id=${sID}&start_date=${startDate}&end_date=${endDate}`
     );
-    setOrderHistoryList(res.data.response);
+    setOrderHistoryList(res.data.order_list);
   };
 
   return (

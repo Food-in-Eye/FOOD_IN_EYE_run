@@ -2,7 +2,6 @@ import MenuBar from "../components/MenuBar";
 import Menu from "../css/MenuManage.module.css";
 import Button from "../css/Button.module.css";
 import Bar from "../css/UnderBar.module.css";
-import axios from "axios";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 
@@ -34,7 +33,7 @@ function MenuManagePage() {
 
   useEffect(() => {
     getFoods(sID)
-      .then((res) => setMenuList(res.data.response))
+      .then((res) => setMenuList(res.data.food_list))
       .catch((e) => console.log(e));
   }, []);
 
