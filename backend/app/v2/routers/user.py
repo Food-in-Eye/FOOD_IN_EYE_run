@@ -41,11 +41,6 @@ async def check_duplicate_id(data: IdModel):
 buyer API
 """
 
-'''
-의견.. DB 안에다가 오류를 넣지 말고.. 상황에 맞게 밖에서 처리하는건 어떨까요?
-예를들어 create가 실패했는데, 그럼 밖에서 catch한 다음에 '유저정보 생성 실패' 와 같이 커스텀 에러를 낸다던지..
-밑에도 모두 다 적용했음 좋겠다
-'''
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     if AuthManager.check_dup('user', {'id':data.id}) == False:
@@ -56,7 +51,8 @@ async def buyer_signup(data: BuyerModel):
             'name': data.name,
             'gender': data.gender.value,
             'age': data.age,
-            'R_Token': ''
+            'R_Token': '',
+            'camera': None
         }
         u_id = str(DB.insert_one('user', user))
     else:
@@ -77,12 +73,14 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     user['R_Token'] = TokenManager.init_r_token(u_id, "buyer")
 
     DB.update_one('user', {'_id':_id}, {'R_Token': user['R_Token']})
+    response = DB.read_one('user', {'_id':_id})
 
     return {
         'u_id': u_id,
         'token_type': "bearer",
         'A_Token': TokenManager.ACCESS_TOKEN_buyer,
-        'R_Token': user['R_Token']
+        'R_Token': user['R_Token'],
+        'camera': response['camera']
     }
 
 
@@ -98,6 +96,7 @@ async def get_buyer_info(u_id:str, data: PwModel, token:str = Depends(TokenManag
         'name': user['name'],
         'gender': user['gender'],
         'age': user['age'],
+        'camera': user['camera']
     }
     
     
@@ -118,10 +117,22 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel, token:str = Depend
         'pw': new_hashed_pw,
         'name': data.name,
         'gender': data.gender.value,
-        'age': data.age
+        'age': data.age,
+        'camera': data.camera
     }
 
     DB.update_one('user', {'_id':_id}, new_data)
+    
+
+@user_router.put('/buyer/camera')
+async def change_buyer_info(u_id:str, data:Camera, token:str = Depends(TokenManager.auth_a_token)):
+    scope = TokenManager.get_payload('access', token).get("scope")
+    assert TokenManager.is_buyer(scope), 403.1
+
+    _id = Util.check_id(u_id)
+
+    DB.update_one('user', {'_id':_id}, {'camera': data.camera})
+
 
 
 """

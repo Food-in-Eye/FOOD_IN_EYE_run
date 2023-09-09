@@ -77,10 +77,6 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         'order_list' : response
     }
 
-'''
-mongoDB오류를 catch해서 밖에서 한다면. 여기도 변경할 수 있는게 좀 있음.
-예를 들면, 주문목록을 불러올 수 있다. 음식을 부러올 수 없다 등.. 근데 이쯤되니 너무 많아서 넣지말까 고민이긴 합니다.
-'''
 @order_router.get("/order")
 async def get_order(id: str, detail: bool=False):
     ''' 특정 id에 대한 주문내역을 찾아서 반환'''
@@ -121,14 +117,10 @@ async def change_status(id: str, request:Request):
     _id = Util.check_id(id)
     response = DB.read_one('order', {'_id':_id})
     s = response['status']
-
-    # websocket으로 전송 결과를 받기 위함 
-    s_id = response['s_id']
     
     if s < 2:
         DB.update_one('order', {'_id':_id}, {'status': s+1})
 
-        # websocket으로 전달하기
         await websocket_manager.send_update(id)
 
     else:
@@ -174,7 +166,6 @@ async def new_order(body:OrderModel, request:Request):
             "o_id": o_id
         })
 
-        # store에게 주문이 생성되었다고 알림
         await websocket_manager.send_create(store_order.s_id)
 
     history = {
@@ -195,9 +186,7 @@ async def new_order(body:OrderModel, request:Request):
         'order_list': response_list
         }
             
-'''
-여기 커스텀 오류 추가해야함 내일 상의
-'''
+
 @order_router.post("/order/gaze")
 async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     assert TokenManager.is_buyer(request.state.token_scope), 403.1
@@ -220,16 +209,11 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
         raise CustomException(e.status_code, f' -> h_id: \'{h_id}\', S3 key: \'{key}\'')
 
     # 임시로 비활성화
-    # asyncio.create_task(preprocess_and_update(key, h_id))
+    asyncio.create_task(preprocess_and_update(key, h_id))
 
-    # websocket으로 gaze 요청 그만 보내기
-    # websocket_manager.app_connections[h_id]['gaze'] = True
+    websocket_manager.app_connections[h_id]['gaze'] = True
 
 
-'''
-여기는 로깅 필요
-'''
-# print()로 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
@@ -237,25 +221,27 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
     headers = {"Content-Type": "application/json"}
 
     async with httpx.AsyncClient() as client:
-        print(f'Request - h_id: \'{h_id}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
+
+        print(f'Request - h_id: \'{h_id}\'')
+
         _id = Util.check_id(h_id)
         doc = DB.read_one('history', {'_id':_id})
         payload = {
         "raw_data_key": raw_data_key,
         "meta_info": Meta.get_meta_detail(doc['date'])
         }
-        print(f'Request payload: \'{payload}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
+        print(f'Request payload: \'{payload}\'')
 
         response = await client.post(filter_url, json=payload, headers=headers)
         data = response.json()
         fix_key = data["fixation_key"]
-        print(f'Result POST - fix_key: \'{fix_key}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
+        print(f'Result POST - fix_key: \'{fix_key}\'')
 
         response = await client.get(aoi_url + f'?key={fix_key}')
         data = response.json()
         aoi_key = data["aoi_key"]
         print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
-        print(f'Result GET - aoi_key: \'{aoi_key}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
+        print(f'Result GET - aoi_key: \'{aoi_key}\'')
         
         DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
 

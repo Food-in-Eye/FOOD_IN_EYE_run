@@ -43,7 +43,6 @@ class ConnectionManager:
         failed_data = {"type": "connect", "result": "falied"}
 
         await self.check_connections(s_id, h_id)
-        
         if s_id != None and h_id == None:
             if check_client_in_db('store', s_id) == False:
                 await self.send_client_data(websocket, failed_data)
@@ -51,9 +50,8 @@ class ConnectionManager:
             
             self.web_connections[s_id] = websocket 
             await self.send_client_data(websocket, connected_data)
-
+    
         elif  h_id != None and s_id == None:
-            
             if check_client_in_db('history', h_id) == False:
                 await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
@@ -64,7 +62,7 @@ class ConnectionManager:
             
             for o_id in history['orders']:
                 _id = Util.check_id(o_id)
-                order = DB.read_one('order', {'_id': o_id})
+                order = DB.read_one('order', {'_id': _id})
                 order_dict[o_id] = order['s_id']
 
             self.app_connections[h_id] = {
@@ -215,9 +213,8 @@ class ConnectionManager:
 
         if web_clients:
             await self.send_client_data(web_clients, result)
-            print({"type": "create_order", "result": "success", "reason": s_id})
         else:
-            print({"type": "create_order", "result": "fali", "reason": f'all web client is not connected'})
+            print(f'ERROR Cannot create_order \'all web client is not connected\'')
 
     
     async def send_update(self, o_id : str):
@@ -228,7 +225,6 @@ class ConnectionManager:
                 - web : {"type": "update_status", "result": "success"}
             - 전송 실패 
                 - app :  {"type": "update_status", "result": "fail"}
-            - return : data(전송 여부)
         """
         result = {"type": "update_status", "result": "success", "o_id" : o_id}
         app_client = await self.get_app_websocekt(o_id)
@@ -241,11 +237,10 @@ class ConnectionManager:
             if status < 3:
                 result['status'] = status
                 await self.send_client_data(app_client, result)
-                print({"type": "update_status", "result": "success"})
             else:
-                print({"type": "update_status", "result": "fail", "reason": "status is already finish"})
+                print(f'ERRPR Cannot update_status \'status is already finish\'')
         else:
-            print({"type": "update_status", "result": "fail", "reason": "app client is not connected"})
+            print(f'ERROR Cannot update_status \'app client is not connected\'')
 
 
     async def send_alarm_gaze(self, websocekt : WebSocket, h_id : str):
@@ -258,15 +253,15 @@ class ConnectionManager:
         result = {"type": "request", "result": "gaze_omission"}
         history = DB.read_one('history', {'_id': _id})
         
-        if history['gaze_path'] == None:
+        if history['raw_gaze_path'] == None:
             while self.app_connections[h_id]['gaze'] != True:
                 await asyncio.sleep(3)
                 await self.send_client_data(websocekt, result)
-                print(result)
+
+        self.app_connections[h_id]['gaze'] = True
 
         result["result"] = "gaze_success"
         await self.send_client_data(websocekt, result)
-        print(result)
 
 
 
