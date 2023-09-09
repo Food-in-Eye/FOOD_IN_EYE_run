@@ -1,7 +1,7 @@
 import MenuBar from "../components/MenuBar";
-import Total from "../css/Analysis.module.css";
+import Total from "../css/DailyReport.module.css";
 
-function AnalysisPage() {
+function DailyReportPage() {
   return (
     <div>
       <section className="header">
@@ -14,4 +14,4 @@ function AnalysisPage() {
   );
 }
 
-export default AnalysisPage;
+export default DailyReportPage;
