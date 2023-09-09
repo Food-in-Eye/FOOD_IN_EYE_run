@@ -70,18 +70,14 @@ class MongodbController:
 
         result = coll.update_one(query, {'$set':fields})
 
-        if result.matched_count == 1 and result.modified_count == 1:
-            return True
-        raise CustomException(503.54)
-        """
-        아래 조건문을 사용했을 때 status code == 200이 출력되지만, 실제로는 DB에 저장되지 않음. 
-        확인 필요.
-        """
-        # if result.acknowledged is False:
-        #     raise CustomException(503.54)
+        if result.acknowledged is False:
+            raise CustomException(503.54)
         
-        # if result.modified_count > 1:
-        #     raise CustomException(503.57)
+        if result.modified_count != 1:
+            raise CustomException(503.57)
+
+        return True
+    
 
     def read_one(self, collection:str, query:dict) -> dict:
         """ query와 일치하는 document를 하나 읽어온다. """

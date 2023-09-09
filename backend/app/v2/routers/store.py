@@ -118,7 +118,7 @@ async def update_store(id:str, store: StoreModel, request:Request):
 
     store =  AuthManager.check_dup('store', {'name':store.name})
     
-    if store and store['_id'] != _id:
+    if store and store['_id'] != id:
         raise CustomException(409.2)
     
     DB.update_one('store', {'_id':_id}, data)
