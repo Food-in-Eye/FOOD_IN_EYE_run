@@ -237,20 +237,25 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
     headers = {"Content-Type": "application/json"}
 
     async with httpx.AsyncClient() as client:
+        print(f'Request - h_id: \'{h_id}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
         _id = Util.check_id(h_id)
         doc = DB.read_one('history', {'_id':_id})
         payload = {
         "raw_data_key": raw_data_key,
         "meta_info": Meta.get_meta_detail(doc['date'])
         }
+        print(f'Request payload: \'{payload}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
+
         response = await client.post(filter_url, json=payload, headers=headers)
         data = response.json()
         fix_key = data["fixation_key"]
+        print(f'Result POST - fix_key: \'{fix_key}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
 
         response = await client.get(aoi_url + f'?key={fix_key}')
         data = response.json()
         aoi_key = data["aoi_key"]
         print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
+        print(f'Result GET - aoi_key: \'{aoi_key}\'') # ToDo : 로깅 가능 시 삭제 예정 코드
         
         DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
 
