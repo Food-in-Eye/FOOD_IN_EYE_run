@@ -33,6 +33,16 @@ async def http_exception_handler(request:Request, ex:CustomException):
         status_code = status_code, 
         content = {'detail' : detail}
     )
+    
+@app.exception_handler(AssertionError)
+async def assert_exception_handler(request:Request, ex:AssertionError):
+    status_code, detail = exmanager.get_status_assert(ex)
+
+    print(f'ERROR {ex.args[0]}, {detail}')
+    return JSONResponse(
+        status_code = status_code, 
+        content = {'detail' : detail}
+    )
 
 
 @app.get("/")
