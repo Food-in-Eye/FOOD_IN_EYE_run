@@ -34,7 +34,9 @@ async def read_menus_of_store(s_id:str, request:Request):
     Util.check_id(s_id)
     response = DB.read_all('menu', {'s_id': s_id}) 
 
-    return response
+    return {
+        'menu_list' : response
+    }
 
 @menu_router.get("/menu")
 async def read_menu(id:str):

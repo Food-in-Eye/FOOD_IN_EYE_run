@@ -34,7 +34,9 @@ async def read_all_store(request: Request):
     for r in result:
         response.append(r)
   
-    return response
+    return {
+        'store_list' : response
+    }
 
 
 @store_router.get('/store')

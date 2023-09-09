@@ -73,7 +73,9 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
 
     response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
     
-    return response
+    return {
+        'order_list' : response
+    }
 
 '''
 mongoDB오류를 catch해서 밖에서 한다면. 여기도 변경할 수 있는게 좀 있음.
@@ -371,5 +373,7 @@ async def get_history_list(request:Request, s_id: str, date: str):
             'total': o['total_price']
         })
     
-    return result
+    return {
+        'order_list' : result
+    }
      

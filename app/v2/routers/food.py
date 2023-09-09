@@ -33,7 +33,9 @@ async def read_all_food(s_id:str):
 
     response = DB.read_all('food', {'s_id': s_id})
 
-    return response
+    return {
+        'food_list' : response
+    }
 
 @food_router.get("/food")
 async def read_food(id:str):
