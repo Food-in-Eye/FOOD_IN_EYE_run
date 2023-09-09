@@ -26,6 +26,9 @@ function LoginPage() {
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
 
+  const [idInput, setIdInput] = useState("");
+  const [passwordInput, setPasswdInput] = useState("");
+
   const onLogin = async (e) => {
     e.preventDefault();
     const newId = document.querySelector("#id").value;
@@ -66,6 +69,10 @@ function LoginPage() {
         }
       } else if (error.response.status === 401) {
         console.log(error.response.data.detail);
+        alert("로그인에 실패했습니다. 다시 로그인해주세요.");
+
+        setIdInput("");
+        setPasswdInput("");
       } else {
         handleError(error);
       }
@@ -75,6 +82,17 @@ function LoginPage() {
   const getStoreNum = async (s_id) => {
     const res = await getStore(s_id);
     localStorage.setItem("storeNum", res.data.num);
+  };
+
+  const handleIdChange = (e) => {
+    setIdInput(e.target.value);
+    setShowIdErrorMsg(false);
+  };
+
+  const handlePasswdChange = (e) => {
+    setPasswdInput(e.target.value);
+    setShowIdErrorMsg(false);
+    setShowPasswdErrorMsg(false);
   };
 
   return (
@@ -140,7 +158,8 @@ function LoginPage() {
                   type="text"
                   name="id"
                   placeholder="아이디"
-                  onChange={() => setShowIdErrorMsg(false)}
+                  value={idInput}
+                  onChange={handleIdChange}
                 />
               </label>
             </section>
@@ -155,10 +174,8 @@ function LoginPage() {
                   type="password"
                   name="password"
                   placeholder="비밀번호"
-                  onChange={() => {
-                    setShowPasswdErrorMsg(false);
-                    setShowIdErrorMsg(false);
-                  }}
+                  value={passwordInput}
+                  onChange={handlePasswdChange}
                 />
               </label>
             </section>
