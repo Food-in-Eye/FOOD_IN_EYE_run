@@ -31,3 +31,11 @@ class Util:
         current_time = current_time_utc.astimezone(pytz.timezone('Asia/Seoul'))
         return current_time
     
+    @staticmethod
+    def get_custom_time(date:datetime) -> datetime:
+        """ 
+            datetime을 입력 받아 원하는 timezone으로 현재 시간을 리턴한다. 
+            - input : datetime 객체(year, month, day)
+        """
+        custom_time = date.astimezone(pytz.timezone('Asia/Seoul'))
+        return custom_time
