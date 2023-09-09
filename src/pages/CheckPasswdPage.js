@@ -13,7 +13,6 @@ function CheckPasswdPage() {
   const uID = localStorage.getItem("u_id");
 
   const [pwCheck, setPWCheck] = useState("");
-  // const [pw, setPW] = useState("");
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
 
   const onCheck = async (e) => {
@@ -24,11 +23,8 @@ function CheckPasswdPage() {
         pw: pwCheck,
       });
 
-      console.log(res);
-
       if (res.status === 200) {
         showPasswdErrorMsg === true && setShowPasswdErrorMsg(false);
-        // setPW(pwCheck);
 
         const responseData = {
           id: res.data.id,
@@ -41,7 +37,7 @@ function CheckPasswdPage() {
       }
     } catch (error) {
       console.log(error);
-      if (error.response && error.response.status === 401) {
+      if (error.response.status === 401) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
         } else {

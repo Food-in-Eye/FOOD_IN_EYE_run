@@ -17,14 +17,11 @@ function MenuPlacementPage() {
   const [menuList, setMenuList] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
-  // const menuItemsPerPage = 8;
-
-  // const [currentPage, setCurrentPage] = useState(1);
 
   const getMenuLists = useCallback(async () => {
     try {
       const res = await getFoods(sID);
-      setMenuList(res.data.response);
+      setMenuList(res.data.food_list);
     } catch (error) {
       console.log(`GET foods error:`, error);
     }
@@ -47,45 +44,23 @@ function MenuPlacementPage() {
 
   const handleSaveBtnClick = async (e) => {
     setIsEditMode(false);
-    console.log(menuItems);
 
     const data = {
-      f_list: menuItems.map((menuItem, index) => ({
-        // pos 삭제 예정
-        pos: index + 1,
-        f_id: menuItem._id,
+      f_list: menuItems.map((menuItem) => ({
+        f_id: menuItem.f_id,
         f_num: menuItem.num,
       })),
     };
 
-    console.log(data);
-
     try {
       await postMenu(sID, data);
     } catch (error) {
+      if (error.response.state === 503) {
+        console.log(error.response.data.detail);
+      }
       console.log(error);
     }
   };
-
-  /** 리스트 -> 페이지 이동 */
-  // const handleNextPage = () => {
-  //   if (canNextPage) {
-  //     setCurrentPage((prevPage) => prevPage + 1);
-  //   }
-  // };
-
-  // const handlePrevPage = () => {
-  //   if (canPrevPage) {
-  //     setCurrentPage((prevPage) => prevPage - 1);
-  //   }
-  // };
-
-  // const startIndex = (currentPage - 1) * menuItemsPerPage;
-  // const endIndex = startIndex + menuItemsPerPage;
-  // const currentMenuItems = menuList.slice(startIndex, endIndex);
-
-  // const canPrevPage = currentPage > 1;
-  // const canNextPage = endIndex < menuList.length;
 
   const handleDragStart = (e, menuItem) => {
     e.dataTransfer.setData("text/plain", JSON.stringify(menuItem));
@@ -112,14 +87,6 @@ function MenuPlacementPage() {
               </li>
             ))}
           </ul>
-          {/* <div className={MPlace.buttons}>
-            <button onClick={handlePrevPage} disabled={!canPrevPage}>
-              {"<"}
-            </button>
-            <button onClick={handleNextPage} disabled={!canNextPage}>
-              {">"}
-            </button>
-          </div> */}
         </div>
         <div className={MPlace.middle}>
           <p>

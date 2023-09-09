@@ -23,12 +23,10 @@ function StoreSettingPage() {
   const handleNameDuplicate = async (e) => {
     e.preventDefault();
     try {
-      console.log(nameCheck);
       const res = await postStore(`/namecheck`, {
         name: nameCheck,
       });
 
-      console.log(res);
       if (res.data.state === "available") {
         setShowNameDuplicateMsg(false);
         setName(nameCheck);
@@ -36,19 +34,23 @@ function StoreSettingPage() {
         setShowNameDuplicateMsg(true);
       }
     } catch (error) {
-      console.log("Error checking store name duplicate:", error);
+      if (error.response.status === 409) {
+        console.log(error.response.data.detail);
+      } else if (error.response.status === 503) {
+        console.log(error.response.data.detail);
+      } else {
+        console.log("Error checking store name duplicate:", error);
+      }
     }
 
     setName(nameCheck);
   };
 
   const handleSelectOpenTime = (time) => {
-    console.log("opentime", time);
     setSelectedOpenTime(time);
   };
 
   const handleSelectCloseTime = (time) => {
-    console.log("closetime", time);
     setSelectedCloseTime(time);
   };
 
@@ -66,8 +68,6 @@ function StoreSettingPage() {
         notice: notice,
         status: 1,
       });
-
-      console.log(res);
 
       if (res.status === 200) {
         localStorage.setItem("s_id", res.data.document_id);

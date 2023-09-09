@@ -37,10 +37,10 @@ function AdminSettingPage() {
     const getStoreName = async () => {
       try {
         const res = await getStore(storeId);
-        setStore(res.data.response);
-        setName(res.data.response.name);
+        setStore(res.data);
+        setName(res.data.name);
       } catch (error) {
-        console.error("가게 이름 가져오는 중 에러 발생:", error);
+        console.error("가게 이름 가져오는 중 에러 발생:", error.response);
       }
     };
 
@@ -76,8 +76,6 @@ function AdminSettingPage() {
 
   const handlePasswdCheck = (newPassword) => {
     const isValid = isPasswordValid(newPassword);
-
-    console.log("passwd", passwd, "newPasswd", newPassword);
     if (!isValid) {
       setShowValidPasswdMsg(false);
       return;
@@ -108,15 +106,25 @@ function AdminSettingPage() {
             ...store,
             name: newName,
           }).catch((error) => {
-            console.error("가게 이름 업데이트 중 오류 발생:", error);
+            if (error.response.state === 409) {
+              console.log(error.response.data.detail);
+            } else if (error.response.state === 503) {
+              console.log(error.response.data.detail);
+            } else {
+              console.error("가게 이름 업데이트 중 오류 발생:", error);
+            }
           });
 
           navigate(`/main`);
         }
       }
     } catch (error) {
-      /** TODO: 에러 처리 필요, pw 중복 제거 */
-      console.error(error);
+      if (error.response.state === 401) {
+        console.log(error.response.data.detail);
+        alert("정보가 존재하지 않거나 일치하지 않습니다. 다시 입력해주세요.");
+      } else {
+        console.error(error);
+      }
     }
   };
 
@@ -193,10 +201,6 @@ function AdminSettingPage() {
                     }}
                     style={{
                       width: "600px",
-                      border:
-                        passwd && !showPasswdMatchMsg
-                          ? "2px solid #52bf8b"
-                          : "",
                     }}
                   />
                 </label>

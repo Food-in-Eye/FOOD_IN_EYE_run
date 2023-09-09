@@ -30,7 +30,6 @@ function RegisterPage() {
         id: idCheck,
       });
 
-      console.log(res);
       if (res.data.state === "available") {
         setShowIdUniqueMsg(true);
         setShowIdDuplicateMsg(false);
@@ -75,9 +74,13 @@ function RegisterPage() {
         await postUser(`/seller/signup`, {
           id: id,
           pw: passwd,
-        }).then((res) => console.log(res));
+        });
       } catch (error) {
-        console.error("Error registering:", error);
+        if (error.response.status === 409) {
+          console.log(error.response.data.detail);
+        } else {
+          console.error("Error registering:", error);
+        }
       }
 
       navigate(`/login`);

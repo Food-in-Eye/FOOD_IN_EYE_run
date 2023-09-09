@@ -1,34 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
 import TM from "../css/TheMenus.module.css";
-import { getMenus, getFoods } from "./API.module";
+import { getStore, getMenus, getFoods } from "./API.module";
 
 function TheMenus({ isEditMode, menuItems, setMenuItems }) {
-  const sID = localStorage.getItem("storeID");
+  const sID = localStorage.getItem("s_id");
   const [foodCount, setFoodCount] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const getMenuItems = useCallback(async () => {
     try {
-      const res = await getMenus(`/q?s_id=${sID}`);
-      const mID =
-        res.data.response.length > 0 ? res.data.response[0]._id : null;
+      const resStore = await getStore(sID);
+      const mID = resStore.data.m_id;
       const resMenu = await getMenus(`/menu/foods?id=${mID}`);
-
       const resFood = await getFoods(sID);
 
-      if (
-        resMenu &&
-        resMenu.data &&
-        resMenu.data.response &&
-        resMenu.data.response.f_list
-      ) {
-        setMenuItems(resMenu.data.response.f_list);
+      if (resMenu && resMenu.data && resMenu.data.f_list) {
+        setMenuItems(resMenu.data.f_list);
       } else {
         setMenuItems([]);
       }
 
-      setFoodCount(resFood.data.response.length);
+      setFoodCount(resFood.data.food_list.length);
     } catch (error) {
       console.error(`menu-items GET error: ${error}`);
     }
@@ -42,24 +35,41 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    setIsDragOver(true);
+    if (isEditMode) {
+      setIsDragOver(true);
+    } else {
+      alert("수정하기 버튼을 눌러주세요!");
+    }
   };
 
   const handleDrop = useCallback(
     (e, index) => {
       e.preventDefault();
-      setIsDragOver(false);
 
-      const data = e.dataTransfer.getData("text/plain");
-      const draggedMenuItem = JSON.parse(data);
-      const targetIndex = index;
+      if (isEditMode) {
+        setIsDragOver(false);
 
-      setMenuItems((prevMenuItems) => {
-        const updatedMenuItems = [...prevMenuItems];
-        updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
+        const data = e.dataTransfer.getData("text/plain");
+        let draggedMenuItem = JSON.parse(data);
 
-        return updatedMenuItems;
-      });
+        const targetIndex = index;
+
+        setMenuItems((prevMenuItems) => {
+          const updatedMenuItems = [...prevMenuItems];
+          draggedMenuItem = {
+            f_id: draggedMenuItem._id,
+            ...draggedMenuItem,
+          };
+
+          delete draggedMenuItem._id;
+
+          updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
+
+          return updatedMenuItems;
+        });
+      } else {
+        alert("수정하기 버튼이 눌리지 않았습니다!");
+      }
     },
     [setMenuItems]
   );

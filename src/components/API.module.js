@@ -1,6 +1,5 @@
 import axios from "axios";
 import { handleAccessToken } from "./JWT.module";
-import { useNavigate } from "react-router-dom";
 
 const USER_URL = "/api/v2/users";
 const STORE_URL = "/api/v2/stores";
@@ -9,7 +8,6 @@ const ORDER_URL = "/api/v2/orders";
 const MENUS_URL = "/api/v2/menus";
 const JSON_FILES_URL = "/api/v2/s3/keys";
 
-/**axios 인스턴스 생성 */
 const apiInstance = axios.create({
   baseURL: ``,
   headers: {
@@ -55,16 +53,15 @@ apiInstance.interceptors.request.use((config) => {
 apiInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      const detail = error.response.data.detail;
-
-      if (detail === "Signature has expired.") {
+    if (error.response.status === 401) {
+      if (error.response.data.detail === "Token has expired.") {
         return retryOriginalRequest(error);
-      } else if (detail === "Signature verification failed.") {
-        const navigate = useNavigate();
-        navigate("/");
-        return Promise.reject(error);
       }
+    } else if (
+      (error.response.status === 403) |
+      (error.response.status === 422)
+    ) {
+      console.log(error.response.data.detail);
     }
     return Promise.reject(error);
   }
@@ -72,8 +69,6 @@ apiInstance.interceptors.response.use(
 
 export const getStore = (s_id) => {
   const requestUrl = `${STORE_URL}/store?id=${s_id}`;
-
-  console.log("getstore a_token", localStorage.getItem("a_token"));
   return apiInstance.get(requestUrl);
 };
 
@@ -89,9 +84,6 @@ export const getFood = (f_id) => {
 
 export const getOrders = (query) => {
   const requestUrl = `${ORDER_URL}/q${query}`;
-
-  console.log("apiInstance headers", apiInstance.defaults.headers);
-
   return apiInstance.get(requestUrl);
 };
 
@@ -124,6 +116,12 @@ export const putFoods = (f_id, data) => {
   const requestUrl = `${FOODS_URL}/food?id=${f_id}`;
 
   return apiInstance.put(requestUrl, JSON.stringify(data));
+};
+
+export const putFoodImg = (query, formData) => {
+  const requestUrl = `${FOODS_URL}${query}`;
+
+  return apiFormDataInstance.put(requestUrl, formData);
 };
 
 export const putOrderStatus = (o_id) => {

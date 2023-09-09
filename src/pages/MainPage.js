@@ -39,6 +39,7 @@ function MainPage() {
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(null);
   const [orderData, setOrderData] = useState([]);
+  const [selectedOrderIndex, setSelectedOrderIndex] = useState(false);
 
   useEffect(() => {
     connectWS(sID);
@@ -75,14 +76,19 @@ function MainPage() {
       setLoading(true);
 
       const ordersResponse = await getOrders(ordersQuery);
-      const orders = ordersResponse.data.response;
-      const foodIds = orders.map((order) => order.f_list[0].f_id);
+      const orders = ordersResponse.data.order_list;
+      const foodIds = orders.reduce((acc, order) => {
+        if (order.f_list) {
+          const fIds = order.f_list.map((item) => item.f_id);
+          acc.push(...fIds);
+        }
+        return acc;
+      }, []);
       const foodsResponse = await Promise.all(
-        foodIds.map((fID) => getFood(fID))
+        foodIds.map((fID) => fID && getFood(fID))
       );
-      const foods = await Promise.all(
-        foodsResponse.map((res) => res.data.response)
-      );
+
+      const foods = await Promise.all(foodsResponse.map((res) => res.data));
 
       const orderListWithFoods = orders
         .filter((order, index) => foods[index])
@@ -116,7 +122,7 @@ function MainPage() {
     Promise.all(promises)
       .then((foodLists) => {
         const data = order.f_list.map((f, index) => {
-          const foodItem = foodLists[index].data.response.find(
+          const foodItem = foodLists[index].data.food_list.find(
             (item) => item._id === f.f_id
           );
           return {
@@ -142,11 +148,14 @@ function MainPage() {
     } else if (newOrders[index].status === 1) {
       newOrders[index].status = 2;
     }
-    // 완료 시 더이상 버튼 못누르게 비활성화나 warning 메시지 띄우기
 
     try {
       await putOrderStatus(newOrders[index]._id);
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        error.response.data.detail === "Status is already finish." &&
+          alert("완료된 주문입니다.");
+      }
       console.log(error);
     }
 
@@ -225,11 +234,21 @@ function MainPage() {
                   <hr />
                   {orderList &&
                     orderList.map((order, index) => (
-                      <div key={index}>
+                      <div
+                        key={index}
+                        className={
+                          selectedOrderIndex === index
+                            ? Main.selectedOrderDiv
+                            : ""
+                        }
+                      >
                         <div>
-                          <li onClick={() => handleOrderClick(order)}>{`${
-                            orderList.length - index
-                          }. ${
+                          <li
+                            onClick={() => {
+                              handleOrderClick(order);
+                              setSelectedOrderIndex(index);
+                            }}
+                          >{`${orderList.length - index}. ${
                             order.foodName.length > 8
                               ? order.foodName.substring(0, 8) + "..."
                               : order.foodName
