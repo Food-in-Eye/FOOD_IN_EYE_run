@@ -37,8 +37,12 @@ class BuyerModifyModel(BaseModel):
     name: str
     gender: Gender = Field(title="Gender of user [male:1/female:2]")
     age: int
+    camera: bool
 
 class SellerModifyModel(BaseModel):
     id: str
     old_pw: str
     new_pw: str
+
+class Camera(BaseModel):
+    camera: bool 
