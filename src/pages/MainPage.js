@@ -39,6 +39,7 @@ function MainPage() {
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(null);
   const [orderData, setOrderData] = useState([]);
+  const [selectedOrderIndex, setSelectedOrderIndex] = useState(false);
 
   useEffect(() => {
     connectWS(sID);
@@ -235,11 +236,21 @@ function MainPage() {
                   <hr />
                   {orderList &&
                     orderList.map((order, index) => (
-                      <div key={index}>
+                      <div
+                        key={index}
+                        className={
+                          selectedOrderIndex === index
+                            ? Main.selectedOrderDiv
+                            : ""
+                        }
+                      >
                         <div>
-                          <li onClick={() => handleOrderClick(order)}>{`${
-                            orderList.length - index
-                          }. ${
+                          <li
+                            onClick={() => {
+                              handleOrderClick(order);
+                              setSelectedOrderIndex(index);
+                            }}
+                          >{`${orderList.length - index}. ${
                             order.foodName.length > 8
                               ? order.foodName.substring(0, 8) + "..."
                               : order.foodName

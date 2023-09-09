@@ -68,14 +68,14 @@
   color: #337db1;
 }
 
-.orderDashboard .orders {
+.orders {
   max-height: 1000px;
   display: flex;
   justify-content: center;
   align-content: center;
 }
 
-.orderDashboard .orders .orderTodays {
+.orders .orderTodays {
   width: 400px;
   position: relative;
   z-index: 2;
@@ -83,7 +83,7 @@
   padding: 0 1% 0 1%;
 }
 
-.orderDashboard .orders .dashboardBackground {
+.dashboardBackground {
   width: 30%;
   height: 90%;
   position: absolute;
@@ -93,36 +93,37 @@
   box-shadow: inset 0 0 10px #686868;
 }
 
-.orderDashboard .orders .orderTodays .orderTodaysHeader {
+.orderTodaysHeader {
   background-color: #fff;
 }
 
-.orderDashboard .orders h2 {
+.orders h2 {
   margin-left: 17%;
   white-space: nowrap;
   font-size: 30px;
 }
 
-.orderDashboard .orders .orderTodays hr {
+.orderTodays hr {
   width: 95%;
   margin-top: 10%;
   margin-left: 0;
   border: 1px solid #b8b3b3;
 }
 
-.orderDashboard .orders .orderTodays ul {
+.orderTodays ul {
   margin-top: 10%;
   max-height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
   background-color: #fff;
 }
 
-.orderDashboard .orders .orderTodays li {
+.orderTodays li {
   margin: 10% 0 0 0;
   font-size: 20px;
 }
 
-.orderDashboard .orders .orderTodays .manageBtn {
+.orderTodays .manageBtn {
   float: right;
   margin-top: -10%;
 }
@@ -145,7 +146,7 @@
   justify-content: center;
 }
 
-.orderInfo .infoBody .orderSeq {
+.orderSeq {
   box-sizing: border-box;
   width: 30%;
   display: flex;
@@ -155,24 +156,24 @@
   position: absolute;
 }
 
-.orderInfo .infoBody .orderSeq .arrow {
+.orderSeq .arrow {
   max-width: 8%;
   height: 5%;
   margin-top: 2%;
 }
 
-.orderInfo .infoBody .orderSeq div img {
+.infoBody .orderSeq div img {
   max-width: 40%;
   top: 20%;
 }
 
-.orderInfo .infoBody .orderSeq div p {
+.infoBody .orderSeq div p {
   top: 20%;
   text-align: center;
   background: none;
 }
 
-.orderInfo .infoBody .orderDetail {
+.infoBody .orderDetail {
   width: 90%;
   height: auto;
   display: flex;
@@ -182,7 +183,7 @@
   margin-top: 30%;
 }
 
-.orderInfo .infoBody .orderDetail h3 {
+.orderDetail h3 {
   margin-left: 0;
   padding: 10px;
   border-radius: 5px 5px 0 0;
@@ -190,7 +191,7 @@
   background-color: #000926;
 }
 
-.orderInfo .infoBody .orderDetail .orderContents {
+.orderContents {
   width: 100%;
   /* box-sizing: border-box; */
   display: flex;
@@ -201,6 +202,11 @@
   border: 2px solid #000926;
 }
 
-.orderInfo .infoBody .orderDetail .orderContents Table {
+.orderContents Table {
   margin: 0 auto;
+}
+
+.selectedOrderDiv {
+  padding: 5px;
+  border: 2px solid #b9062f;
 }
