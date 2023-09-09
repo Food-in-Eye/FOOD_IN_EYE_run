@@ -41,33 +41,42 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    setIsDragOver(true);
+    if (isEditMode) {
+      setIsDragOver(true);
+    } else {
+      alert("수정하기 버튼을 눌러주세요!");
+    }
   };
 
   const handleDrop = useCallback(
     (e, index) => {
       e.preventDefault();
-      setIsDragOver(false);
 
-      const data = e.dataTransfer.getData("text/plain");
-      let draggedMenuItem = JSON.parse(data);
-      console.log("draggedMenuItem", draggedMenuItem);
-      const targetIndex = index;
+      if (isEditMode) {
+        setIsDragOver(false);
 
-      setMenuItems((prevMenuItems) => {
-        const updatedMenuItems = [...prevMenuItems];
-        draggedMenuItem = {
-          f_id: draggedMenuItem._id,
-          ...draggedMenuItem,
-        };
+        const data = e.dataTransfer.getData("text/plain");
+        let draggedMenuItem = JSON.parse(data);
+        console.log("draggedMenuItem", draggedMenuItem);
+        const targetIndex = index;
 
-        delete draggedMenuItem._id;
-        console.log("final draggedMenuItem", draggedMenuItem);
-        updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
-        console.log("spliced updatedMenuItems", updatedMenuItems);
+        setMenuItems((prevMenuItems) => {
+          const updatedMenuItems = [...prevMenuItems];
+          draggedMenuItem = {
+            f_id: draggedMenuItem._id,
+            ...draggedMenuItem,
+          };
 
-        return updatedMenuItems;
-      });
+          delete draggedMenuItem._id;
+          console.log("final draggedMenuItem", draggedMenuItem);
+          updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
+          console.log("spliced updatedMenuItems", updatedMenuItems);
+
+          return updatedMenuItems;
+        });
+      } else {
+        alert("수정하기 버튼이 눌리지 않았습니다!");
+      }
     },
     [setMenuItems]
   );
