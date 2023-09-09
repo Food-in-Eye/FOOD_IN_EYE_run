@@ -49,8 +49,10 @@ class APIException(Exception):
         503.55 : "Failed to READ document.",
         503.56 : "Failed to DELETE document.",
         503.57 : "Modified_count is not 1.",
-        # .6 : utill ERROR
-        503.61 : "The id format is not valid. Please check"
+        # .6 : S3 ERROR
+        503.61 : "Failed to UPLOAD to S3.",
+        # .7 : utill ERROR
+        503.71 : "The id format is not valid. Please check"
     }
 
     def __init__(self):
@@ -58,15 +60,24 @@ class APIException(Exception):
         self.DEFAULT_DETAIL = "Internal server error" 
 
     def get_status(self, ex:CustomException) -> (int, str):
+        detail = self.STATUS_DICT.get(ex.status_code)
         if ex.status_code in self.STATUS_DICT:
             if ex.detail != "":
-                detail = ex.detail
-            else:
-                detail = self.STATUS_DICT.get(ex.status_code)
+                detail = f'{detail}: {ex.detail}'
 
-            if detail != '':
-                return int(ex.status_code), detail
+            return int(ex.status_code), detail
         return self.DEFAULT_CODE, self.DEFAULT_DETAIL
+
+    # def get_status(self, ex:CustomException) -> (int, str):
+    #     if ex.status_code in self.STATUS_DICT:
+    #         if ex.detail != "":
+    #             detail = ex.detail
+    #         else:
+    #             detail = self.STATUS_DICT.get(ex.status_code)
+
+    #         if detail != '':
+    #             return int(ex.status_code), detail
+    #     return self.DEFAULT_CODE, self.DEFAULT_DETAIL
     
     def get_status_assert(self, ex:AssertionError) -> (int, str):
         if ex.args[0] in self.STATUS_DICT:

@@ -206,30 +206,30 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     for page in body:
         gaze_data.append(page.dict())
 
+
+    _id = Util.check_id(h_id)
+
     try:
-        _id = Util.check_id(h_id)
         key = storage.upload(gaze_data, 'json', 'C_0714')
+    except CustomException as e:
+        raise CustomException(e.status_code, f'h_id: \'{h_id}\'')
 
-        if DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key}):
-            # 임시로 비활성화
-            asyncio.create_task(preprocess_and_update(key, h_id))
+    try:
+        DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key})
+    except CustomException as e:
+        raise CustomException(e.status_code, f'h_id: \'{h_id}\', S3 key: \'{key}\'')
 
-            # websocket으로 gaze 요청 그만 보내기
-            # websocket_manager.app_connections[h_id]['gaze'] = True
-            
-            return {
-            'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
-            'status': 'OK'
-            }
+    # 임시로 비활성화
+    # asyncio.create_task(preprocess_and_update(key, h_id))
 
-        return {'success': 'call the admin'}
-        
-    except:
-        return {'success': False}
+    # websocket으로 gaze 요청 그만 보내기
+    # websocket_manager.app_connections[h_id]['gaze'] = True
+
 
 '''
 여기는 로깅 필요
 '''
+# print()로 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
     filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"

@@ -33,33 +33,6 @@ async def http_exception_handler(request:Request, ex:CustomException):
         status_code = status_code, 
         content = {'detail' : detail}
     )
-    
-    # 아래 코드로 동작 시 에러 발생
-    # if ex_status_code != 500:
-    #     raise HTTPException(status_code=ex_status_code, detail=ex_detail)
-    # raise HTTPException(status_code=500, detail=ex)
-
-@app.exception_handler(AssertionError)
-async def assert_exception_handler(request:Request, ex:AssertionError):
-    status_code, detail = exmanager.get_status_assert(ex)
-
-    print(f'ERROR {ex.args[0]}, {detail}')
-    return JSONResponse(
-        status_code = status_code, 
-        content = {'detail' : detail}
-    )
-# @app.exception_handler(AssertionError)
-# async def http_exception_handler(request:Request, e:AssertionError):
-#     ex_status_code, ex_detail = exmanager.get_status(e)
-
-#     if ex_status_code != 500:
-#         return JSONResponse(
-#             status_code = ex_status_code,
-#             content = {"detail" : ex_detail}
-#         )
-
-        # 아래 코드로 동작 시 에러 발생
-        # raise HTTPException(status_code=ex_status_code, detail=ex_detail)
 
 
 @app.get("/")

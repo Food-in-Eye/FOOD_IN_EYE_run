@@ -20,7 +20,7 @@ class Util:
     @staticmethod
     def check_id(id:str) -> ObjectId:
         if not ObjectId.is_valid(id):
-            raise CustomException(503.61, f'The id format is not valid. Please check')
+            raise CustomException(503.71, f'id: \'{id}\'')
         else:
             return ObjectId(id)
 
