@@ -5,11 +5,12 @@ store_router
 from fastapi import APIRouter, Depends, Request, HTTPException
 from core.models.store import StoreModel, NameModel
 from core.common.mongo import MongodbController
-from core.common.authority import TokenManagement
+from core.common.authority import AuthManagement, TokenManagement
 from core.error.exception import CustomException
 from .src.util import Util
 
 
+AuthManager = AuthManagement()
 TokenManager = TokenManagement()
 
 store_router = APIRouter(prefix="/stores", dependencies=[Depends(TokenManager.dispatch)])
@@ -34,7 +35,7 @@ async def read_all_store(request: Request):
         response.append(r)
   
     return {
-        'response' : response
+        'store_list' : response
     }
 
 
@@ -45,35 +46,23 @@ async def read_store(id:str):
     _id = Util.check_id(id)
 
     response = DB.read_one('store', {'_id':_id})
-    print(response) # 확인용 print문은 나중에 지우기~ 혹시 모르니까 주석 옆에 달아두면 나중에 놓칠일도 적을거같습니다.
-    # m_id는 왜 빠져있었죠? response를 아래처럼 바꾼 이유도 알려주시길.
 
-    return {
-        "_id": response['_id'],
-        "name": response['name'],
-        "desc": response['desc'],
-        "schedule": response['schedule'],
-        "notice": response['notice'],
-        "status": response['status'],
-        "num": response['num'],
-        "m_id": response['m_id']
-    }
+    return response
 
 '''
  왜 에러가 났는데 사용가능??????? 아래 코드 설명 필요
+ -> (mira) `DB 조회 불가 == name이 중복되지 않음`을 의미하지만, 조회 불가 시 오류가 발생합니다.
+           표기의 혼동이 있으므로 다른 함수로 표기를 변경했습니다.
 '''
 @store_router.post('/namecheck')
 async def check_duplicate_name(data:NameModel, request:Request):
     """ store name의 중복 여부를 확인한다. """
     assert TokenManager.is_seller(request.state.token_scope), 403.1 
 
-    try:
-        store = DB.read_one('store', {'name': data.name})
-        if store:
-            state = 'unavailable'
-    except CustomException:
+    if AuthManager.check_dup('store', {'name':data.name}):
+        state = 'unavailable'
+    else:
         state = 'available'
-
     return {
         'state': state
     }
@@ -113,6 +102,7 @@ async def create_store(u_id:str, store:StoreModel, request:Request):
 이유: 이미 있는 정보를 변경하는데 예를들어 '파스타' 가게가 잇고, 이 가게의 설명을 바꾸기 위해 사용했다고 합시다.
      파스타 가게 이름은 그대로 두고 가게 설명만 바꾸더라도 저기에서 이름 중복을 체크할 것으로 보여짐
      파스타 가게는 이미 있는게 맞으니까..? 오류가 나지 않을까??
+-> (mira) 입력받은 input name으로 조회한 store['_id'] == input s_id과 동일한 경우 예외를 발생시키지 않도록 수정하였습니다.
 '''
 
 @store_router.put('/store')
@@ -126,10 +116,9 @@ async def update_store(id:str, store: StoreModel, request:Request):
     
     _id = Util.check_id(id)
 
-    name_data = NameModel(name=store.name)
-    state = await check_duplicate_name(name_data, request)
-    if state == 'unavailable':
+    store =  AuthManager.check_dup('store', {'name':store.name})
+    
+    if store and store['_id'] != _id:
         raise CustomException(409.2)
     
-    if DB.update_one('store', {'_id':_id}, data) == False:
-        raise CustomException(503.54)
+    DB.update_one('store', {'_id':_id}, data)

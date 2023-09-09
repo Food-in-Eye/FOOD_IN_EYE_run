@@ -3,6 +3,8 @@ import boto3
 import uuid
 import json
 from dotenv import load_dotenv
+from botocore.exceptions import ClientError
+from core.error.exception import CustomException
 
 class Storage:
     
@@ -19,7 +21,6 @@ class Storage:
     
     def upload(self, file_data, form:str, path:str, key=None)-> str:
         ''' 주어진 key로 S3에 파일을 저장하는 함수. Key값이 주어지지 않으면 랜덤한 값으로 생성함. '''
-
         if key is None:
             key = uuid.uuid4()
         key = path + '/' + str(key) + '.' + form
@@ -27,8 +28,11 @@ class Storage:
         if form == "json":
             file_data = json.dumps(file_data)
 
-        self.s3.put_object(Bucket=self.bucket, Key=key, Body=file_data)
-
+        try:
+            self.s3.put_object(Bucket=self.bucket, Key=key, Body=file_data)
+        except ClientError:
+            raise CustomException(503.61)
+        
         return str(key)
     
     def get_json(self, key:str) -> dict:

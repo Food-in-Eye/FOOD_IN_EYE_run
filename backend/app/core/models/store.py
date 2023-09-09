@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 from enum import Enum
-from datetime import datetime
+
 class Status(Enum):
     open = 1
     close = 2

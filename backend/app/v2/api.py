@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from v2.routers.src.util import Util
 
 from .routers.store import store_router
 from .routers.menu import menu_router
@@ -57,7 +58,7 @@ async def analysis_test():
         3. 분석 보고서를 리턴한다.
     """
     
-    # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    # today = Util.get_cur_time().replace(hour=0, minute=0, second=0, microsecond=0)
     today = datetime(2023, 7, 26)
     try:
         sale_report = await CallAnalysis.sale_stats(today)

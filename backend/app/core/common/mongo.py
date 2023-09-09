@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from bson.objectid import ObjectId
-from datetime import datetime
 
 from core.error.exception import CustomException
 
@@ -26,7 +25,7 @@ class MongodbController:
         if DB in db_names:
             self.db = client[DB]
         else:
-            raise CustomException(503.51, f'No DataBase exists with name \'{DB}\'')
+            raise CustomException(503.51, f'DB: \'{DB}\'')
 
         self.collections = self.db.list_collection_names()
     
@@ -34,7 +33,7 @@ class MongodbController:
         if name in self.collections:
             return self.db[name]
         else:
-            raise CustomException(503.52, f'No collection exists with name \'{name}\'')
+            raise CustomException(503.52, f'collection: \'{name}\'')
         
     def insert_one(self, collection:str, data:dict) -> ObjectId:
         """ 딕셔너리를 받아서 collection에 새로운 document를 추가한다. """
@@ -44,7 +43,7 @@ class MongodbController:
         
         result = coll.insert_one(data)
         if result.acknowledged is False:
-            raise CustomException(503.53, f'Failed to CREATE new document.')
+            raise CustomException(503.53)
 
         return result.inserted_id
 
@@ -56,10 +55,10 @@ class MongodbController:
 
         result = coll.replace_one(query, data)
         if result.acknowledged is False:
-            raise CustomException(503.54, f'Failed to UPDATE document')
+            raise CustomException(503.54)
         
         if result.modified_count != 1:
-            raise CustomException(503.57, f'modified_count is not 1')
+            raise CustomException(503.57)
 
         return True
     
@@ -71,13 +70,18 @@ class MongodbController:
 
         result = coll.update_one(query, {'$set':fields})
 
-        if result.acknowledged is False:
-            raise CustomException(503.54, f'Failed to UPDATE document')
+        if result.matched_count == 1 and result.modified_count == 1:
+            return True
+        raise CustomException(503.54)
+        """
+        아래 조건문을 사용했을 때 status code == 200이 출력되지만, 실제로는 DB에 저장되지 않음. 
+        확인 필요.
+        """
+        # if result.acknowledged is False:
+        #     raise CustomException(503.54)
         
-        if result.modified_count > 1:
-            raise CustomException(503.57, f'modified_count is not 1')
-
-        return True
+        # if result.modified_count > 1:
+        #     raise CustomException(503.57)
 
     def read_one(self, collection:str, query:dict) -> dict:
         """ query와 일치하는 document를 하나 읽어온다. """
@@ -86,7 +90,7 @@ class MongodbController:
 
         result = coll.find_one(query)
         if result is None:
-            raise CustomException(503.55, f'Failed to READ document')
+            raise CustomException(503.55)
         
         return objectIdToStr(result)
     
@@ -104,7 +108,7 @@ class MongodbController:
             result.sort([(asc_by, 1 if asc else -1)])
 
         if result is None:
-            raise CustomException(503.55, f'Failed to READ document')
+            raise CustomException(503.55)
         
         response = []
         for r in result:
@@ -119,7 +123,7 @@ class MongodbController:
 
     #     result = self.coll.delete_one({'_id': ObjectId(id)})
     #     if result.acknowledged is False:
-    #         raise CustomException(503.56, f'Failed to DELETE document with id \'{id}\'')
+    #         raise CustomException(503.56, f'id: \'{id}\'')
         
     #     return True
 

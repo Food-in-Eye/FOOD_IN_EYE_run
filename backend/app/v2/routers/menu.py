@@ -35,7 +35,7 @@ async def read_menus_of_store(s_id:str, request:Request):
     response = DB.read_all('menu', {'s_id': s_id}) 
 
     return {
-        'response': response
+        'menu_list' : response
     }
 
 @menu_router.get("/menu")
@@ -63,14 +63,18 @@ async def create_menu(s_id:str, menu:MenuModel, request:Request):
 
     new_menu = {
         's_id': s_id,
-        'date': datetime.now(),
+        'date': Util.get_cur_time().now(),
         'f_list': data['f_list']
     }
 
     new_id = str(DB.insert_one('menu', new_menu))
 
-    if DB.update_one('store', {'_id': _id}, {'m_id': new_id}):
-        update_meta(s_id, new_id)
+    DB.update_one('store', {'_id': _id}, {'m_id': new_id})
+    update_meta(s_id, new_id)
+
+    return {
+        'm_id': new_id
+    }
     
 
 @menu_router.get('/menu/foods')

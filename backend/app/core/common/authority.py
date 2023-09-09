@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from passlib.exc import UnknownHashError
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from bson.objectid import ObjectId
 
@@ -10,8 +10,7 @@ from core.common.mongo import MongodbController
 
 import os
 from jose import jwt, ExpiredSignatureError
-from datetime import datetime, timedelta
-from fastapi import HTTPException, Request
+from datetime import timedelta
 
 
 DB = MongodbController('FIE_DB2')
@@ -22,15 +21,15 @@ class AuthManagement:
     def __init__(self):
         self.pw_handler = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
-    def check_dup(self, id:str) -> dict:
+    def check_dup(self, collection:str, field:str) -> dict:
         try:
-            user = DB.read_one('user', {'id':id})
+            user = DB.read_one(collection, field)
         except:
             return False
         return user
 
-    def get_uid(self, id:str):
-        user = self.check_dup(id)
+    def get_uid(self, id:str):        
+        user = self.check_dup('user', {'id':id})
 
         if user:
             return user['_id']
@@ -77,12 +76,12 @@ class TokenManagement:
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
     def init_a_token(self, scope:str):
-        exp_time = int((datetime.now() + timedelta(minutes=30)).timestamp())
+        exp_time = int((Util.get_cur_time() + timedelta(minutes=30)).timestamp())
         
         data = {
             "iss": "ACCESS_Token",
             "exp": exp_time,
-            "iat": int(datetime.now().timestamp()),
+            "iat": int(Util.get_cur_time().timestamp()),
             "scope": scope
         }
 
@@ -95,15 +94,15 @@ class TokenManagement:
     
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
-            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
+            EXP = int((Util.get_cur_time() + timedelta(minutes=60)).timestamp())
         elif scope == "seller":
-            EXP = int((datetime.now() + timedelta(minutes=60*2)).timestamp())
+            EXP = int((Util.get_cur_time() + timedelta(minutes=60*2)).timestamp())
 
         data = {
             "iss": "REFRESH_Token",
             "sub": u_id,
             "exp": EXP,
-            "iat": int(datetime.now().timestamp()),
+            "iat": int(Util.get_cur_time().timestamp()),
             "scope": scope
         }
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
@@ -127,7 +126,7 @@ class TokenManagement:
     def recreate_r_token(self, token:str, u_id:str, scope:str):
         payload = self.get_payload('refresh', token)
 
-        cur_time = int(datetime.now().timestamp())
+        cur_time = int(Util.get_cur_time().timestamp())
         exp_time = payload["exp"]
 
         if (exp_time - cur_time) > 60 * 10:
@@ -173,7 +172,6 @@ class TokenManagement:
         
     @staticmethod
     def is_buyer(scope:str) -> bool:
-        print(scope)
         if scope == "buyer":
             return True
         return False
