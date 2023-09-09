@@ -41,11 +41,6 @@ async def check_duplicate_id(data: IdModel):
 buyer API
 """
 
-'''
-의견.. DB 안에다가 오류를 넣지 말고.. 상황에 맞게 밖에서 처리하는건 어떨까요?
-예를들어 create가 실패했는데, 그럼 밖에서 catch한 다음에 '유저정보 생성 실패' 와 같이 커스텀 에러를 낸다던지..
-밑에도 모두 다 적용했음 좋겠다
-'''
 @user_router.post('/buyer/signup')
 async def buyer_signup(data: BuyerModel):
     if AuthManager.check_dup('user', {'id':data.id}) == False:

@@ -7,8 +7,6 @@ from core.common.mongo import MongodbController
 from core.common.websocket import ConnectionManager
 
 from fastapi import WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
-from typing import Optional
 
 websocket_router = APIRouter(prefix="/websockets")
 

@@ -67,17 +67,6 @@ class APIException(Exception):
 
             return int(ex.status_code), detail
         return self.DEFAULT_CODE, self.DEFAULT_DETAIL
-
-    # def get_status(self, ex:CustomException) -> (int, str):
-    #     if ex.status_code in self.STATUS_DICT:
-    #         if ex.detail != "":
-    #             detail = ex.detail
-    #         else:
-    #             detail = self.STATUS_DICT.get(ex.status_code)
-
-    #         if detail != '':
-    #             return int(ex.status_code), detail
-    #     return self.DEFAULT_CODE, self.DEFAULT_DETAIL
     
     def get_status_assert(self, ex:AssertionError) -> (int, str):
         if ex.args[0] in self.STATUS_DICT:
