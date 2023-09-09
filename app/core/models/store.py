@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 from enum import Enum
-from datetime import datetime
+
 class Status(Enum):
     open = 1
     close = 2
@@ -27,3 +27,6 @@ class FoodPos(BaseModel):
 
 class MenuModel(BaseModel):
     f_list: list[FoodPos] = Field(title="list of food")
+
+class NameModel(BaseModel):
+    name: str
