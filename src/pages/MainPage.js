@@ -77,7 +77,7 @@ function MainPage() {
 
       const ordersResponse = await getOrders(ordersQuery);
       console.log("ordersResponse", ordersResponse);
-      const orders = ordersResponse.data.response;
+      const orders = ordersResponse.data.order_list;
       console.log("orders", orders);
       const foodIds = orders.reduce((acc, order) => {
         if (order.f_list) {
@@ -124,7 +124,7 @@ function MainPage() {
     Promise.all(promises)
       .then((foodLists) => {
         const data = order.f_list.map((f, index) => {
-          const foodItem = foodLists[index].data.response.find(
+          const foodItem = foodLists[index].data.food_list.find(
             (item) => item._id === f.f_id
           );
           return {

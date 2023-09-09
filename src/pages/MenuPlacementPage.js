@@ -22,7 +22,7 @@ function MenuPlacementPage() {
     try {
       const res = await getFoods(sID);
       console.log("getFoods", res);
-      setMenuList(res.data.response);
+      setMenuList(res.data.food_list);
     } catch (error) {
       console.log(`GET foods error:`, error);
     }
