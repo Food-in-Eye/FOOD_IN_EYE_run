@@ -12,16 +12,10 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
     try {
       const resStore = await getStore(sID);
       const mID = resStore.data.m_id;
-
       const resMenu = await getMenus(`/menu/foods?id=${mID}`);
-
-      console.log("resMenu", resMenu);
-
       const resFood = await getFoods(sID);
-      console.log("resFood", resFood);
 
       if (resMenu && resMenu.data && resMenu.data.f_list) {
-        console.log("resMenu.data", resMenu.data);
         setMenuItems(resMenu.data.f_list);
       } else {
         setMenuItems([]);
@@ -57,7 +51,7 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
 
         const data = e.dataTransfer.getData("text/plain");
         let draggedMenuItem = JSON.parse(data);
-        console.log("draggedMenuItem", draggedMenuItem);
+
         const targetIndex = index;
 
         setMenuItems((prevMenuItems) => {
@@ -68,9 +62,8 @@ function TheMenus({ isEditMode, menuItems, setMenuItems }) {
           };
 
           delete draggedMenuItem._id;
-          console.log("final draggedMenuItem", draggedMenuItem);
+
           updatedMenuItems.splice(targetIndex, 1, draggedMenuItem);
-          console.log("spliced updatedMenuItems", updatedMenuItems);
 
           return updatedMenuItems;
         });

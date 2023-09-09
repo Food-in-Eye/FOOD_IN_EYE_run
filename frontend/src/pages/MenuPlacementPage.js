@@ -21,7 +21,6 @@ function MenuPlacementPage() {
   const getMenuLists = useCallback(async () => {
     try {
       const res = await getFoods(sID);
-      console.log("getFoods", res);
       setMenuList(res.data.food_list);
     } catch (error) {
       console.log(`GET foods error:`, error);
@@ -54,7 +53,7 @@ function MenuPlacementPage() {
     };
 
     try {
-      await postMenu(sID, data).then((res) => console.log(res));
+      await postMenu(sID, data);
     } catch (error) {
       if (error.response.state === 503) {
         console.log(error.response.data.detail);

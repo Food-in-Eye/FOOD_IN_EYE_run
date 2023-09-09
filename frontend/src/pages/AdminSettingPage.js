@@ -37,7 +37,6 @@ function AdminSettingPage() {
     const getStoreName = async () => {
       try {
         const res = await getStore(storeId);
-        console.log("getStore", res);
         setStore(res.data);
         setName(res.data.name);
       } catch (error) {
@@ -77,8 +76,6 @@ function AdminSettingPage() {
 
   const handlePasswdCheck = (newPassword) => {
     const isValid = isPasswordValid(newPassword);
-
-    console.log("passwd", passwd, "newPasswd", newPassword);
     if (!isValid) {
       setShowValidPasswdMsg(false);
       return;
@@ -122,9 +119,9 @@ function AdminSettingPage() {
         }
       }
     } catch (error) {
-      /** TODO: 에러 처리 필요, pw 중복 제거 */
       if (error.response.state === 401) {
         console.log(error.response.data.detail);
+        alert("정보가 존재하지 않거나 일치하지 않습니다. 다시 입력해주세요.");
       } else {
         console.error(error);
       }

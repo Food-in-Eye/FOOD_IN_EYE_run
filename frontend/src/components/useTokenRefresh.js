@@ -3,7 +3,6 @@ import { startTokenRefresh, stopTokenRefresh } from "./TokenRefreshService";
 
 function useTokenRefresh() {
   useEffect(() => {
-    console.log("startTokenRefresh 실행");
     startTokenRefresh();
     return () => {
       stopTokenRefresh();

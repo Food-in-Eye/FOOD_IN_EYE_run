@@ -32,14 +32,6 @@ function OrdersHistoryTable({ data }) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
 
-  //   const total = React.useMemo(() => {
-  //     let sum = 0;
-  //     data.forEach((item) => {
-  //       sum += item.menuPrice * item.menuCount;
-  //     });
-  //     return sum;
-  //   }, [data]);
-
   return (
     <table {...getTableProps()}>
       <thead>
