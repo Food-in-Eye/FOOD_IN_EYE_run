@@ -26,9 +26,7 @@ function OrderManagePage() {
   const [endDate, setEndDate] = useState("");
 
   const handlePageChange = (newPageNumber) => {
-    console.log(newPageNumber);
     setCurrentPage(newPageNumber);
-    // getHistory(sID);
   };
 
   const getHistory = (sID, batch) => {

@@ -26,7 +26,6 @@ function StoreManagePage() {
         setLoading(true);
 
         const request = await getStore(sID);
-        console.log("request", request);
         setStore(request.data);
 
         if (request.data.status === 1) {

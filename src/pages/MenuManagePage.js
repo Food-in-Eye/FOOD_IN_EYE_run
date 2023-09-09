@@ -47,7 +47,6 @@ function MenuManagePage() {
 
       getFood(selectedMenuIdRef.current)
         .then((res) => {
-          console.log("res getFood", res);
           setSelectedMenu(res.data);
           if (res.data.img_key) {
             setSelectedMenuImgURL(
@@ -84,9 +83,8 @@ function MenuManagePage() {
       origin: "메뉴에 대한 원산지 정보를 입력하세요",
     })
       .then(async (res) => {
-        console.log("postFood", res);
         const newMenu = await getFood(res.data.document_id);
-        console.log("newMenu", newMenu);
+
         setMenuList([...menuList, newMenu.data]);
       })
       .catch((e) => {

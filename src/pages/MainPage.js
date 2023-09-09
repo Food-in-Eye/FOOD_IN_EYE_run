@@ -76,9 +76,7 @@ function MainPage() {
       setLoading(true);
 
       const ordersResponse = await getOrders(ordersQuery);
-      console.log("ordersResponse", ordersResponse);
       const orders = ordersResponse.data.order_list;
-      console.log("orders", orders);
       const foodIds = orders.reduce((acc, order) => {
         if (order.f_list) {
           const fIds = order.f_list.map((item) => item.f_id);

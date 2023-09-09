@@ -18,10 +18,6 @@ function MenuBar() {
 
     logout();
 
-    console.log("logout u_id", localStorage.getItem("u_id"));
-    console.log("logout a_token", localStorage.getItem("a_token"));
-    console.log("logout r_token", localStorage.getItem("r_token"));
-
     navigate(`/login`);
   };
 

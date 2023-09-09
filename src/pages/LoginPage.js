@@ -1,9 +1,9 @@
 import Login from "../css/Login.module.css";
 import Button from "../css/Button.module.css";
 import { getStore, postLogin } from "../components/API.module";
-import { handleRefreshToken, handleError } from "../components/JWT.module";
+import { handleError } from "../components/JWT.module";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { startTokenRefresh } from "../components/TokenRefreshService";
 import { useAuth } from "../components/AuthContext";
 
@@ -36,14 +36,8 @@ function LoginPage() {
     formData.append("password", newPasswd);
 
     try {
-      console.log(
-        "formData",
-        formData.get("username"),
-        formData.get("password")
-      );
       const request = await postLogin(`/seller/login`, formData);
 
-      console.log("##request", request);
       if (request.status === 200) {
         const tokenCreationTime = new Date(request.headers.date).getTime();
 
@@ -53,9 +47,6 @@ function LoginPage() {
         localStorage.setItem("r_token", request.data.R_Token);
         localStorage.setItem("r_token_create_time", tokenCreationTime);
 
-        console.log("loginpage a_token", localStorage.getItem("a_token"));
-        console.log("loginpage r_token", localStorage.getItem("r_token"));
-
         startTokenRefresh();
         login();
 
@@ -63,7 +54,6 @@ function LoginPage() {
           getStoreNum(localStorage.getItem("s_id"));
           navigate("/main");
         } else {
-          // 가게 초기 설정 화면으로 이동
           navigate("/store-setting");
         }
       }

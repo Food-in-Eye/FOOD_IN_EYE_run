@@ -1,7 +1,6 @@
 function CalculateHeight(data) {
   if (!data || data.length === 0) return 0;
 
-  // console.log(data);
   const minY = Math.min(
     ...data.flatMap((item) => item.gaze.map((point) => point.y))
   );

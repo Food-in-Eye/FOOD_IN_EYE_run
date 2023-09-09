@@ -8,7 +8,6 @@ const ORDER_URL = "/api/v2/orders";
 const MENUS_URL = "/api/v2/menus";
 const JSON_FILES_URL = "/api/v2/s3/keys";
 
-/**axios 인스턴스 생성 */
 const apiInstance = axios.create({
   baseURL: ``,
   headers: {
@@ -28,7 +27,6 @@ const apiFormDataInstance = axios.create({
 });
 
 async function retryOriginalRequest(error) {
-  console.log("토큰 만료 시 a_token 재발급 및 재요청");
   try {
     await handleAccessToken();
 
@@ -71,8 +69,6 @@ apiInstance.interceptors.response.use(
 
 export const getStore = (s_id) => {
   const requestUrl = `${STORE_URL}/store?id=${s_id}`;
-
-  console.log("getstore a_token", localStorage.getItem("a_token"));
   return apiInstance.get(requestUrl);
 };
 
@@ -88,9 +84,6 @@ export const getFood = (f_id) => {
 
 export const getOrders = (query) => {
   const requestUrl = `${ORDER_URL}/q${query}`;
-
-  console.log("apiInstance headers", apiInstance.defaults.headers);
-
   return apiInstance.get(requestUrl);
 };
 

@@ -23,12 +23,10 @@ function StoreSettingPage() {
   const handleNameDuplicate = async (e) => {
     e.preventDefault();
     try {
-      console.log(nameCheck);
       const res = await postStore(`/namecheck`, {
         name: nameCheck,
       });
 
-      console.log(res);
       if (res.data.state === "available") {
         setShowNameDuplicateMsg(false);
         setName(nameCheck);
@@ -49,12 +47,10 @@ function StoreSettingPage() {
   };
 
   const handleSelectOpenTime = (time) => {
-    console.log("opentime", time);
     setSelectedOpenTime(time);
   };
 
   const handleSelectCloseTime = (time) => {
-    console.log("closetime", time);
     setSelectedCloseTime(time);
   };
 
@@ -72,8 +68,6 @@ function StoreSettingPage() {
         notice: notice,
         status: 1,
       });
-
-      console.log(res);
 
       if (res.status === 200) {
         localStorage.setItem("s_id", res.data.document_id);
