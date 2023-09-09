@@ -212,12 +212,12 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     try:
         key = storage.upload(gaze_data, 'json', 'C_0714')
     except CustomException as e:
-        raise CustomException(e.status_code, f'h_id: \'{h_id}\'')
+        raise CustomException(e.status_code, f' -> h_id: \'{h_id}\'')
 
     try:
         DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key})
     except CustomException as e:
-        raise CustomException(e.status_code, f'h_id: \'{h_id}\', S3 key: \'{key}\'')
+        raise CustomException(e.status_code, f' -> h_id: \'{h_id}\', S3 key: \'{key}\'')
 
     # 임시로 비활성화
     # asyncio.create_task(preprocess_and_update(key, h_id))
