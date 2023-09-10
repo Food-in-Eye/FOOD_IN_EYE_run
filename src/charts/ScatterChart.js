@@ -3,7 +3,6 @@ import ReactApexChart from "react-apexcharts";
 import dailyReport from "../data/daily_report.json";
 import SChart from "../css/ScatterChart.module.css";
 import { getFoods } from "../components/API.module";
-import { fn } from "moment";
 
 function ScatterChart() {
   const aoiData = dailyReport["Store 1"].aoi_summary.total_food_report;

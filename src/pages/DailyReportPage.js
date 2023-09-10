@@ -4,6 +4,7 @@ import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
 import { useRef } from "react";
 import ScatterChart from "../charts/ScatterChart";
+import BarChart from "../charts/BarChart";
 
 function DailyReportPage() {
   useTokenRefresh();
@@ -20,7 +21,7 @@ function DailyReportPage() {
     0: useMoveScroll("오늘의 리포트"),
     1: useMoveScroll("시간당 주문량 및 시선 수"),
     2: useMoveScroll("시선/체류 시간과 주문량"),
-    3: useMoveScroll("메뉴별 방문 시선 수"),
+    3: useMoveScroll("내 가게 메뉴판"),
     length: 4,
   };
 
@@ -87,6 +88,7 @@ function DailyReportPage() {
       </div>
       <div ref={tabs[1].element} className={DR.tabElement}>
         <span>시간당 주문량 및 시선 수</span>
+        <BarChart />
       </div>
       <div ref={tabs[2].element} className={DR.tabElement}>
         <span>시선/체류 시간과 주문량</span>
@@ -110,7 +112,7 @@ function DailyReportPage() {
         </section>
       </div>
       <div ref={tabs[3].element} className={DR.tabElement}>
-        <span>메뉴별 방문 시선 수</span>
+        <span>내 가게 메뉴판</span>
       </div>
     </div>
   );
