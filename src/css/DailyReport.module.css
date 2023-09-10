@@ -7,12 +7,85 @@
   padding: 0px;
 }
 
+.tabsTable {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 5vw 10vw;
+}
+
 .tabsToClick {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0;
+  padding: 10px 0;
+  background-color: #e0e0e0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.tabsToClick:hover {
+  background-color: #ccc;
 }
 
 .tabElement {
+  margin-left: 10vw;
   margin-bottom: 200px;
+}
+
+.tabElement span {
+  font-size: 20px;
+}
+
+.todaysReport {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 2vw 0;
+}
+
+.todaysReportLeft {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0;
+  margin-right: auto;
+  padding: 20px 10px;
+  white-space: nowrap;
+  border: 1px solid #c4c4c4;
+  border-radius: 10px;
+}
+
+.todaysReportLeft span {
+  padding-right: 10vw;
+  margin: 10px 15px;
+}
+
+.todaysReportRight {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.todaysReportRight div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 15vw;
+}
+
+.todaysReportRight span {
+  margin: 2px 30px;
+  white-space: nowrap;
+}
+
+.ReportDesc {
+  float: right;
+  width: 31vw;
+  text-align: right;
+}
+
+.ReportDesc p {
+  color: #565656;
+  background: none;
 }
