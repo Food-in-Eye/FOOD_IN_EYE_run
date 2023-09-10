@@ -1,0 +1,25 @@
+.total {
+  display: flex;
+  flex-flow: column;
+}
+
+.radioButtons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: 10vw;
+}
+
+.radioButtons label {
+  display: flex;
+  flex-flow: row nowrap;
+  white-space: nowrap;
+  width: 8vw;
+}
+
+.charts {
+  margin-left: 0px;
+  margin-right: auto;
+}

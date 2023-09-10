@@ -36,7 +36,7 @@
 }
 
 .tabElement span {
-  font-size: 20px;
+  font-size: 30px;
 }
 
 .todaysReport {
@@ -57,13 +57,15 @@
 }
 
 .todaysReportLeft span {
-  padding-right: 10vw;
+  padding-right: 20vw;
   margin: 10px 15px;
+  font-size: 20px;
 }
 
 .todaysReportRight {
   display: flex;
   flex-flow: row nowrap;
+  margin-right: 7vw;
 }
 
 .todaysReportRight div {
@@ -77,15 +79,55 @@
 .todaysReportRight span {
   margin: 2px 30px;
   white-space: nowrap;
+  font-size: 20px;
 }
 
 .ReportDesc {
   float: right;
   width: 31vw;
+  margin-right: 4vw;
   text-align: right;
 }
 
 .ReportDesc p {
   color: #565656;
   background: none;
+}
+
+.scatterChart {
+  display: flex;
+  flex-flow: row nowrap;
+  height: 500px;
+}
+
+.scatterChartLeftDiv {
+  width: 50%;
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+.scatterChartRightDiv {
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+}
+
+.scatterChartRightDiv span {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.scatterChartRightDiv p {
+  font-size: 18px;
+  text-align: center;
+  background: none;
+}
+
+.scatterChartDesc {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  padding: 20px;
+  margin: 10px 20px 50px 20px;
+  border: 1px solid #d2d2d2;
 }

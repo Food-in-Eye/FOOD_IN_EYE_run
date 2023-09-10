@@ -1,10 +1,13 @@
 import MenuBar from "../components/MenuBar";
 import DR from "../css/DailyReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
-
+import useTokenRefresh from "../components/useTokenRefresh";
 import { useRef } from "react";
+import ScatterChart from "../charts/ScatterChart";
 
 function DailyReportPage() {
+  useTokenRefresh();
+
   const useMoveScroll = (elementId) => {
     const element = useRef(null);
     const onMoveToElement = () => {
@@ -87,6 +90,24 @@ function DailyReportPage() {
       </div>
       <div ref={tabs[2].element} className={DR.tabElement}>
         <span>시선/체류 시간과 주문량</span>
+        <section className={DR.scatterChart}>
+          <div className={DR.scatterChartLeftDiv}>
+            <ScatterChart />
+          </div>
+          <div className={DR.scatterChartRightDiv}>
+            <div className={DR.scatterChartDesc}>
+              <span>✏️ 다음 분석에 대한 설명</span>
+              <p>
+                * 각 메뉴마다 시선이 얼마나 가는지에 따라 주문량에 영향이 있는지
+                알 수 있습니다. <br />
+                <br />* 메뉴에 사용자가 얼마나 머무르고 있는지에 따라 주문량에
+                영향이 있는지 알 수 있습니다.
+              </p>
+            </div>
+            <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
+            <p></p>
+          </div>
+        </section>
       </div>
       <div ref={tabs[3].element} className={DR.tabElement}>
         <span>메뉴별 방문 시선 수</span>

@@ -16,6 +16,7 @@
     "moment": "^2.29.4",
     "npm": "^9.6.4",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
     "react-calendar": "^4.2.1",
     "react-cookie": "^6.1.0",
     "react-cropper": "^2.3.3",
