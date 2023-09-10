@@ -7,7 +7,12 @@
   padding: 0px;
 }
 
-.inner p {
-  margin: auto;
-  display: block;
+.tabsToClick {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabElement {
+  margin-bottom: 200px;
 }
