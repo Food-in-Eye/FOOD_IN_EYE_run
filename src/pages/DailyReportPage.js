@@ -44,7 +44,7 @@ function DailyReportPage() {
   };
 
   const moveToMenusAnalysis = () => {
-    navigate("/menu-analysis");
+    navigate("/select-menu");
   };
 
   return (
