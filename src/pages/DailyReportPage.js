@@ -163,6 +163,9 @@ function DailyReportPage() {
           </div>
         </div>
       </div>
+      <div className={DR.goUpButton}>
+        <button>⬆︎</button>
+      </div>
     </div>
   );
 }
