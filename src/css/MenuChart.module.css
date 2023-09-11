@@ -1,7 +1,10 @@
 .total {
-  width: 50vw;
   display: flex;
   flex-flow: column;
+  width: 35vw;
+  height: 35vw;
+  margin-left: 0;
+  margin-right: auto;
 }
 
 table {

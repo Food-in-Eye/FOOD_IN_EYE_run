@@ -138,8 +138,29 @@ function DailyReportPage() {
       </div>
       <div ref={tabs[3].element} className={DR.tabElement}>
         <span>내 가게 메뉴판</span>
+        <div className={DR.buttonToMenuAnalysis}>
+          <button>메뉴별 분석 보러가기 ⇨</button>
+        </div>
         <div className={DR.menuChart}>
-          <TheMenuChart />
+          <div className={DR.menuChartLeftDiv}>
+            <TheMenuChart />
+          </div>
+          <div className={DR.menuChartRightDiv}>
+            <div className={DR.menuChartDesc}>
+              <div className={DR.menuChartDescUp}>
+                <span>✏️ 다음 분석에 대한 설명</span>
+                <p>원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!</p>
+                <p>
+                  * 집중도는 사용자가 해당 메뉴에 대해 얼마나 집중하였는지 저희
+                  웹에서 사용하는 공식을 통해 도출한 점수입니다.
+                </p>
+              </div>
+              <div className={DR.menuChartDescDown}>
+                <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
+                <p></p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -94,27 +94,33 @@
   background: none;
 }
 
-.scatterChart {
+.scatterChart,
+.menuChart {
   display: flex;
   flex-flow: row nowrap;
   height: 500px;
 }
 
-.scatterChartLeftDiv {
+.scatterChartLeftDiv,
+.menuChartLeftDiv {
   width: 50%;
   margin-left: 0px;
   margin-right: auto;
 }
 
-.scatterChartRightDiv {
+.scatterChartRightDiv,
+.menuChartRightDiv {
   display: flex;
+  justify-content: center;
   align-items: center;
   flex-flow: column;
   margin: 0 40px 30px 20px;
 }
 
 .scatterChartDescUp span,
-.scatterChartDescDown span {
+.scatterChartDescDown span,
+.menuChartDescUp span,
+.menuChartDescDown span {
   text-align: center;
   font-size: 20px;
   font-weight: 600;
@@ -122,22 +128,19 @@
 }
 
 .scatterChartDescUp p,
-.scatterChartDescDown p {
+.scatterChartDescDown p,
+.menuChartDescUp p,
+.menuChartDescDown p {
   margin: 5px 0;
   font-size: 18px;
-  white-space: nowrap;
   text-align: center;
   background: none;
 }
 
-.scatterChartDesc {
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-}
-
 .scatterChartDescUp,
-.scatterChartDescDown {
+.scatterChartDescDown,
+.menuChartDescUp,
+.menuChartDescDown {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -156,8 +159,14 @@
   padding-right: 10vw;
 }
 
-.menuChart {
-  display: flex;
-  width: 35vw;
-  margin: 20px auto 0px 0px;
+.buttonToMenuAnalysis {
+  display: inline-flex;
+  padding: 20px;
+}
+
+.buttonToMenuAnalysis button {
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 10px;
+  background-color: #f6f6f6;
 }
