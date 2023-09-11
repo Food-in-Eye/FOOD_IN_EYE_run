@@ -2,13 +2,23 @@ import MenuBar from "../components/MenuBar";
 import DR from "../css/DailyReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import ScatterChart from "../charts/ScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
+import dailyReport from "../data/daily_report.json";
 
 function DailyReportPage() {
   useTokenRefresh();
+  const aoiData = dailyReport["Store 1"].aoi_summary;
+  const saleData = dailyReport["Store 1"].sale_summary;
+
+  const totalDwellTime = `${(aoiData.total_dwell_time / 60000).toFixed(1)} 분`;
+  const visitCount = `${aoiData.store_visit} 회`;
+  const gToFRatio = `${(
+    (aoiData.total_fix_count / aoiData.total_gaze_count) *
+    100
+  ).toFixed(2)} %`;
 
   const useMoveScroll = (elementId) => {
     const element = useRef(null);
@@ -48,16 +58,25 @@ function DailyReportPage() {
         <span>오늘의 리포트</span>
         <div className={DR.todaysReport}>
           <section className={DR.todaysReportLeft}>
-            <span>총 수입액:</span>
-            <span>총 주문량:</span>
-            <span>주문 당 평균 금액:</span>
+            <span>
+              <strong>총 수입액: </strong>
+              {saleData.total_sales}원
+            </span>
+            <span>
+              <strong>총 주문량: </strong>
+              {saleData.total_order}건
+            </span>
+            <span>
+              <strong>주문 당 평균 금액: </strong>
+              {saleData.average_sales_per_order}원
+            </span>
           </section>
           <section className={DR.todaysReportRight}>
             <div>
               <span>오늘의 방문 누적 시간</span>
               <CircleWithText
                 radius={70}
-                text="8시간 13분"
+                text={totalDwellTime}
                 strokeColor="rgba(221, 11, 150, 0.2)"
               />
             </div>
@@ -65,7 +84,7 @@ function DailyReportPage() {
               <span>가게 방문 횟수</span>
               <CircleWithText
                 radius={70}
-                text="38회"
+                text={visitCount}
                 strokeColor="rgba(14, 71, 216, 0.2)"
               />
             </div>
@@ -73,7 +92,7 @@ function DailyReportPage() {
               <span>시선의 응집 정도</span>
               <CircleWithText
                 radius={70}
-                text="63%"
+                text={gToFRatio}
                 strokeColor="rgba(0, 128, 133, 0.2)"
               />
             </div>
