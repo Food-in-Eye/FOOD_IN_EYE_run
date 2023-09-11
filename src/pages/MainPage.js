@@ -111,10 +111,6 @@ function MainPage() {
     }
   }, [socket, orderLists]);
 
-  useEffect(() => {
-    connectWS(sID);
-  }, [sID]);
-
   const handleOrderClick = (order) => {
     setOrderData([]);
     const promises = order.f_list.map((f) => getFoods(order.s_id));
