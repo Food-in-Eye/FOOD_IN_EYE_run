@@ -1,5 +1,5 @@
 import axios from "axios";
-import { handleAccessToken } from "./JWT.module";
+import { handleAccessToken, resetLogin } from "./JWT.module";
 
 const USER_URL = "/api/v2/users";
 const STORE_URL = "/api/v2/stores";
@@ -62,6 +62,9 @@ apiInstance.interceptors.response.use(
       (error.response.status === 422)
     ) {
       console.log(error.response.data.detail);
+      if (error.response.data.detail === "R_Token mismatch.") {
+        resetLogin();
+      }
     }
     return Promise.reject(error);
   }
