@@ -3,6 +3,7 @@ import DR from "../css/DailyReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import ScatterChart from "../charts/ScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
@@ -10,6 +11,8 @@ import dailyReport from "../data/daily_report.json";
 
 function DailyReportPage() {
   useTokenRefresh();
+  const navigate = useNavigate();
+
   const aoiData = dailyReport["Store 1"].aoi_summary;
   const saleData = dailyReport["Store 1"].sale_summary;
 
@@ -38,6 +41,10 @@ function DailyReportPage() {
 
   const moveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const moveToMenusAnalysis = () => {
+    navigate("/menu-analysis");
   };
 
   return (
@@ -162,7 +169,7 @@ function DailyReportPage() {
       <div ref={tabs[3].element} className={DR.tabElement}>
         <span>내 가게 메뉴판</span>
         <div className={DR.buttonToMenuAnalysis}>
-          <button>메뉴별 분석 보러가기 ⇨</button>
+          <button onClick={moveToMenusAnalysis}>메뉴별 분석 보러가기 ⇨</button>
         </div>
         <div className={DR.menuChart}>
           <div className={DR.menuChartLeftDiv}>

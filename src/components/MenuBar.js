@@ -59,7 +59,7 @@ function MenuBar() {
                 <a href="./daily-report">데일리 리포트</a>
               </li>
               <li>
-                <a href="./analysis-detail">메뉴별 분석</a>
+                <a href="./menu-analysis">메뉴별 분석</a>
               </li>
               <li>
                 <a href="./gaze-visualize">Gaze 시각화</a>
