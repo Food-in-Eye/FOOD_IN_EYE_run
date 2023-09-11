@@ -5,6 +5,7 @@ import useTokenRefresh from "../components/useTokenRefresh";
 import { useRef } from "react";
 import ScatterChart from "../charts/ScatterChart";
 import BarChart from "../charts/BarChart";
+import TheMenuChart from "../charts/TheMenuChart";
 
 function DailyReportPage() {
   useTokenRefresh();
@@ -88,7 +89,9 @@ function DailyReportPage() {
       </div>
       <div ref={tabs[1].element} className={DR.tabElement}>
         <span>시간당 주문량 및 시선 수</span>
-        <BarChart />
+        <div className={DR.barChart}>
+          <BarChart />
+        </div>
       </div>
       <div ref={tabs[2].element} className={DR.tabElement}>
         <span>시선/체류 시간과 주문량</span>
@@ -98,21 +101,46 @@ function DailyReportPage() {
           </div>
           <div className={DR.scatterChartRightDiv}>
             <div className={DR.scatterChartDesc}>
-              <span>✏️ 다음 분석에 대한 설명</span>
-              <p>
-                * 각 메뉴마다 시선이 얼마나 가는지에 따라 주문량에 영향이 있는지
-                알 수 있습니다. <br />
-                <br />* 메뉴에 사용자가 얼마나 머무르고 있는지에 따라 주문량에
-                영향이 있는지 알 수 있습니다.
-              </p>
+              <div className={DR.scatterChartDescUp}>
+                <span>✏️ 다음 분석에 대한 설명</span>
+                <p>
+                  * 각 메뉴마다 시선이 얼마나 가는지에 따라 주문량에 영향이
+                  있는지 알 수 있습니다.
+                </p>
+                <p>
+                  * 메뉴에 사용자가 얼마나 머무르고 있는지에 따라 주문량에
+                  영향이 있는지 알 수 있습니다.
+                </p>
+              </div>
+              <div className={DR.scatterChartDescDown}>
+                <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
+                <p>
+                  시선 수가 많을수록 주문량이 많은 메뉴는 사용자의 눈길을 끌고
+                  구매까지 간 메뉴들이에요!
+                </p>
+                <p>
+                  시선 수가 적지만 주문량이 많은 메뉴는 매니아층이 있는
+                  메뉴들이에요😃
+                </p>
+                <p>
+                  시선 수는 많지만 주문량이 없는 메뉴는 사용자의 눈길을 끌지만
+                  구매는 되지 않은 메뉴들이에요🙁
+                </p>
+                <p>
+                  시선 수가 적고 주문량도 적은 메뉴는 사용자들이 잘 찾지 않는
+                  메뉴들이에요. <br />
+                  다른 메뉴로 바꾸시는 건 어떠신가요?
+                </p>
+              </div>
             </div>
-            <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
-            <p></p>
           </div>
         </section>
       </div>
       <div ref={tabs[3].element} className={DR.tabElement}>
         <span>내 가게 메뉴판</span>
+        <div className={DR.menuChart}>
+          <TheMenuChart />
+        </div>
       </div>
     </div>
   );

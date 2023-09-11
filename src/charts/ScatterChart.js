@@ -5,6 +5,7 @@ import SChart from "../css/ScatterChart.module.css";
 import { getFoods } from "../components/API.module";
 
 function ScatterChart() {
+  const sID = "64a2d45c1fe80e3e4db82af9";
   const aoiData = dailyReport["Store 1"].aoi_summary.total_food_report;
   const saleData = dailyReport["Store 1"].sale_summary.food_detail;
   const [fNameList, setFNameList] = useState([]);
@@ -17,7 +18,7 @@ function ScatterChart() {
 
   useEffect(() => {
     const getFName = async () => {
-      const res = await getFoods("64a2d45c1fe80e3e4db82af9");
+      const res = await getFoods(sID);
       const foodNames = res.data.food_list.map((food) => food.name);
       setFNameList(foodNames);
     };
@@ -57,7 +58,6 @@ function ScatterChart() {
         });
       }
     }
-    console.log(foodDataArray);
 
     setGraphData(foodDataArray);
   }, [xAxisType, aoiData, saleData, fNameList]);
@@ -113,7 +113,7 @@ function ScatterChart() {
             checked={xAxisType === "duration"}
             onChange={handleXAxisChange}
           />
-          Duration
+          체류 시간
         </label>
       </div>
 

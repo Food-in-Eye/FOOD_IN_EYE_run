@@ -1,7 +1,7 @@
 import axios from "axios";
 import { stopTokenRefresh } from "./TokenRefreshService";
 
-const resetLogin = () => {
+export const resetLogin = () => {
   stopTokenRefresh();
   setTimeout(() => {
     localStorage.removeItem("u_id");

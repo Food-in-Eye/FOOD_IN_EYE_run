@@ -18,6 +18,15 @@ function BarChart() {
         text: "주문량(단위: 건)",
       },
     },
+    tooltip: {
+      custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+        const orderData = orderCounts[dataPointIndex];
+        let html = `<div className={SChart.customTooltip}>`;
+        html += `<div>주문량: ${orderData} 건</div>`;
+        html += `</div>`;
+        return html;
+      },
+    },
   };
 
   const series = [
@@ -33,7 +42,7 @@ function BarChart() {
         options={options}
         series={series}
         type="bar"
-        width={1200}
+        width={1400}
         height={400}
       />
     </div>

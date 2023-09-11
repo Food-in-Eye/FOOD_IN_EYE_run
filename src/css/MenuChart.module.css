@@ -1,0 +1,62 @@
+.total {
+  width: 50vw;
+  display: flex;
+  flex-flow: column;
+}
+
+table {
+  border-collapse: collapse;
+  width: 30vw;
+  padding: 10%;
+}
+
+td {
+  width: 20px;
+  height: 15px;
+  padding: 10px;
+  border: 1px solid #393939;
+}
+
+.menuItem {
+  margin: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.menuItemName {
+  white-space: nowrap;
+  font-size: 25px;
+  font-weight: 700;
+  color: #2c2c2c;
+}
+
+.radioButtons {
+  display: flex;
+  border-radius: 10px;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.radioButtons label {
+  display: flex;
+  flex-flow: row nowrap;
+  white-space: nowrap;
+  width: 6vw;
+  margin: 0 4px;
+}
+
+.radioButtons label input {
+  margin: auto 0;
+}
+
+.menuItemValue {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  /* text-align: center; */
+  font-size: 25px;
+  font-weight: 600;
+  color: #5a5a5a;
+  white-space: nowrap;
+}
