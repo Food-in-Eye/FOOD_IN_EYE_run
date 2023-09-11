@@ -52,7 +52,7 @@ async def buyer_signup(data: BuyerModel):
             'gender': data.gender.value,
             'age': data.age,
             'R_Token': '',
-            'camera': None
+            'camera': 0
         }
         u_id = str(DB.insert_one('user', user))
     else:
@@ -118,7 +118,7 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel, token:str = Depend
         'name': data.name,
         'gender': data.gender.value,
         'age': data.age,
-        'camera': data.camera
+        'camera': data.camera.value
     }
 
     DB.update_one('user', {'_id':_id}, new_data)
@@ -130,8 +130,10 @@ async def change_buyer_info(u_id:str, data:Camera, token:str = Depends(TokenMana
     assert TokenManager.is_buyer(scope), 403.1
 
     _id = Util.check_id(u_id)
-
-    DB.update_one('user', {'_id':_id}, {'camera': data.camera})
+    print(data.camera)
+    print(type(data.camera))
+    print(data.camera.value)
+    DB.update_one('user', {'_id':_id}, {'camera': data.camera.value})
 
 
 
