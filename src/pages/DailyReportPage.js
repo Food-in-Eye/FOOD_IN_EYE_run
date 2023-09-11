@@ -2,7 +2,7 @@ import MenuBar from "../components/MenuBar";
 import DR from "../css/DailyReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import ScatterChart from "../charts/ScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
@@ -34,6 +34,10 @@ function DailyReportPage() {
     2: useMoveScroll("시선/체류 시간과 주문량"),
     3: useMoveScroll("내 가게 메뉴판"),
     length: 4,
+  };
+
+  const moveToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -182,8 +186,10 @@ function DailyReportPage() {
           </div>
         </div>
       </div>
-      <div className={DR.goUpButton}>
-        <button>⬆︎</button>
+      <div className={DR.divForButton}>
+        <button className={DR.goUpButton} onClick={moveToTop}>
+          ⇪
+        </button>
       </div>
     </div>
   );

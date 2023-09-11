@@ -170,3 +170,22 @@
   border-radius: 10px;
   background-color: #f6f6f6;
 }
+
+.divForButton {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+.goUpButton {
+  width: 40px;
+  height: 40px;
+  line-height: 1vw;
+  color: #3a3a3a;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px;
+  border: 1px solid #3a3a3a;
+  border-radius: 100%;
+  background: none;
+}
