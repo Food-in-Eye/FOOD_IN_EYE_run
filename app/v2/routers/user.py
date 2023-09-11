@@ -77,11 +77,13 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 
     return {
         'u_id': u_id,
+        'name': response['name'],
         'token_type': "bearer",
         'A_Token': TokenManager.ACCESS_TOKEN_buyer,
         'R_Token': user['R_Token'],
         'camera': response['camera']
     }
+
 
 
 @user_router.post('/buyer/info')
