@@ -109,6 +109,29 @@ async def get_order(id: str, detail: bool=False):
         "f_list": response['f_list']
     }
 
+# todo: buyer check 고민
+@order_router.get("/order/h")
+async def get_order_by_hid(id:str):
+    _id = Util.check_id(id)
+    response = DB.read_one('history', {'_id':_id})
+    result = []
+    for o_id in response["orders"]:
+        _id = Util.check_id(o_id)
+        order = DB.read_one('order', {'_id':_id})
+        result.append({
+            'o_id': o_id,
+            'status': order['status'],
+            's_id': order['s_id'],
+            's_name': order['s_name'],
+            'm_id': order['m_id'],
+            'f_list': order['f_list']
+        })
+    return { 'order_list': result }
+
+@order_router.get("/history/status")
+async def get_history_status(id:str):
+    return { 'complete': Util.is_done(id)}
+
 @order_router.put("/order/status")
 async def change_status(id: str, request:Request):
     ''' 특정 주문 내역의 진행 상태를 변경한다. '''
@@ -190,16 +213,22 @@ async def new_order(body:OrderModel, request:Request):
 @order_router.post("/order/gaze")
 async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     assert TokenManager.is_buyer(request.state.token_scope), 403.1
+    SAVE_DIR = 'EXP1'
 
     gaze_data = []
     for page in body:
         gaze_data.append(page.dict())
 
-
+    ## test 계정은 예외처리하기 위해 추가 (SYSYSY 디렉토리에 혹시몰라 저장하기는 함)
     _id = Util.check_id(h_id)
+    history = DB.read_one('history', {'_id':_id})
+    u_id = Util.check_id(history['u_id'])
+    user = DB.read_one('user', {'_id': u_id})
+    if user['id'] == "test":
+        SAVE_DIR = 'SYSYSY'
 
     try:
-        key = storage.upload(gaze_data, 'json', 'C_0714')
+        key = storage.upload(gaze_data, 'json', SAVE_DIR)
     except CustomException as e:
         raise CustomException(e.status_code, f' -> h_id: \'{h_id}\'')
 
@@ -209,7 +238,7 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
         raise CustomException(e.status_code, f' -> h_id: \'{h_id}\', S3 key: \'{key}\'')
 
     # 임시로 비활성화
-    asyncio.create_task(preprocess_and_update(key, h_id))
+    # asyncio.create_task(preprocess_and_update(key, h_id))
 
     websocket_manager.app_connections[h_id]['gaze'] = True
 
