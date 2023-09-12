@@ -203,7 +203,8 @@ async def new_order(body:OrderModel, request:Request):
     }
     
     h_id = str(DB.insert_one('history', history)) 
-
+    _id = Util.check_id(body.u_id)
+    DB.update_one('user', {'_id':_id}, {'h_id':h_id})
     return {
         'h_id': h_id,
         'order_list': response_list
