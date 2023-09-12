@@ -127,6 +127,14 @@
   background-color: #fff;
 }
 
+.menuDetailPageStatisticsDesc span {
+  text-align: center;
+  font-size: 18px;
+  color: #2b2b2b;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .divForButton {
   position: fixed;
   bottom: 10px;

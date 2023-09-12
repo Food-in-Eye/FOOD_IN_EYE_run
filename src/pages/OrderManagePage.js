@@ -118,13 +118,6 @@ function OrderManagePage() {
         orderMenus: totalOrderMenus.slice(0, -2),
         orderPrice: totalOrderPrice,
       });
-
-      // orderTime: data.date.slice(11, 19),
-      // // DELETE LATER: 이전 주문 중 f_name이 없는 data를 위한 f_id 남겨놓은 상태
-      // orderMenus: `${
-      //   data.detail[0].f_name ? data.detail[0].f_name : data.detail[0].f_id
-      // } ${data.detail[0].count}개`,
-      // orderPrice: data.detail[0].price * data.detail[0].count,
     }
 
     return orderData;

@@ -4,11 +4,62 @@ import SemiCircleGaugeChart from "../charts/SemiCircleGaugeChart";
 import RowBarChart from "../charts/RowBarChart";
 import dailyReport from "../data/daily_report.json";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function MenuAnalysisPage() {
   const aoiData = dailyReport["Store 1"].aoi_summary;
   const saleData = dailyReport["Store 1"].sale_summary;
+  const fNum = "Food 6";
+  const [maxHour, setMaxHour] = useState(-1);
+  const [saleRatio, setSaleRatio] = useState(0);
+  const [menuSalesCount, setMenuSalesCount] = useState(0);
+  const [dwellTime, setDwellTime] = useState(0);
+  const [fixRatio, setFixRatio] = useState(0);
+  const [score, setScore] = useState(0);
+  const [visitCount, setVisitCount] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  console.log("aoiData", aoiData);
+  console.log("saleData", saleData);
+
+  const setSaleData = () => {
+    let maxCount = -1;
+    let maxHour = -1;
+
+    const foodDetail = saleData.food_detail[fNum];
+    const hoursData = foodDetail.hourly_sale_info;
+    hoursData.forEach((hourlyInfo, hour) => {
+      if (hourlyInfo.count > maxCount) {
+        maxCount = hourlyInfo.count;
+        maxHour = hour;
+      }
+    });
+
+    const menuTotalSales = foodDetail.total_sales;
+    const totalSales = saleData.total_sales;
+
+    setMaxHour(maxHour);
+    setMenuSalesCount(foodDetail.total_count);
+    setSaleRatio(((menuTotalSales / totalSales) * 100).toFixed(0));
+  };
+
+  const setAoiData = () => {
+    const foodDetail = aoiData.total_food_report[fNum];
+
+    const menuFixCount = foodDetail.fix_count;
+    const totalFixCount = aoiData.total_fix_count;
+
+    setDwellTime((foodDetail.duration / 10000).toFixed(2));
+    setFixRatio(((menuFixCount / totalFixCount) * 100).toFixed(1));
+    setScore(foodDetail.score);
+    setVisitCount(foodDetail.in_detail.visit);
+    setDuration((foodDetail.in_detail.duration / 10000).toFixed(2));
+  };
+
+  useEffect(() => {
+    setSaleData();
+    setAoiData();
+  }, [fNum]);
 
   const useMoveScroll = (elementId) => {
     const element = useRef(null);
@@ -60,11 +111,11 @@ function MenuAnalysisPage() {
             <div className={MAnalysis.menuSummaryBody}>
               <div className={MAnalysis.menuSummaryTime}>
                 <p>인기 시간대</p>
-                <span>시간대</span>
+                <span>{maxHour} 시</span>
               </div>
               <div className={MAnalysis.menuSummarySales}>
                 <p>총 매출액의 매출 기여도</p>
-                <span>매출 기여도 퍼센트</span>
+                <span>{saleRatio} %</span>
               </div>
             </div>
           </section>
@@ -107,19 +158,19 @@ function MenuAnalysisPage() {
             <div className={MAnalysis.menuPageStatisticsBody}>
               <div className={MAnalysis.menuPageSaleCount}>
                 <p>판매 개수</p>
-                <span>100 개</span>
+                <span>{menuSalesCount} 개</span>
               </div>
               <div className={MAnalysis.menuPageDwellTime}>
                 <p>총 체류시간</p>
-                <span>320 시간</span>
+                <span>{dwellTime} 초</span>
               </div>
               <div className={MAnalysis.menuPageGazeRatio}>
                 <p>총 시선 점유율</p>
-                <span>45%</span>
+                <span>{fixRatio} %</span>
               </div>
               <div className={MAnalysis.menuPageScore}>
-                <p>집중도</p>
-                <span>5.6 점</span>
+                <p>집중도(0점 ~ 5점)</p>
+                <span>{score} 점</span>
               </div>
             </div>
           </section>
@@ -137,23 +188,27 @@ function MenuAnalysisPage() {
                 사용자가 이 메뉴에 대해 얼마나 관심 있게 봤는지 알 수 있어요!
                 <br />
                 <br />
-                그리고 방문 대비 주문율을 통해 관심에 비해 주문이 얼마나
-                되었는지를 비율로 통해 확인할 수 있어요.
               </p>
+              <span>
+                이 메뉴의 메뉴 상세 페이지에는 {visitCount} 회 방문했고,{" "}
+                {menuSalesCount} 건 주문되었어요!
+              </span>
             </div>
             <div className={MAnalysis.menuDetailPageStatisticsBody}>
               <div className={MAnalysis.menuDetailPageVisitCount}>
                 <p>방문 횟수</p>
-                <span>9 회</span>
+                <span>{visitCount} 회</span>
               </div>
               <div className={MAnalysis.menuDetailPageDwellTime}>
                 <p>총 체류시간</p>
-                <span>320 시간</span>
+                <span>{duration} 초</span>
               </div>
-              <div className={MAnalysis.menuDetailOrderRatio}>
+              {/* <div className={MAnalysis.menuDetailOrderRatio}>
                 <p>방문 대비 주문율</p>
-                <span>30%</span>
-              </div>
+                <span>
+                  
+                </span>
+              </div> */}
             </div>
           </section>
         </div>
