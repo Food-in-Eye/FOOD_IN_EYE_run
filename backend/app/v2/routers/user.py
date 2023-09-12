@@ -74,14 +74,24 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
 
     DB.update_one('user', {'_id':_id}, {'R_Token': user['R_Token']})
     response = DB.read_one('user', {'_id':_id})
-
-    return {
+    result = {
         'u_id': u_id,
+        'name': response['name'],
         'token_type': "bearer",
         'A_Token': TokenManager.ACCESS_TOKEN_buyer,
         'R_Token': user['R_Token'],
         'camera': response['camera']
     }
+    try:
+        # 현재 db에 아예 h_id field가 없는 경우가 많아서 일시적인 조치
+        h_id = response['h_id']
+    except:
+        h_id = ""
+    if h_id and Util.is_done(h_id):
+        result['h_id'] = ""
+    else:
+        result['h_id'] = h_id
+    return result
 
 
 @user_router.post('/buyer/info')
