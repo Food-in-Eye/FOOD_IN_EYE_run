@@ -96,14 +96,36 @@ function OrderManagePage() {
   const fetchOrderDetails = async (date) => {
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
     const orderDetails = res.data.order_list;
-    const orderData = orderDetails.map((data) => ({
-      orderTime: data.date.slice(11, 19),
-      // DELETE LATER: 이전 주문 중 f_name이 없는 data를 위한 f_id 남겨놓은 상태
-      orderMenus: `${
-        data.detail[0].f_name ? data.detail[0].f_name : data.detail[0].f_id
-      } ${data.detail[0].count}개`,
-      orderPrice: data.detail[0].price * data.detail[0].count,
-    }));
+    console.log("orderDetails", orderDetails);
+
+    const orderData = [];
+
+    for (const data of orderDetails) {
+      let totalOrderMenus = "";
+      let totalOrderPrice = 0;
+
+      for (const detail of data.detail) {
+        const menuName = detail.f_name;
+        const menuCount = detail.count;
+        const menuPrice = detail.price * detail.count;
+
+        totalOrderMenus += `${menuName} ${menuCount}개, `;
+        totalOrderPrice += menuPrice;
+      }
+
+      orderData.push({
+        orderTime: data.date.slice(11, 19),
+        orderMenus: totalOrderMenus.slice(0, -2),
+        orderPrice: totalOrderPrice,
+      });
+
+      // orderTime: data.date.slice(11, 19),
+      // // DELETE LATER: 이전 주문 중 f_name이 없는 data를 위한 f_id 남겨놓은 상태
+      // orderMenus: `${
+      //   data.detail[0].f_name ? data.detail[0].f_name : data.detail[0].f_id
+      // } ${data.detail[0].count}개`,
+      // orderPrice: data.detail[0].price * data.detail[0].count,
+    }
 
     return orderData;
   };
