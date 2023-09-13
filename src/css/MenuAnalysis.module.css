@@ -48,14 +48,14 @@
 }
 
 .menuSummarySection,
-.GtoFRatioSection,
 .menuPageStatistics,
-.menuDetailPageStatistics {
+.menuDetailPageStatistics,
+.GtoFRatioSection {
   flex-direction: column;
 }
 
 .menuSummarySection,
-.GtoFRatioSection,
+.GtoFRatioBody,
 .menuPageStatistics,
 .menuDetailPageStatistics,
 .menuSummaryBody,
@@ -76,7 +76,9 @@
 .menuPageStatistics .menuPageScore,
 .menuDetailPageStatistics .menuDetailPageVisitCount,
 .menuDetailPageStatistics .menuDetailPageDwellTime,
-.menuDetailPageStatistics .menuDetailOrderRatio {
+.menuDetailPageStatistics .menuDetailOrderRatio,
+.GtoFRatioSection .GtoFRatioValue,
+.GtoFRatioSection .GtoFRatioPercent {
   display: flex;
   flex-direction: column;
   width: 20vw;
@@ -89,11 +91,12 @@
 
 .menuSummarySection p,
 .menuPageStatistics p,
-.menuDetailPageStatistics p {
+.menuDetailPageStatistics p,
+.GtoFRatioSection p {
   margin-left: 0px;
   margin-right: auto;
   color: #4d4d4d;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 24px;
   white-space: nowrap;
@@ -102,11 +105,13 @@
 
 .menuSummarySection span,
 .menuPageStatistics span,
-.menuDetailPageStatistics span {
+.menuDetailPageStatistics span,
+.GtoFRatioPercent span,
+.GtoFRatioValue span {
   margin-left: 0px;
   margin-right: auto;
   color: #1e1e1e;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 36px;
   white-space: nowrap;
@@ -116,24 +121,32 @@
 .menuDetailPageStatisticsDesc p,
 .menuPageStatisticsDesc p,
 .menuSummarySectionDesc p,
-.GtoFRatioSection p {
+.GtoFRatioSectionDesc p {
   display: flex;
   justify-content: center;
   width: 45vw;
   text-align: center;
   color: #4d4d4d;
+  font-size: 18px;
   font-weight: 500;
   line-height: 30px;
   background-color: #fff;
 }
 
-.menuDetailPageStatisticsDesc span {
-  text-align: center;
-  font-size: 18px;
-  color: #2b2b2b;
-  font-weight: 600;
-  white-space: nowrap;
+/* .visitAndOrder .visitCount,
+.visitAndOrder .salesCount {
+  margin: 0px;
+  color: #051c77;
+  font-size: 20px;
+  font-weight: 800;
 }
+
+.visitAndOrder .salesCount {
+  margin-left: 5px;
+  color: #051c77;
+  font-size: 28px;
+  font-weight: 800;
+} */
 
 .divForButton {
   position: fixed;
@@ -152,4 +165,34 @@
   border: 1px solid #3a3a3a;
   border-radius: 100%;
   background: none;
+}
+
+.menuDetailPageGazeBody {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 30vw;
+  margin-top: 10px;
+}
+
+.menuDetailPageGazeBody img {
+  width: 20vw;
+  height: auto;
+}
+
+.detailDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 30px;
+}
+
+.detailDiv p {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 20px 0px;
+  padding: 20px 0;
+  white-space: nowrap;
+  background-color: #fff;
 }

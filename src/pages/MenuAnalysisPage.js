@@ -1,8 +1,9 @@
 import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
-import SemiCircleGaugeChart from "../charts/SemiCircleGaugeChart";
-import RowBarChart from "../charts/RowBarChart";
+import CircleGraph from "../charts/CircleGraph";
+import StackBarChart from "../charts/StackBarChart";
 import dailyReport from "../data/daily_report.json";
+import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -18,6 +19,14 @@ function MenuAnalysisPage() {
   const [score, setScore] = useState(0);
   const [visitCount, setVisitCount] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [salesPerVisit, setSalesPerVisit] = useState(0);
+
+  const [fixCount, setFixCount] = useState(0);
+  const [gazeCount, setGazeCount] = useState(0);
+  const [foodsPercentage, setFoodsPercentage] = useState(0);
+
+  const [fixDataInDetail, setFixDataInDetail] = useState([]);
+  const [foodRankOfGtoF, setFoodRankOfGtoF] = useState([]);
 
   console.log("aoiData", aoiData);
   console.log("saleData", saleData);
@@ -54,12 +63,54 @@ function MenuAnalysisPage() {
     setScore(foodDetail.score);
     setVisitCount(foodDetail.in_detail.visit);
     setDuration((foodDetail.in_detail.duration / 10000).toFixed(2));
+
+    getPercentageOfFixData(foodDetail.in_detail.fix_count);
+  };
+
+  const updateFixAndGazeCountList = () => {
+    const fixAndGazeArray = [];
+
+    for (const foodName in aoiData.total_food_report) {
+      if (foodName !== "ETC" && foodName !== "Store INFO") {
+        const foodData = aoiData.total_food_report[foodName];
+        const detailData = foodData.in_detail;
+
+        const detailFixCount =
+          detailData.fix_count.name +
+          detailData.fix_count.image +
+          detailData.fix_count.info +
+          detailData.fix_count.price +
+          detailData.fix_count.etc;
+        const detailGazeCount =
+          detailData.gaze_count.name +
+          detailData.gaze_count.image +
+          detailData.gaze_count.info +
+          detailData.gaze_count.price +
+          detailData.gaze_count.etc;
+        const fixCount = foodData.fix_count || 0 + detailFixCount;
+
+        const gazeCount = foodData.gaze_count || 0 + detailGazeCount;
+
+        fixAndGazeArray.push({
+          name: foodName,
+          gaze_count: gazeCount,
+          fixation_count: fixCount,
+        });
+      }
+    }
+
+    DegreeOfFixComparedToGaze(fixAndGazeArray);
   };
 
   useEffect(() => {
     setSaleData();
     setAoiData();
-  }, [fNum]);
+    setSalesPerVisit(((menuSalesCount / visitCount) * 100).toFixed(0));
+  }, [fNum, menuSalesCount, visitCount]);
+
+  useEffect(() => {
+    updateFixAndGazeCountList();
+  }, []);
 
   const useMoveScroll = (elementId) => {
     const element = useRef(null);
@@ -81,6 +132,85 @@ function MenuAnalysisPage() {
   const moveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const DegreeOfFixComparedToGaze = (data) => {
+    // 최소 및 최대값 초기화
+    let minValue = Infinity;
+    let maxValue = -Infinity;
+
+    // Fixation/Gaze 비율 계산 및 최소/최대값 찾기
+    data.forEach((item) => {
+      const ratio = item.fixation_count / item.gaze_count;
+      if (ratio < minValue) {
+        minValue = ratio;
+      }
+      if (ratio > maxValue) {
+        maxValue = ratio;
+      }
+    });
+
+    // Fixation/Gaze 비율을 [0, 1] 범위로 정규화
+    const normalizeData = (data, minValue, maxValue) => {
+      return data.map((item) => ({
+        ...item,
+        normalized_ratio:
+          (item.fixation_count / item.gaze_count - minValue) /
+          (maxValue - minValue),
+      }));
+    };
+
+    // 'Food 6' 메뉴의 정규화된 값을 찾아 상위 몇 퍼센트에 속하는지 계산
+    const findPercentile = (data, targetName) => {
+      const targetItem = data.find((item) => item.name === targetName);
+      setFixCount(targetItem.fixation_count);
+      setGazeCount(targetItem.gaze_count);
+      const targetValue = targetItem.normalized_ratio;
+
+      const percentile =
+        (data.filter((item) => item.normalized_ratio > targetValue).length /
+          data.length) *
+        100;
+
+      return percentile;
+    };
+
+    // 정규화된 데이터 반환
+    const normalizedData = normalizeData(data, minValue, maxValue);
+    console.log("normalizedData", normalizedData);
+    const sortedData = normalizedData
+      .slice()
+      .sort((a, b) => b.normalized_ratio - a.normalized_ratio);
+    const rank = sortedData.findIndex((item) => item.name === fNum) + 1;
+
+    setFoodRankOfGtoF(rank);
+
+    // 'Food 6' 메뉴의 상위 백분위수 계산
+    const percentileFood = findPercentile(normalizedData, fNum);
+    console.log("percentile", percentileFood);
+    setFoodsPercentage(percentileFood.toFixed(0));
+
+    return percentileFood;
+  };
+
+  const getPercentageOfFixData = (fixData) => {
+    const fixPercentageObject = {};
+
+    const totalSum = Object.values(fixData).reduce((acc, val) => acc + val, 0);
+
+    Object.entries(fixData).forEach(([key, value]) => {
+      // 각 칸의 비율 계산
+      const percentage =
+        (value / totalSum) * 100 !== 0
+          ? ((value / totalSum) * 100).toFixed(1)
+          : ((value / totalSum) * 100).toFixed(0);
+
+      fixPercentageObject[key] = percentage;
+    });
+
+    setFixDataInDetail(fixPercentageObject);
+  };
+
+  console.log("fixDataInDetail", fixDataInDetail);
 
   return (
     <div>
@@ -125,17 +255,34 @@ function MenuAnalysisPage() {
         <div>
           <span>전체 시선 수 대비 시선의 응집 정도</span>
           <section className={MAnalysis.GtoFRatioSection}>
-            <p>
-              사용자가 특정 부분을 고정적으로 주목했을 때 생기는 시선들의 집합을
-              전체 시선 수에 대비하여 확률로 나타내었습니다.
-              <br />
-              이를 통해 사용자가 얼마나 오래 메뉴를 쳐다보고 있는지를 알 수
-              있습니다.
-            </p>
-            {/* <div className={MAnalysis.GtoFRatioGraph}>
-              <SemiCircleGaugeChart />
-            </div> */}
-            <div className={MAnalysis.GtoFRatioGraphDesc}></div>
+            <div className={MAnalysis.GtoFRatioSectionDesc}>
+              <p>
+                사용자가 특정 부분을 고정적으로 주목했을 때 생기는 시선들의
+                집합을 전체 시선 수에 대비하여 확률로 나타냈습니다.
+                <br />
+                이를 통해 사용자가 얼마나 오래 메뉴를 쳐다보고 있는지를 알 수
+                있어요!
+                <br />
+                <br />* Fixation: 사용자가 특정 부분을 고정적으로 주목했을 때
+                생기는 시선들의 집합
+              </p>
+            </div>
+            <div className={MAnalysis.GtoFRatioBody}>
+              <div className={MAnalysis.GtoFRatioValue}>
+                <p>시선 수 대비 Fixation 수 비율</p>
+                <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
+              </div>
+              <div className={MAnalysis.GtoFRatioPercent}>
+                <p>
+                  전 메뉴 중 상위{" "}
+                  <strong style={{ fontSize: "20px", color: "#051c77" }}>
+                    {foodsPercentage} %
+                  </strong>
+                </p>
+                <span>{foodRankOfGtoF} 등</span>
+              </div>
+            </div>
+            {/* <div className={MAnalysis.GtoFRatioGraphDesc}></div> */}
           </section>
         </div>
       </div>
@@ -188,11 +335,9 @@ function MenuAnalysisPage() {
                 사용자가 이 메뉴에 대해 얼마나 관심 있게 봤는지 알 수 있어요!
                 <br />
                 <br />
+                그리고 메뉴 상세 페이지의 방문 횟수에 비해 얼마나 판매되었는지
+                방문 대비 주문율을 통해 확인할 수 있어요.
               </p>
-              <span>
-                이 메뉴의 메뉴 상세 페이지에는 {visitCount} 회 방문했고,{" "}
-                {menuSalesCount} 건 주문되었어요!
-              </span>
             </div>
             <div className={MAnalysis.menuDetailPageStatisticsBody}>
               <div className={MAnalysis.menuDetailPageVisitCount}>
@@ -203,12 +348,10 @@ function MenuAnalysisPage() {
                 <p>총 체류시간</p>
                 <span>{duration} 초</span>
               </div>
-              {/* <div className={MAnalysis.menuDetailOrderRatio}>
+              <div className={MAnalysis.menuDetailOrderRatio}>
                 <p>방문 대비 주문율</p>
-                <span>
-                  
-                </span>
-              </div> */}
+                <span>{salesPerVisit} %</span>
+              </div>
             </div>
           </section>
         </div>
@@ -223,9 +366,19 @@ function MenuAnalysisPage() {
                 확인할 수 있어요!
               </p>
             </div>
-            {/* <div className={MAnalysis.menuDetailPageGazeBody}>
-              <RowBarChart data={data} />
-            </div> */}
+            <div className={MAnalysis.menuDetailPageGazeBody}>
+              <img src={menuDetailPage} alt="menuDetailPage" />
+              <div className={MAnalysis.detailDiv}>
+                <p>메뉴 이름: {fixDataInDetail.name} %</p>
+                <p>메뉴 이미지: {fixDataInDetail.image} %</p>
+                <p>메뉴 정보: {fixDataInDetail.info} %</p>
+                <p>메뉴 가격: {fixDataInDetail.price} %</p>
+                <p>그 외: {fixDataInDetail.etc} %</p>
+              </div>
+            </div>
+            {/* <div className={MAnalysis.menuDetailPageGazeBody}> */}
+            {/* <StackBarChart fixData={fixDataInDetail} /> */}
+            {/* </div> */}
           </section>
         </div>
       </div>
