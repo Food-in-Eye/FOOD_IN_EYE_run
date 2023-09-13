@@ -93,10 +93,35 @@ function OrderManagePage() {
     }
   };
 
+  const convertUtcToKST = (utcTimeString) => {
+    const utcDate = new Date(utcTimeString); // UTC 시간 문자열을 Date 객체로 변환
+
+    const koreanDate = new Date(
+      utcDate.getTime() +
+        utcDate.getTimezoneOffset() * 60 * 1000 +
+        9 * 60 * 60 * 1000
+    ); // UTC 시간을 한국 시간으로 변환
+
+    // 한국 시간을 원하는 형식으로 포맷팅
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+    const koreanTimeFormatted = new Intl.DateTimeFormat(
+      "ko-KR",
+      options
+    ).format(koreanDate);
+
+    return koreanTimeFormatted;
+  };
+
   const fetchOrderDetails = async (date) => {
     const res = await getOrderHistory(`date?s_id=${sID}&date=${date}`);
     const orderDetails = res.data.order_list;
-    console.log("orderDetails", orderDetails);
 
     const orderData = [];
 
@@ -109,12 +134,14 @@ function OrderManagePage() {
         const menuCount = detail.count;
         const menuPrice = detail.price * detail.count;
 
-        totalOrderMenus += `${menuName} ${menuCount}개, `;
+        totalOrderMenus += `${menuName} ${menuCount}개, \n`;
         totalOrderPrice += menuPrice;
       }
 
+      const convertedOrderTime = convertUtcToKST(data.date);
+
       orderData.push({
-        orderTime: data.date.slice(11, 19),
+        orderTime: convertedOrderTime.slice(14, 25),
         orderMenus: totalOrderMenus.slice(0, -2),
         orderPrice: totalOrderPrice,
       });
