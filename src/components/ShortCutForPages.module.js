@@ -35,17 +35,17 @@ function ShortCutForPages() {
   const onClickToAnalysisPage = (e) => {
     e.preventDefault();
 
-    navigate(`/analysis`);
+    navigate(`/daily-report`);
   };
   const onClickToDetailAnalysisPage = (e) => {
     e.preventDefault();
 
-    navigate(`/analysis-detail`);
+    navigate(`/menu-analysis`);
   };
 
   return (
     <div className={ShortCut.body}>
-      <h3>바로가기 탭</h3>
+      <span>바로가기 탭</span>
       <section className={ShortCut.icons}>
         <div>
           <button onClick={onClickToStoreManagePage}>
@@ -70,8 +70,8 @@ function ShortCutForPages() {
         <hr className={ShortCut.vertical} />
         <div>
           <button onClick={onClickToAnalysisPage}>
-            <img src={aTotal} alt="전체 분석 바로가기" />
-            <p>전체 분석</p>
+            <img src={aTotal} alt="데일리 리포트 바로가기" />
+            <p>데일리 리포트</p>
           </button>
           <button onClick={onClickToDetailAnalysisPage}>
             <img src={aMenus} alt="메뉴 분석 바로가기" />
