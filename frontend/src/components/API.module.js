@@ -67,9 +67,10 @@ apiInstance.interceptors.response.use(
       (error.response.status === 422)
     ) {
       console.log(error.response.data.detail);
-      if (error.response.data.detail === "R_Token mismatch.") {
-        resetLogin();
-      }
+      // if (error.response.data.detail === "R_Token mismatch.") {
+      //   resetLogin();
+      // }
+      resetLogin();
     }
     return Promise.reject(error);
   }
