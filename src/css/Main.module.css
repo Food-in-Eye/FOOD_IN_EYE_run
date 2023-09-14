@@ -20,14 +20,16 @@
 
 .rest .cal {
   width: 100%;
-  margin-top: 15%;
+  margin-top: 30px;
 }
 
 .cal span {
-  margin-left: 2%;
   font-size: 20px;
   font-weight: 600;
-  margin-bottom: 10px;
+}
+
+.cal .calender {
+  margin-top: 10px;
 }
 
 .rest .shortcut {
@@ -38,9 +40,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   margin-top: 0px;
-  padding: 10%;
   white-space: nowrap;
 }
 
@@ -54,6 +54,7 @@
 
 .sales h2 {
   margin-top: 10px;
+  margin-left: 0px;
   color: #323232;
 }
 
@@ -125,17 +126,20 @@
   margin: 20px;
 }
 
-.orderSeq h3 {
+.orderSeq span {
   margin-left: 0px;
   margin-bottom: 5px;
   border: none;
   color: #323232;
+  font-size: 20px;
+  font-weight: 600;
   white-space: nowrap;
 }
 .orderSeqBody {
   display: flex;
   flex-flow: row nowrap;
   padding: 10px;
+  margin-top: 10px;
   border: 1px solid #d2d2d2;
   border-radius: 100px;
 }
@@ -178,11 +182,13 @@
   margin: 30px 20px;
 }
 
-.orderDetail h3 {
+.orderDetail span {
   margin-left: 0;
   margin-bottom: 5px;
   border: none;
   color: #323232;
+  font-size: 20px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -190,8 +196,8 @@
   display: flex;
   justify-content: center;
   white-space: nowrap;
-  /* margin: 0px 10px; */
   padding: 70px;
+  margin-top: 10px;
   border: 1px solid #d2d2d2;
 }
 

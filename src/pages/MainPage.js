@@ -208,7 +208,11 @@ function MainPage() {
             </section>
             <section className={Main.cal}>
               <span>📊 데일리 리포트</span>
-              <Calendar onChange={onChange} value={value} />
+              <Calendar
+                className={Main.calender}
+                onChange={onChange}
+                value={value}
+              />
             </section>
             <section className={Main.shortcut}>
               <ShortCuts />
@@ -266,10 +270,9 @@ function MainPage() {
               </div>
             </div>
           </div>
-
           <div className={Main.infoBody}>
             <section id="orderSeq" className={Main.orderSeq}>
-              <h3>주문 진행률</h3>
+              <span>주문 진행률</span>
               <div className={Main.orderSeqBody}>
                 <div>
                   <img
@@ -304,7 +307,7 @@ function MainPage() {
               </div>
             </section>
             <section className={Main.orderDetail}>
-              <h3>주문 내역</h3>
+              <span>주문 내역</span>
               <div className={Main.orderContents}>
                 <MenuTable data={orderData} />
               </div>

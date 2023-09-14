@@ -33,7 +33,8 @@ function DailyReportPage() {
 
   const tabs = {
     0: useMoveScroll("오늘의 리포트"),
-    1: useMoveScroll("시간당 주문량 및 시선 수"),
+    // 1: useMoveScroll("시간당 주문량 및 시선 수"),
+    1: useMoveScroll("시간당 주문량"),
     2: useMoveScroll("시선/체류 시간과 주문량"),
     3: useMoveScroll("내 가게 메뉴판"),
     length: 4,
@@ -118,7 +119,8 @@ function DailyReportPage() {
         </div>
       </div>
       <div ref={tabs[1].element} className={DR.tabElement}>
-        <span>시간당 주문량 및 시선 수</span>
+        {/* <span>시간당 주문량 및 시선 수</span> */}
+        <span>시간당 주문량</span>
         <div className={DR.barChart}>
           <BarChart />
         </div>
@@ -187,7 +189,14 @@ function DailyReportPage() {
               </div>
               <div className={DR.menuChartDescDown}>
                 <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
-                <p></p>
+                <p>
+                  어떤 메뉴가 잘 팔리는지, 인기가 많은지 등을 한눈에 비교해볼 수
+                  있습니다.
+                </p>
+                <p>
+                  그리고 사용자가 잘 쳐다보지 않았거나 집중도 점수가 낮거나 등을
+                  통해 어떤 메뉴를 보완해야 할 지 확인할 수 있어요!
+                </p>
               </div>
             </div>
           </div>

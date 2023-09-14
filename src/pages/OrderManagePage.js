@@ -112,6 +112,10 @@ function OrderManagePage() {
         totalOrderPrice += menuPrice;
       }
 
+      if (totalOrderMenus.endsWith(", \n")) {
+        totalOrderMenus = totalOrderMenus.slice(0, -3);
+      }
+
       orderData.push({
         orderTime: data.date.slice(11, 19),
         orderMenus: totalOrderMenus.slice(0, -2),

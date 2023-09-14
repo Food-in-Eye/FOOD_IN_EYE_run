@@ -135,7 +135,7 @@ function AdminSettingPage() {
         <div className={Admin.body}>
           <section className={Admin.desc}>
             <h1>Account Settings</h1>
-            <span>가게 이름과 비밀번호를 수정할 수 있습니다.</span>
+            <span>비밀번호를 수정할 수 있습니다.</span>
           </section>
           <section className={Admin.EditForm}>
             <form>
