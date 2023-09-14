@@ -76,26 +76,52 @@ function MainPage() {
       setLoading(true);
 
       const ordersResponse = await getOrders(ordersQuery);
+
       const orders = ordersResponse.data.order_list;
-      const foodIds = orders.reduce((acc, order) => {
-        if (order.f_list) {
-          const fIds = order.f_list.map((item) => item.f_id);
-          acc.push(...fIds);
-        }
-        return acc;
-      }, []);
+
       const foodsResponse = await Promise.all(
-        foodIds.map((fID) => fID && getFood(fID))
+        orders.map(async (order) => {
+          if (order.f_list) {
+            const foodItems = await Promise.all(
+              order.f_list.map(async (item) => {
+                if (item.f_id) {
+                  const response = await getFood(item.f_id);
+                  return response.data;
+                }
+                return null;
+              })
+            );
+
+            return foodItems;
+          }
+          return null;
+        })
       );
 
-      const foods = await Promise.all(foodsResponse.map((res) => res.data));
+      console.log("orders", orders);
+      console.log("foodsResponse", foodsResponse);
 
-      const orderListWithFoods = orders
-        .filter((order, index) => foods[index])
-        .map((order, index) => ({
-          ...order,
-          foodName: foods[index].name,
-        }));
+      const names = [];
+
+      await Promise.all(
+        foodsResponse.map(async (res) => {
+          const foodName = await Promise.all(
+            res.map(async (item) => {
+              if (item) {
+                return item.name;
+              }
+            })
+          );
+          names.push(foodName);
+        })
+      );
+
+      const orderListWithFoods = orders.map((order, index) => ({
+        ...order,
+        foodName: names[index],
+      }));
+
+      console.log("orderListWithFoods", orderListWithFoods);
 
       setOrderList(orderListWithFoods);
       setLoading(false);
@@ -137,6 +163,7 @@ function MainPage() {
   };
 
   const handleOrderButtonClick = async (index) => {
+    // setSelectedOrderIndex(index);
     const newOrders = [...orderList];
 
     if (newOrders[index].status === 0) {
@@ -245,14 +272,21 @@ function MainPage() {
                                 setSelectedOrderIndex(index);
                               }}
                             >{`${orderList.length - index}. ${
-                              order.foodName.length > 8
-                                ? order.foodName.substring(0, 8) + "..."
+                              Array.isArray(order.foodName) &&
+                              order.foodName.length > 1
+                                ? `${order.foodName[0]} 외 ${
+                                    order.foodName.length - 1
+                                  } 개`
                                 : order.foodName
                             }`}</li>
                             <section className={Main.manageBtn}>
                               <button
                                 className={Button.getOrder}
-                                onClick={() => handleOrderButtonClick(index)}
+                                onClick={() => {
+                                  handleOrderButtonClick(index);
+                                  handleOrderClick(order);
+                                  setSelectedOrderIndex(index);
+                                }}
                               >
                                 <span>
                                   {order.status === 0 && "접수 대기"}
