@@ -10,7 +10,6 @@
 .rest {
   width: 20%;
   height: 100%;
-
   margin-left: 2%;
 }
 
@@ -19,18 +18,18 @@
   height: 100%;
 }
 
-.orderInfo {
-  width: 35%;
-  height: 100%;
-  margin-right: 2%;
-  border-radius: 40px 40px 0 20px;
-  background-color: #fff;
-  box-shadow: 2px 5px 10px #686868;
-}
-
 .rest .cal {
   width: 100%;
-  margin-top: 15%;
+  margin-top: 30px;
+}
+
+.cal span {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cal .calender {
+  margin-top: 10px;
 }
 
 .rest .shortcut {
@@ -38,34 +37,25 @@
 }
 
 .rest .sales {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 10%;
+  justify-content: center;
+  margin-top: 0px;
   white-space: nowrap;
-  border-width: 2px 0 2px 0;
-  border-color: #000;
-  border-style: solid;
 }
 
-.rest .sales h3 {
-  margin: 0 0 5% auto;
-  color: #ff9345;
-}
-
-.rest .sales h2,
-.rest .sales p {
-  margin-left: -5px;
+.sales p {
+  margin-left: 0px;
+  color: #575757;
+  font-size: 20px;
+  font-weight: 500;
   background: none;
 }
 
-.rest .sales h2 {
-  font-size: 30px;
-}
-
-.rest .sales p {
-  font-size: 20px;
-  color: #337db1;
+.sales h2 {
+  margin-top: 10px;
+  margin-left: 0px;
+  color: #323232;
 }
 
 .orders {
@@ -76,137 +66,142 @@
 }
 
 .orders .orderTodays {
-  width: 400px;
+  width: 30vw;
   position: relative;
+  overflow-y: scroll;
   z-index: 2;
   border: none;
   padding: 0 1% 0 1%;
 }
 
-.dashboardBackground {
-  width: 30%;
-  height: 90%;
-  position: absolute;
-  z-index: 1;
-  margin-top: 2%;
-  border: 2px solid #000;
-  box-shadow: inset 0 0 10px #686868;
-}
-
 .orderTodaysHeader {
+  text-align: center;
   background-color: #fff;
 }
 
-.orders h2 {
-  margin-left: 17%;
-  white-space: nowrap;
-  font-size: 30px;
-}
-
 .orderTodays hr {
-  width: 95%;
+  width: 100%;
   margin-top: 10%;
   margin-left: 0;
   border: 1px solid #b8b3b3;
 }
 
 .orderTodays ul {
-  margin-top: 10%;
+  margin-top: 10px;
   max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   background-color: #fff;
 }
 
 .orderTodays li {
   margin: 10% 0 0 0;
-  font-size: 20px;
+  font-size: 25px;
+  color: #444444;
 }
 
 .orderTodays .manageBtn {
   float: right;
-  margin-top: -10%;
+  margin-top: -5%;
+  font-size: 20px;
+  color: #444444;
 }
 
-.orderInfo .infoHeader {
-  padding: 2%;
-  text-align: center;
-  border-radius: 40px 40px 0 0;
-  background-color: #ff9345;
+.orderTodaysHeader h2 {
+  white-space: nowrap;
+  color: #323232;
+  font-size: 35px;
+  font-weight: 800;
 }
 
-.orderInfo .infoHeader h2 {
-  font-size: 30px;
-}
-
-.orderInfo .infoBody {
-  width: auto;
-  height: auto;
+.infoBody {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  width: 35%;
+  height: auto;
 }
 
 .orderSeq {
-  box-sizing: border-box;
-  width: 30%;
   display: flex;
+  flex-direction: column;
+  margin: 20px;
+}
+
+.orderSeq span {
+  margin-left: 0px;
+  margin-bottom: 5px;
+  border: none;
+  color: #323232;
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.orderSeqBody {
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #d2d2d2;
+  border-radius: 100px;
+}
+
+.orderSeqBody div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+}
+
+.orderSeqBody div .process {
+  min-width: 30px;
+  max-width: 70px;
+}
+
+.orderSeqBody div p {
   text-align: center;
-  margin-top: 2%;
-  position: absolute;
-}
-
-.orderSeq .arrow {
-  max-width: 8%;
-  height: 5%;
-  margin-top: 2%;
-}
-
-.infoBody .orderSeq div img {
-  max-width: 40%;
-  top: 20%;
-}
-
-.infoBody .orderSeq div p {
-  top: 20%;
-  text-align: center;
+  font-size: 15px;
   background: none;
 }
 
-.infoBody .orderDetail {
-  width: 90%;
-  height: auto;
+.orderSeqBody .arrowDiv {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-flow: column;
-  margin-top: 30%;
 }
 
-.orderDetail h3 {
+.orderSeqBody .arrow {
+  min-width: 30px;
+  max-width: 70px;
+  height: 45px;
+}
+
+.orderDetail {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 20px;
+}
+
+.orderDetail span {
   margin-left: 0;
-  padding: 10px;
-  border-radius: 5px 5px 0 0;
-  color: #fff;
-  background-color: #000926;
+  margin-bottom: 5px;
+  border: none;
+  color: #323232;
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .orderContents {
-  width: 100%;
-  /* box-sizing: border-box; */
   display: flex;
   justify-content: center;
-  padding: 50px;
-  margin-bottom: 5%;
   white-space: nowrap;
-  border: 2px solid #000926;
-}
-
-.orderContents Table {
-  margin: 0 auto;
+  padding: 70px;
+  margin-top: 10px;
+  border: 1px solid #d2d2d2;
 }
 
 .selectedOrderDiv {
   padding: 5px;
-  border: 2px solid #b9062f;
+  background-color: #d5d5d5;
 }

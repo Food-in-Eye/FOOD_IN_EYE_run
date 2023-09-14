@@ -16,65 +16,52 @@
   color: #fff;
 }
 
-.util a:visited {
-  color: #fff;
+.util .logoutButton {
+  margin-top: 10px;
+  padding: 2px;
+  border-radius: 5px;
+  background-color: #e7e7e7;
 }
 
 .header {
-  width: 100%;
-  height: 150px;
-  border-bottom: 1px solid #ddd;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  background-color: #000926;
+  width: 100%;
+  height: 90px;
+  background-color: #f5f5f5;
 }
 
-.header h2 {
-  top: 30px;
-  left: 20px;
-  padding: 30px;
+.header img {
+  width: 400px;
+  height: auto;
+  top: 10px;
+  left: -50px;
   position: absolute;
-  font-size: 30px;
-  color: #fff;
-  background: none;
-}
-
-ul {
-  list-style: none;
-  background-color: #000926;
-}
-
-li {
-  fill: #000926;
 }
 
 .profile {
-  width: 150px;
-  right: 20px;
-  bottom: 30px;
-  display: flex;
-  justify-content: space-between;
+  width: 200px;
+  top: 15px;
+  right: 30px;
   position: absolute;
-  margin-right: 10px;
-  background-color: transparent;
 }
 
-.profile img {
+/* .profile img {
   width: 60px;
   height: auto;
   padding: 0;
   border: 1px solid black;
   border-radius: 100%;
-}
+} */
 
 .profile h3 {
-  margin-top: 17px;
-  font: bold 25px/1 "arial";
-  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  margin-top: 10px;
+  color: #2a2a2a;
   white-space: nowrap;
-  background: none;
 }
 
 .dropMenu {
@@ -90,10 +77,17 @@ li {
   justify-content: center;
   align-items: center;
   position: relative;
+
+  background-color: #f5f5f5;
+}
+
+ul {
+  list-style: none;
 }
 
 .menubarHeader li {
   margin: 0 20px;
+  fill: #f5f5f5;
 }
 
 .menubarSub {
@@ -101,12 +95,13 @@ li {
   padding: 20px 40px;
   transition: all 0.5s;
   position: relative;
-  font: bold 23px/1 "arial";
+  font: normal 23px/1 "arial";
+  font-weight: 700;
   white-space: nowrap;
   text-decoration: none;
   text-underline-offset: 4px;
-  color: #fff;
-  background-color: #000926;
+  color: #2a2a2a;
+  background-color: #f5f5f5;
 }
 
 .menubarHeader li a:hover,

@@ -1,0 +1,30 @@
+.row {
+  display: flex;
+  flex-direction: row nowrap;
+  align-items: flex-end;
+  width: auto;
+  background-color: #d2d2d2;
+}
+
+.column {
+  flex: 1;
+  margin: 0 2px; /* 칸 간격 조정 */
+  text-align: center;
+  background-color: yellow;
+}
+
+.stackBar {
+  margin: 0px 0px;
+  border: 1px solid #000;
+  background-color: #82a7c8; /* 바의 배경색 설정 */
+  transition: width 0.3s ease; /* 높이 변화에 애니메이션 적용 */
+}
+
+.percentageText {
+  margin-top: 5px; /* 텍스트와 바 사이 간격 조정 */
+}
+
+.percentageText p {
+  font-size: 14px;
+  background-color: #fff;
+}

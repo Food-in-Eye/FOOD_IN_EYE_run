@@ -1,10 +1,27 @@
 import style from "../css/MenuBar.module.css";
+import foodineyeDark from "../images/foodineye-dark.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import { useEffect, useState } from "react";
+import { getStore } from "./API.module";
 
 function MenuBar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const sID = localStorage.getItem("s_id");
+  const [storeName, setStoreName] = useState("");
+
+  useEffect(() => {
+    const getStoreName = async () => {
+      try {
+        const request = await getStore(sID);
+        setStoreName(request.data.name);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getStoreName();
+  }, [sID]);
 
   const onLogout = (e) => {
     e.preventDefault();
@@ -23,7 +40,7 @@ function MenuBar() {
 
   return (
     <section className={style.header}>
-      <h2>LOGO</h2>
+      <img src={foodineyeDark} alt="food_in_eye 로고" />
       <div className={style.dropMenu}>
         <ul className={style.menubarHeader}>
           <li>
@@ -56,10 +73,10 @@ function MenuBar() {
             </a>
             <ul className={style.menubarSubOfSub}>
               <li>
-                <a href="./analysis">전체 메뉴분석</a>
+                <a href="./daily-report">데일리 리포트</a>
               </li>
               <li>
-                <a href="./analysis-detail">메뉴별 분석</a>
+                <a href="./select-menu">메뉴별 분석</a>
               </li>
               <li>
                 <a href="./gaze-visualize">Gaze 시각화</a>
@@ -79,15 +96,15 @@ function MenuBar() {
 
       <div className="logout">
         <ul className={style.util}>
-          <li>
-            <button onClick={onLogout}>Logout</button>
-          </li>
+          <button className={style.logoutButton} onClick={onLogout}>
+            Logout
+          </button>
         </ul>
       </div>
 
       <div className={style.profile}>
-        <img src={require("../images/profile.jpeg")} alt="프로필 이미지"></img>
-        <h3>00가게</h3>
+        {/* <img src={require("../images/profile.jpeg")} alt="프로필 이미지"></img> */}
+        <h3>{storeName}</h3>
       </div>
     </section>
   );

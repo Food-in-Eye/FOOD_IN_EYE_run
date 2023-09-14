@@ -1,0 +1,198 @@
+.inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column wrap;
+  height: 700px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.tabsTable {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin: 5vw 10vw;
+}
+
+.tabsToClick {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 10px 0;
+  background-color: #e0e0e0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.tabsToClick:hover {
+  background-color: #ccc;
+}
+
+.tabElement {
+  margin-bottom: 200px;
+}
+
+.tabElement div:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabElement div:first-child span:first-child {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.menuSummarySection,
+.menuPageStatistics,
+.menuDetailPageStatistics,
+.GtoFRatioSection {
+  flex-direction: column;
+}
+
+.menuSummarySection,
+.GtoFRatioBody,
+.menuPageStatistics,
+.menuDetailPageStatistics,
+.menuSummaryBody,
+.menuPageStatisticsBody,
+.menuDetailPageStatisticsBody {
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.menuSummarySection .menuSummaryTime,
+.menuSummarySection .menuSummarySales,
+.menuPageStatistics .menuPageSaleCount,
+.menuPageStatistics .menuPageDwellTime,
+.menuPageStatistics .menuPageGazeRatio,
+.menuPageStatistics .menuPageScore,
+.menuDetailPageStatistics .menuDetailPageVisitCount,
+.menuDetailPageStatistics .menuDetailPageDwellTime,
+.menuDetailPageStatistics .menuDetailOrderRatio,
+.GtoFRatioSection .GtoFRatioValue,
+.GtoFRatioSection .GtoFRatioPercent {
+  display: flex;
+  flex-direction: column;
+  width: 20vw;
+  padding: 15px;
+  gap: 4px;
+  flex: 1 0 0;
+  border-radius: 6px;
+  border: 1px solid #444444;
+}
+
+.menuSummarySection p,
+.menuPageStatistics p,
+.menuDetailPageStatistics p,
+.GtoFRatioSection p {
+  margin-left: 0px;
+  margin-right: auto;
+  color: #4d4d4d;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  white-space: nowrap;
+  background: none;
+}
+
+.menuSummarySection span,
+.menuPageStatistics span,
+.menuDetailPageStatistics span,
+.GtoFRatioPercent span,
+.GtoFRatioValue span {
+  margin-left: 0px;
+  margin-right: auto;
+  color: #1e1e1e;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 36px;
+  white-space: nowrap;
+}
+
+.menuDetailPageGazeDesc p,
+.menuDetailPageStatisticsDesc p,
+.menuPageStatisticsDesc p,
+.menuSummarySectionDesc p,
+.GtoFRatioSectionDesc p {
+  display: flex;
+  justify-content: center;
+  width: 45vw;
+  text-align: center;
+  color: #4d4d4d;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 30px;
+  background-color: #fff;
+}
+
+/* .visitAndOrder .visitCount,
+.visitAndOrder .salesCount {
+  margin: 0px;
+  color: #051c77;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.visitAndOrder .salesCount {
+  margin-left: 5px;
+  color: #051c77;
+  font-size: 28px;
+  font-weight: 800;
+} */
+
+.divForButton {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+.goUpButton {
+  width: 40px;
+  height: 40px;
+  line-height: 1vw;
+  color: #3a3a3a;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px;
+  border: 1px solid #3a3a3a;
+  border-radius: 100%;
+  background: none;
+}
+
+.menuDetailPageGazeBody {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 30vw;
+  margin-top: 10px;
+}
+
+.menuDetailPageGazeBody img {
+  width: 20vw;
+  height: auto;
+}
+
+.detailDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 30px;
+}
+
+.detailDiv p {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 20px 0px;
+  padding: 20px 0;
+  white-space: nowrap;
+  background-color: #fff;
+}
