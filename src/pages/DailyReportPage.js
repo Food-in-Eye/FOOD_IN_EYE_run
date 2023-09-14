@@ -33,8 +33,7 @@ function DailyReportPage() {
 
   const tabs = {
     0: useMoveScroll("오늘의 리포트"),
-    // 1: useMoveScroll("시간당 주문량 및 시선 수"),
-    1: useMoveScroll("시간당 주문량"),
+    1: useMoveScroll("시간당 주문량 및 시선 수"),
     2: useMoveScroll("시선/체류 시간과 주문량"),
     3: useMoveScroll("내 가게 메뉴판"),
     length: 4,
@@ -119,8 +118,7 @@ function DailyReportPage() {
         </div>
       </div>
       <div ref={tabs[1].element} className={DR.tabElement}>
-        {/* <span>시간당 주문량 및 시선 수</span> */}
-        <span>시간당 주문량</span>
+        <span>시간당 주문량 및 시선 수</span>
         <div className={DR.barChart}>
           <BarChart />
         </div>

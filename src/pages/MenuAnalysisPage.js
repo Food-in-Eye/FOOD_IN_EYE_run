@@ -349,7 +349,7 @@ function MenuAnalysisPage() {
                 <span>{duration} 초</span>
               </div>
               <div className={MAnalysis.menuDetailOrderRatio}>
-                <p>방문 대비 주문율</p>
+                <p>방문 대비 주문률</p>
                 <span>{salesPerVisit} %</span>
               </div>
             </div>
