@@ -1,7 +1,7 @@
 import MenuBar from "../components/MenuBar";
 import VisualizeGaze from "../css/VisualizeGaze.module.css";
-// import GenerateImgUrl from "../components/GenerateImgUrl.module";
-import ExImgUrl from "../components/ExImgUrl.module";
+import GenerateImgUrl from "../components/GenerateImgUrl.module";
+// import ExImgUrl from "../components/ExImgUrl.module";
 import heatmap from "heatmap.js";
 
 import { useState, useEffect } from "react";
@@ -100,8 +100,8 @@ function VisualizeGazePage() {
         const imgUrls = await Promise.all(
           pageList.map(async (page) => {
             console.log("s_num, f_num", page.s_num, page.f_num);
-            // return await GenerateImgUrl(page.s_num, page.f_num);
-            return await ExImgUrl(page.s_num, page.f_num);
+            return await GenerateImgUrl(page.s_num, page.f_num);
+            // return await ExImgUrl(page.s_num, page.f_num);
           })
         );
         setImgUrls(imgUrls);
@@ -260,8 +260,10 @@ function VisualizeGazePage() {
                       key={`gaze_point_${idx}`}
                       className={VisualizeGaze.gazePoint}
                       style={{
-                        left: `${(point.x / divWidths[index]) * 100}%`,
-                        top: `${(point.y / divHeight) * 100}%`,
+                        left: `${point.x}px`,
+                        top: `${point.y}px`,
+                        // left: `${(point.x / divWidths[index]) * 100}%`,
+                        // top: `${(point.y / divHeight) * 100}%`,
                       }}
                       title={pageList[index].page}
                     ></div>
@@ -305,8 +307,10 @@ function VisualizeGazePage() {
                       key={`${idx}`}
                       className={VisualizeGaze.overGazePoint}
                       style={{
-                        left: `${(point.x / divWidths[index]) * 100}%`,
-                        top: `${(point.y / divHeight) * 100}%`,
+                        left: `${point.x}px`,
+                        top: `${point.y}px`,
+                        // left: `${(point.x / divWidths[index]) * 100}%`,
+                        // top: `${(point.y / divHeight) * 100}%`,
                       }}
                       title={pageList[index].page}
                     ></div>
@@ -316,8 +320,10 @@ function VisualizeGazePage() {
                       key={`gaze_point_${idx}`}
                       className={VisualizeGaze.overGP}
                       style={{
-                        left: `${(point.x / divWidths[index]) * 100}%`,
-                        top: `${(point.y / divHeight) * 100}%`,
+                        left: `${point.x}px`,
+                        top: `${point.y}px`,
+                        // left: `${(point.x / divWidths[index]) * 100}%`,
+                        // top: `${(point.y / divHeight) * 100}%`,
                       }}
                       title={pageList[index].page}
                     ></div>

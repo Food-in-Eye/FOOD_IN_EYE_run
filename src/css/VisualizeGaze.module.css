@@ -35,7 +35,7 @@
   width: 643.2px;
   height: auto;
   border: 1px solid black;
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .gazePlotRow {
@@ -55,15 +55,17 @@
 }
 
 .screensForCompare {
-  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .screensBeforeFilter,
-.screensAfterFilter {
+.screensAfterFilter,
+.screensOverLapGaze {
   flex: 1;
   flex-direction: column;
   margin: 0 10px;
@@ -74,6 +76,10 @@
 }
 
 .screensAfterFilter {
+  margin: 0 10px 0 10px;
+}
+
+.screensOverLapGaze {
   margin: 0 auto 0 10px;
 }
 
@@ -82,15 +88,32 @@
   flex-flow: row nowrap;
 }
 
-h1,
-h3 {
+.head h1,
+.head h3 {
   margin: 0 auto 10px 20px;
 }
 
 .inputs {
-  margin: 0 10px 0 auto;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 5px 10px 0 auto;
 }
 
-input {
-  margin: 20px 5px 0 5px;
+.inputs label {
+  font-size: 15px;
+  /* width: 10vw; */
+  margin: 0px 5px;
+}
+
+.inputs input {
+  width: 12vw;
+  margin: 10px 5px 5px 5px;
+}
+
+.inputs button {
+  width: 5vw;
+  height: 2vw;
+  margin-left: 10px;
 }
