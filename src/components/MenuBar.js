@@ -45,7 +45,7 @@ function MenuBar() {
         <ul className={style.menubarHeader}>
           <li>
             <a href="./main" className={style.menubarSub}>
-              Home
+              메인 대시보드
             </a>
           </li>
           <li>
@@ -93,7 +93,6 @@ function MenuBar() {
           </li>
         </ul>
       </div>
-
       <div className="logout">
         <ul className={style.util}>
           <button className={style.logoutButton} onClick={onLogout}>
@@ -101,7 +100,6 @@ function MenuBar() {
           </button>
         </ul>
       </div>
-
       <div className={style.profile}>
         {/* <img src={require("../images/profile.jpeg")} alt="프로필 이미지"></img> */}
         <h3>{storeName}</h3>

@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import ShortCut from "../css/ShortCutForPages.module.css";
 
-import mBills from "../images/manage_bills.jpeg";
-import mFoods from "../images/manage_food.jpeg";
-import mMenuLoc from "../images/manage_menu_location.jpeg";
-import mStore from "../images/manage_store.jpeg";
-import aTotal from "../images/analyze_all.jpeg";
-import aMenus from "../images/analyze_menu.jpeg";
+import mStore from "../images/store.png";
+import mOrder from "../images/bill.png";
+import mFood from "../images/fast-food-outline.png";
+import mMenu from "../images/menu-dots.png";
+import dailyReport from "../images/24-hours.png";
+import menuAnalysis from "../images/analytics.png";
 
 function ShortCutForPages() {
   const navigate = useNavigate();
@@ -53,28 +53,28 @@ function ShortCutForPages() {
             <p>가게 관리</p>
           </button>
           <button onClick={onClickToMenuManagePage}>
-            <img src={mFoods} alt="메뉴 관리 바로가기" />
+            <img src={mFood} alt="메뉴 관리 바로가기" />
             <p>메뉴 관리</p>
           </button>
         </div>
         <div>
           <button onClick={onClickToOrderManagePage}>
-            <img src={mBills} alt="주문 관리 바로가기" />
+            <img src={mOrder} alt="주문 관리 바로가기" />
             <p>주문 관리</p>
           </button>
           <button onClick={onClickToMenuPosRecPage}>
-            <img src={mMenuLoc} alt="메뉴 배치 바로가기" />
+            <img src={mMenu} alt="메뉴 배치 바로가기" />
             <p>메뉴 배치</p>
           </button>
         </div>
         <hr className={ShortCut.vertical} />
         <div>
           <button onClick={onClickToAnalysisPage}>
-            <img src={aTotal} alt="데일리 리포트 바로가기" />
+            <img src={dailyReport} alt="데일리 리포트 바로가기" />
             <p>데일리 리포트</p>
           </button>
           <button onClick={onClickToDetailAnalysisPage}>
-            <img src={aMenus} alt="메뉴 분석 바로가기" />
+            <img src={menuAnalysis} alt="메뉴 분석 바로가기" />
             <p>메뉴 분석</p>
           </button>
         </div>

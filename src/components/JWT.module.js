@@ -12,7 +12,7 @@ export const resetLogin = () => {
     localStorage.removeItem("storeNum");
 
     window.location.href = "/login";
-  }, 10000);
+  }, 2000);
 };
 
 export const handleAccessToken = async () => {

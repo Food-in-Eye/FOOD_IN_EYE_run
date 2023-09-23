@@ -38,7 +38,9 @@
 }
 
 .icons button:hover {
-  border: 2px solid #337db1;
+  padding: 5px;
+  background-color: #e2e2e2;
+  /* border: 2px solid #337db1; */
 }
 
 .icons button,

@@ -1,9 +1,7 @@
 import Calendar from "react-calendar";
-import moment from "moment";
 import "react-calendar/dist/Calendar.css";
 
 import Main from "../css/Main.module.css";
-import Bar from "../css/UnderBar.module.css";
 import Button from "../css/Button.module.css";
 import MenuBar from "../components/MenuBar";
 import MenuTable from "../components/MenuTable.module";
@@ -163,7 +161,6 @@ function MainPage() {
   };
 
   const handleOrderButtonClick = async (index) => {
-    // setSelectedOrderIndex(index);
     const newOrders = [...orderList];
 
     if (newOrders[index].status === 0) {
@@ -247,14 +244,13 @@ function MainPage() {
           </div>
           <div className={Main.orderDashboard}>
             <div className={Main.orders}>
-              <section className={Main.dashboardBackground} />
+              <div className={Main.orderTodaysHeader}>
+                <h2>현재 주문 내역</h2>
+              </div>
               <div className={Main.orderTodays}>
-                <div className={Main.orderTodaysHeader}>
-                  <h2>현재 주문 내역</h2>
-                </div>
+                <hr />
                 <div className={Main.ulList}>
                   <ul>
-                    <hr />
                     {orderList &&
                       orderList.map((order, index) => (
                         <div
@@ -341,7 +337,7 @@ function MainPage() {
               </div>
             </section>
             <section className={Main.orderDetail}>
-              <span>주문 내역</span>
+              <span>상세 주문 내역</span>
               <div className={Main.orderContents}>
                 <MenuTable data={orderData} />
               </div>
