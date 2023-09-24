@@ -15,6 +15,7 @@
   max-width: 40%;
   padding: 2%;
   border-radius: 0 20px 0 0;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
   /* background-color: #ff9345; */
@@ -52,6 +53,7 @@
 .icons button p {
   margin: 2% 0 10% 15%;
   white-space: nowrap;
+  font-family: "Hahmlet-Light";
 }
 
 .icons button img {

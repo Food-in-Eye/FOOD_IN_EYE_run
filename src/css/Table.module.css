@@ -14,8 +14,13 @@ td {
 
 th,
 .orderTH {
+  font-family: "Hahmlet-SemiBold";
   font-size: 18px;
   font-weight: 600;
+}
+
+td {
+  font-family: "Hahmlet-Regular";
 }
 
 .menuTD {

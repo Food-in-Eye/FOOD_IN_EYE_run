@@ -24,6 +24,7 @@
 }
 
 .cal span {
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
 }
@@ -47,6 +48,7 @@
 .sales p {
   margin-left: 0px;
   color: #575757;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 500;
   background: none;
@@ -55,6 +57,7 @@
 .sales h2 {
   margin-top: 10px;
   margin-left: 0px;
+  font-family: "Hahmlet-Regular";
   color: #323232;
 }
 
@@ -100,6 +103,7 @@
 
 .orderTodays li {
   margin: 10% 0 0 0;
+  font-family: "Hahmlet-Regular";
   font-size: 25px;
   color: #444444;
 }
@@ -107,13 +111,18 @@
 .orderTodays .manageBtn {
   float: right;
   margin-top: -5%;
+}
+
+.manageBtn span {
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
-  color: #444444;
+  color: #5c5c5c;
 }
 
 .orderTodaysHeader h2 {
   white-space: nowrap;
   color: #323232;
+  font-family: "Hahmlet-SemiBold";
   font-size: 35px;
   font-weight: 800;
 }
@@ -136,6 +145,7 @@
   margin-bottom: 5px;
   border: none;
   color: #323232;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
   white-space: nowrap;
@@ -163,6 +173,7 @@
 
 .orderSeqBody div p {
   text-align: center;
+  font-family: "Hahmlet-Regular";
   font-size: 15px;
   background: none;
 }
@@ -192,6 +203,7 @@
   margin-bottom: 5px;
   border: none;
   color: #323232;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
   white-space: nowrap;
