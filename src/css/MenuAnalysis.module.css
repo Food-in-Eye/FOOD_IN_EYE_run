@@ -10,7 +10,7 @@
 .tabsTable {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin: 5vw 10vw;
+  margin: 3vw 10vw;
 }
 
 .tabsToClick {
@@ -22,6 +22,7 @@
   background-color: #e0e0e0;
   border: 1px solid #ccc;
   cursor: pointer;
+  font-family: "Hahmlet-Medium";
   text-align: center;
   box-sizing: border-box;
 }
@@ -43,6 +44,7 @@
 
 .tabElement div:first-child span:first-child {
   text-align: center;
+  font-family: "Hahmlet-SemiBold";
   font-size: 30px;
   font-weight: 700;
 }
@@ -55,6 +57,7 @@
 }
 
 .menuSummarySection,
+.GtoFRatioSection,
 .GtoFRatioBody,
 .menuPageStatistics,
 .menuDetailPageStatistics,
@@ -96,6 +99,7 @@
   margin-left: 0px;
   margin-right: auto;
   color: #4d4d4d;
+  font-family: "Hahmlet-Regular";
   font-size: 18px;
   font-weight: 400;
   line-height: 24px;
@@ -111,6 +115,7 @@
   margin-left: 0px;
   margin-right: auto;
   color: #1e1e1e;
+  font-family: "Hahmlet-Medium";
   font-size: 22px;
   font-weight: 700;
   line-height: 36px;
@@ -127,6 +132,7 @@
   width: 45vw;
   text-align: center;
   color: #4d4d4d;
+  font-family: "Hahmlet-Light";
   font-size: 18px;
   font-weight: 500;
   line-height: 30px;

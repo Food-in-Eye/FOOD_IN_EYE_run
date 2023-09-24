@@ -193,34 +193,6 @@ function MenuManagePage() {
     }
   };
 
-  /** 메뉴 삭제 관련 코드 */
-  /** ----------------------------------------------------- */
-  // const handleAddMenu = () => {
-  //   const newMenu = ` 메뉴 `;
-  //   setMenus([...menuList, newMenu]);
-  // };
-
-  // const [showButtons, setShowButtons] = useState(
-  //   Array(menuList.length).fill(false)
-  // );
-
-  // const handleDeleteMenu = (index) => {
-  //   const newMenus = [...menus];
-  //   newMenus.splice(index, 1);
-  //   setMenus(newMenus);
-
-  //   const newButtons = [...showButtons];
-  //   newButtons.splice(index, 1);
-  //   setShowButtons(newButtons);
-  // };
-
-  // const toggleButton = (index) => {
-  //   const newButtons = [...showButtons];
-  //   newButtons[index] = !newButtons[index];
-  //   setShowButtons(newButtons);
-  // };
-  /** ----------------------------------------------------- */
-
   return (
     <div>
       <section className="header">
@@ -244,15 +216,6 @@ function MenuManagePage() {
                     onClick={(e) => handleMenuClick(e, menu._id)}
                   >
                     <span>{menu.name}</span>
-                    {/* {showButtons[index] && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteMenu(index);
-                        }}
-                      >
-                        삭제
-                      </button> */}
                   </li>
                 ))}
               </ul>
@@ -286,14 +249,14 @@ function MenuManagePage() {
                         className={Button.saveImgMenu}
                         onClick={(e) => handleSaveImgClick(e)}
                       >
-                        저장하기
+                        저장
                       </button>
                     ) : (
                       <button
                         className={Button.modifyImgMenu}
                         onClick={(e) => handleEditImgClick(e)}
                       >
-                        수정하기
+                        수정
                       </button>
                     )}
                   </div>

@@ -12,6 +12,7 @@
   border: 1px solid #fd773e;
   text-align: center;
   color: #fff;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
   background-color: #fd773e;
@@ -21,6 +22,8 @@
   padding: 15px 30px;
   border-radius: 10px;
   color: #fff;
+  font-family: "Hahmlet-SemiBold";
+  font-size: 12px;
   background-color: #fd773e;
 }
 
@@ -88,12 +91,13 @@
 
 .modifyMenu,
 .saveMenu {
-  width: 150px;
+  width: 100px;
   height: 50px;
-  border-radius: 30px;
+  border-radius: 10px;
+  border: #393939;
   color: #000;
-  font-size: 25px;
-  font-family: "Akaya Telivigala";
+  font-size: 20px;
+  font-family: "Hahmlet-Medium";
   background-color: #ff9345;
 }
 
@@ -103,8 +107,8 @@
   height: 50px;
   border-radius: 10px;
   color: #fff;
-  font-size: 15px;
-  font-family: "Akaya Telivigala";
+  font-size: 20px;
+  font-family: "Hahmlet-Medium";
   background-color: #2f365f;
 }
 
@@ -141,16 +145,18 @@
   padding: 5px 15px 5px 15px;
   border: 2px solid #000;
   border-radius: 10px;
+  text-align: center;
   font-size: 18px;
-  font-family: "Akaya Telivigala";
+  font-family: "Hahmlet-Regular";
 }
 
 .inactiveSortBtn {
   padding: 5px 17px 5px 17px;
   border: none;
   border-radius: 10px;
+  text-align: center;
   font-size: 18px;
-  font-family: "Akaya Telivigala";
+  font-family: "Hahmlet-Regular";
   color: #fff;
-  background-color: #959292;
+  background-color: #ababab;
 }

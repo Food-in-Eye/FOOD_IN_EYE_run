@@ -33,7 +33,7 @@ function OrdersHistoryTable({ data }) {
     tableInstance;
 
   return (
-    <table {...getTableProps()}>
+    <table {...getTableProps()} className={TableStyle.orderTable}>
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>

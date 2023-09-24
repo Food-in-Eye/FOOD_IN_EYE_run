@@ -29,7 +29,7 @@
 }
 
 .LoginForm,
-form {
+.LoginForm form {
   background: #fff;
 }
 
@@ -50,27 +50,28 @@ form {
   margin-top: 20px;
   margin-bottom: 10px;
   text-align: center;
-  font-family: Palanquin Dark;
+  font-family: "Hahmlet-ExtraBold";
   font-size: 40px;
   font-weight: 800;
-  line-height: 28px; /* 112% */
+  line-height: 32px;
   letter-spacing: 1.25px;
 }
 
-form,
-label {
+.LoginForm form,
+.LoginForm label {
   display: flex;
   flex-direction: column;
 }
 
-label {
+.LoginForm label {
   width: 400px;
   justify-content: center;
   margin: 15px 0 20px 0;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
 }
 
-input {
+.LoginForm input {
   width: 400px;
   margin-top: 5px;
   margin-left: 0px;
@@ -78,6 +79,7 @@ input {
   border: 1px solid #e2e1e5;
   border-radius: 5px;
   color: #d2d2d2;
+  font-family: "Hahmlet-Regular";
   font-size: 15px;
 }
 
@@ -94,6 +96,7 @@ input {
   margin: 0px 5px;
   white-space: nowrap;
   color: #b9062f;
+  font-family: "Hahmlet-Medium";
   background: none;
 }
 
@@ -109,5 +112,6 @@ input {
   justify-content: center;
   align-items: center;
   margin-top: 10px;
+  font-family: "Hahmlet-Medium";
   color: #000;
 }

@@ -18,6 +18,7 @@ import trendingUp from "../images/trending-up.png";
 import update from "../images/update.png";
 import shoppingCart from "../images/shopping-cart.png";
 import calendar from "../images/calendar.png";
+import foodineye from "../images/foodineye.png";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -145,7 +146,9 @@ function LoginPage() {
           alt="update"
           style={{ top: "67%", left: "15%" }}
         />
+        {/* <img src={foodineye} alt="logo" style={{ top: "20%", left: "50%" }} /> */}
       </section>
+
       <section className={Login.LoginForm}>
         <h2>Login</h2>
         <form>

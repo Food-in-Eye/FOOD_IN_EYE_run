@@ -7,7 +7,7 @@
   margin-right: auto;
 }
 
-table {
+/* table {
   border-collapse: collapse;
   width: 30vw;
   padding: 10%;
@@ -31,16 +31,16 @@ td {
   font-size: 25px;
   font-weight: 700;
   color: #2c2c2c;
-}
+} */
 
-.radioButtons {
+.checkboxButtons {
   display: flex;
   border-radius: 10px;
   margin-left: 0;
   margin-right: auto;
 }
 
-.radioButtons label {
+.checkboxButtons label {
   display: flex;
   flex-flow: row nowrap;
   white-space: nowrap;
@@ -48,18 +48,41 @@ td {
   margin: 0 4px;
 }
 
-.radioButtons label input {
+.checkboxButtons label input {
   margin: auto 0;
 }
 
-.menuItemValue {
+/* .menuItemValue {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 30px;
-  /* text-align: center; */
+  text-align: center;
   font-size: 25px;
   font-weight: 600;
   color: #5a5a5a;
   white-space: nowrap;
+} */
+
+.radarCharts {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100vw;
+  height: 50vw;
+  margin-left: 0px;
+  margin-right: auto;
+  /* margin: 0 10px; */
+  /* background-color: aqua; */
+}
+
+.radarCharts .radarChart {
+  width: 15vw;
+  margin: 5px 10vw;
+}
+
+.radarCharts .radarChartGroup {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 5px;
 }

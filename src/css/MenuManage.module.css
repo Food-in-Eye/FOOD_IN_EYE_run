@@ -33,11 +33,13 @@
   text-align: center;
 }
 
-h1 {
+.title h1 {
+  font-family: "Hahmlet-SemiBold";
   font-size: 50px;
 }
 
-h2 {
+.inner h2 {
+  font-family: "Hahmlet-SemiBold";
   font-size: 40px;
 }
 
@@ -63,28 +65,15 @@ h2 {
 }
 
 .menus li span {
+  font-family: "Hahmlet-Regular";
   margin: 0px auto 0px 50px;
 }
-/* 
-.menus li button {
-  width: 20%;
-  height: 100%;
-  float: right;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0px -1px 0px 0px;
-  padding: 20px;
-  border: none;
-  border-radius: 0px 20px 20px 0px;
-  font-size: 20px;
-} */
 
 .menus button {
   margin: 60px 0px 5px auto;
 }
 
-hr {
+.inner hr {
   margin-left: 10%;
 }
 
@@ -144,6 +133,7 @@ hr {
 
 .Img .foodImgLabel {
   margin: 20px 0 10px 0;
+  font-family: "Hahmlet-Regular";
   font-size: 20px;
   font-weight: bold;
   color: #616162;
@@ -177,6 +167,7 @@ hr {
   align-items: center;
   margin: 10px auto 20px 10px;
   padding: 20px 0px 20px 15px;
+  font-family: "Hahmlet-Medium";
   font-size: 20px;
 }
 
@@ -186,23 +177,23 @@ hr {
   float: left;
   margin-top: 6%;
   margin-right: 20%;
-  padding: 5px 0px 5px 5px;
+  padding: 0px 0px 5px 5px;
+  font-family: "Hahmlet-Regular";
   font-size: 20px;
   background-color: #fff;
 }
 
-.button {
+.buttons {
   width: 30%;
-
-  align-items: center;
-  margin-top: 80%;
+  margin-top: 10px;
 }
 
-textarea {
+.origin textarea {
   width: 70%;
   height: auto;
-  font-size: 20px;
   margin: 30px 30px 0px 30px;
+  font-family: "Hahmlet-Regular";
+  font-size: 20px;
   background-color: #fff;
 }
 
@@ -217,6 +208,5 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
-  font-size: 30px;
+  font-size: 25px;
 }

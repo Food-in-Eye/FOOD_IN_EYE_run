@@ -10,7 +10,7 @@
 .tabsTable {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin: 5vw 10vw;
+  margin: 3vw 10vw;
 }
 
 .tabsToClick {
@@ -22,6 +22,7 @@
   background-color: #e0e0e0;
   border: 1px solid #ccc;
   cursor: pointer;
+  font-family: "Hahmlet-Medium";
   text-align: center;
   box-sizing: border-box;
 }
@@ -35,7 +36,8 @@
   margin-bottom: 200px;
 }
 
-.tabElement span {
+.tabElementFirstSpan {
+  font-family: "Hahmlet-SemiBold";
   font-size: 30px;
 }
 
@@ -59,13 +61,16 @@
 .todaysReportLeft span {
   padding-right: 20vw;
   margin: 10px 15px;
+  font-family: "Hahmlet-Medium";
   font-size: 20px;
 }
 
 .todaysReportRight {
   display: flex;
   flex-flow: row nowrap;
-  margin-right: 7vw;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-right: 10vw;
 }
 
 .todaysReportRight div {
@@ -73,48 +78,73 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 15vw;
+  margin: 0 10px;
+  width: 10vw;
 }
 
 .todaysReportRight span {
   margin: 2px 30px;
   white-space: nowrap;
+  font-family: "Hahmlet-Medium";
   font-size: 20px;
 }
 
 .ReportDesc {
   float: right;
   width: 31vw;
-  margin-right: 4vw;
+  margin-right: 5vw;
   text-align: right;
 }
 
 .ReportDesc p {
+  font-family: "Hahmlet-Light";
   color: #565656;
   background: none;
 }
 
-.scatterChart,
-.menuChart {
+.scatterChart {
   display: flex;
   flex-flow: row nowrap;
   height: 500px;
 }
 
+.menuChart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+.menuChartDesc {
+  display: flex;
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+.menuChart p {
+  margin: -10px auto 30px 0px;
+  white-space: nowrap;
+  font-family: "Hahmlet-Medium";
+  font-size: 20px;
+  color: #565656;
+  background-color: #fff;
+}
+
 .scatterChartLeftDiv,
-.menuChartLeftDiv {
+.menuChartUpDiv {
   width: 50%;
   margin-left: 0px;
   margin-right: auto;
 }
 
 .scatterChartRightDiv,
-.menuChartRightDiv {
+.menuChartDownDiv {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-flow: column;
-  margin: 0 40px 30px 20px;
+  margin: 0px 40px 30px 20px;
 }
 
 .scatterChartDescUp span,
@@ -122,6 +152,7 @@
 .menuChartDescUp span,
 .menuChartDescDown span {
   text-align: center;
+  font-family: "Hahmlet-Medium";
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -132,6 +163,7 @@
 .menuChartDescUp p,
 .menuChartDescDown p {
   margin: 5px 0;
+  font-family: "NotoSansKR-Regular";
   font-size: 18px;
   text-align: center;
   background: none;

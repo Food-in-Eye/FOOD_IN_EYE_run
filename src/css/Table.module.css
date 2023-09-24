@@ -52,3 +52,11 @@ tfoot td {
 .orderPriceCell {
   width: 30%;
 }
+
+.orderTable {
+  width: 50vw;
+}
+
+.orderTD {
+  height: 3vw;
+}
