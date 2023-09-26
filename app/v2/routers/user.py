@@ -143,9 +143,7 @@ async def change_buyer_info(u_id:str, data:Camera, token:str = Depends(TokenMana
     assert TokenManager.is_buyer(scope), 403.1
 
     _id = Util.check_id(u_id)
-    print(data.camera)
-    print(type(data.camera))
-    print(data.camera.value)
+
     DB.update_one('user', {'_id':_id}, {'camera': data.camera.value})
 
 
