@@ -4,7 +4,7 @@ import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ScatterChart from "../charts/ScatterChart";
+import DailyScatterChart from "../charts/DailyScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
 import dailyReport from "../data/daily_report.json";
@@ -134,7 +134,7 @@ function DailyReportPage() {
         <span className={DR.tabElementFirstSpan}>시선/체류 시간과 주문량</span>
         <section className={DR.scatterChart}>
           <div className={DR.scatterChartLeftDiv}>
-            <ScatterChart />
+            <DailyScatterChart />
           </div>
           <div className={DR.scatterChartRightDiv}>
             <div className={DR.scatterChartDesc}>

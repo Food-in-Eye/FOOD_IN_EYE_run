@@ -4,7 +4,7 @@ import dailyReport from "../data/daily_report.json";
 import SChart from "../css/ScatterChart.module.css";
 import { getFoods } from "../components/API.module";
 
-function ScatterChart() {
+function ScatterChartSample() {
   const sID = "64a2d45c1fe80e3e4db82af9";
   const aoiData = dailyReport["Store 1"].aoi_summary.total_food_report;
   const saleData = dailyReport["Store 1"].sale_summary.food_detail;
@@ -55,6 +55,7 @@ function ScatterChart() {
           totalSales: totalSales,
           x: xAxisType === "fixCount" ? fixCount : duration,
           y: totalCount,
+          fillColor: "#1e2f4d",
         });
       }
     }
@@ -120,7 +121,15 @@ function ScatterChart() {
       <div className={SChart.charts}>
         <ReactApexChart
           options={options}
-          series={[{ name: "Food Data", data: graphData }]}
+          series={[
+            {
+              name: "Food Data",
+              data: graphData,
+              // dataPoint: {
+              //   color: graphData.map((point) => point.color),
+              // },
+            },
+          ]}
           type="scatter"
           width={600}
           height={400}
@@ -130,4 +139,4 @@ function ScatterChart() {
   );
 }
 
-export default ScatterChart;
+export default ScatterChartSample;

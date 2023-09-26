@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           backgroundColor: "#fff",
           padding: "2px 0px",
           textAlign: "left",
-          border: "1px solid #8d8d8d",
+          border: "1px solid #d2d2d2",
         }}
       >
         <p
@@ -39,9 +39,9 @@ const CustomTooltip = ({ active, payload, label }) => {
           style={{
             width: "auto",
             backgroundColor: "#fff",
-            padding: "5px",
-            fontSize: "18px",
-            fontFamily: "NotoSansKR-Bold",
+            padding: "2px",
+            fontSize: "12px",
+            fontFamily: "NotoSansKR-SemiBold",
           }}
         >{`${label}`}</p>
         {payload.map((entry) => {
@@ -53,10 +53,8 @@ const CustomTooltip = ({ active, payload, label }) => {
               style={{
                 width: "auto",
                 backgroundColor: "#fff",
-                padding: "3px",
-                color: "#323232",
-                fontSize: "15px",
-                fontFamily: "NotoSansKR-SemiBold",
+                fontSize: "12px",
+                fontFamily: "NotoSansKR-Light",
               }}
             >{`${entry.name}: ${entry.value} ${unit}`}</p>
           );
@@ -70,9 +68,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 function BarChart() {
   const hourlySaleInfo = dailyReport["Store 1"].sale_summary.hourly_sale_info;
-  //   const timeLabels = hourlySaleInfo.map((hourData, index) => `${index}시`);
-  //   const orderCounts = hourlySaleInfo.map((hourData) => hourData.order);
-  //   const dwellTimes = hourlySaleInfo.map((hourData) => hourData.dwell_time);
 
   const data = hourlySaleInfo.map((hourData, index) => ({
     name: `${index}시`,
@@ -124,19 +119,19 @@ function BarChart() {
         <Tooltip content={<CustomTooltip />} />
         <Legend />
         <Bar
-          yAxisId="left"
-          dataKey="oc"
+          yAxisId="right"
+          dataKey="dt"
           barSize={20}
           fill="#1e2f4d"
-          name="주문량"
+          name="체류시간"
         />
         <Line
-          yAxisId="right"
+          yAxisId="left"
           type="monotone"
-          dataKey="dt"
+          dataKey="oc"
           stroke="#feb930"
           strokeWidth={3}
-          name="체류시간"
+          name="주문량"
         />
       </ComposedChart>
     </div>

@@ -6,6 +6,7 @@ import dailyReport from "../data/daily_report.json";
 import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
 import { useEffect, useRef, useState } from "react";
+import PieChartForFood from "../charts/PieChartForFood";
 
 function MenuAnalysisPage() {
   const aoiData = dailyReport["Store 1"].aoi_summary;
@@ -245,7 +246,8 @@ function MenuAnalysisPage() {
               </div>
               <div className={MAnalysis.menuSummarySales}>
                 <p>총 매출액의 매출 기여도</p>
-                <span>{saleRatio} %</span>
+                <PieChartForFood saleRatio={saleRatio} />
+                {/* <span>{saleRatio} %</span> */}
               </div>
             </div>
           </section>
