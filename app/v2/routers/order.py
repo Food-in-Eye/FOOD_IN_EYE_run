@@ -56,8 +56,8 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         query["u_id"] = u_id
         q_str_list.append(f"u_id={u_id}")
     if today:
-        today_str = Util.get_cur_time().today().strftime("%Y-%m-%d")
-        today_start = Util.get_cur_time().strptime(today_str, "%Y-%m-%d")
+        today_str = Util.get_utc_time().today().strftime("%Y-%m-%d")
+        today_start = Util.get_utc_time().strptime(today_str, "%Y-%m-%d")
         today_end = today_start + timedelta(days=1)
         query["date"] = {"$gte": today_start, "$lt": today_end}
         q_str_list.append(f"today={today}")
@@ -169,7 +169,7 @@ async def new_order(body:OrderModel, request:Request):
         for food in store_order.f_list:
             store_price += food['price'] * food['count']
         order = {
-            "date": Util.get_cur_time().now(),
+            "date": Util.get_utc_time().now(),
             "u_id": body.u_id,
             "s_id": store_order.s_id,
             "m_id": store_order.m_id,
@@ -193,7 +193,7 @@ async def new_order(body:OrderModel, request:Request):
 
     history = {
         "u_id": body.u_id,
-        "date": Util.get_cur_time(),
+        "date": Util.get_utc_time(),
         "total_price": total_price,
         "raw_gaze_path": None,
         "fixation_path": None,
@@ -346,8 +346,8 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
     ]
     if (start_date != None) and (end_date != None):
         pipeline[0]["$match"]["date"] = {
-            "$gte": Util.get_cur_time().strptime(start_date, "%Y-%m-%d"),
-            "$lte": Util.get_cur_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            "$gte": Util.get_utc_time().strptime(start_date, "%Y-%m-%d"),
+            "$lte": Util.get_utc_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
         }
 
     aggreagted_data = DB.aggregate_pipline('order', pipeline)
@@ -374,7 +374,7 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
 async def get_history_list(request:Request, s_id: str, date: str):
     assert TokenManager.is_seller(request.state.token_scope), 403.1
 
-    start_datetime = Util.get_cur_time().strptime(date, "%Y-%m-%d")
+    start_datetime = Util.get_utc_time().strptime(date, "%Y-%m-%d")
     end_datetime = start_datetime + timedelta(days=1)
 
     query = {

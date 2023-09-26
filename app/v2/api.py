@@ -56,12 +56,18 @@ async def analysis_test():
         2. execute_sale 함수를 실행한다. -> return sale_report
         3. 분석 보고서를 리턴한다.
     """
-    
-    # today = Util.get_cur_time().replace(hour=0, minute=0, second=0, microsecond=0)
-    today = datetime(2023, 7, 26)
+
+    # today = Util.get_utc_time_by_datetime(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
+    custom_date = datetime(2023, 9, 22, 17, 44, 16, 867255)
+    today = Util.get_utc_time_by_datetime(custom_date.replace(hour=0, minute=0, second=0, microsecond=0))
+    print(f'custom time: {custom_date}')
+    print(f'UTC time: {today}')
+    print(f'local time: {Util.get_local_time(today)}')
+
     try:
         sale_report = await CallAnalysis.sale_stats(today)
 
         return sale_report
     except Exception as e:
         return e
+    

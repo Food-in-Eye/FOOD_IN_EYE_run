@@ -25,22 +25,28 @@ class Util:
         else:
             return ObjectId(id)
 
+
     @staticmethod
-    def get_cur_time() -> datetime:
-        """ 원하는 timezone으로 현재 시간을 리턴한다. """
-        current_time_utc = datetime.now(pytz.UTC)
-        current_time = current_time_utc.astimezone(pytz.timezone('Asia/Seoul'))
-        return current_time
+    def get_utc_time() -> datetime:
+        """ 현재 local 시간을 가져와 UTC timezone으로 리턴한다. """
+        date = datetime.now(pytz.timezone('Asia/Seoul'))
+        utc_time = date.astimezone(pytz.utc)
+        return utc_time
     
     @staticmethod
-    def get_custom_time(date:datetime) -> datetime:
-        """ 
-            datetime을 입력 받아 원하는 timezone으로 현재 시간을 리턴한다. 
-            - input : datetime 객체(year, month, day)
-        """
-        custom_time = date.astimezone(pytz.timezone('Asia/Seoul'))
-        return custom_time
+    def get_utc_time_by_datetime(date:datetime) -> datetime:
+        """ local 시간을 입력받아 UTC timezone으로 리턴한다. """
+        # timestamp = datetime.strptime(date, '%Y-%m-%d')
+        utc_time = date.astimezone(pytz.utc)
+        return utc_time
     
+    @staticmethod
+    def get_local_time(date:datetime) -> datetime:
+        """ UTC 시간을 입력 받아 Asia/Seoul timezone으로 리턴한다. """
+        local_time = date.astimezone(pytz.timezone('Asia/Seoul'))
+        return local_time
+    
+
     @staticmethod
     def delete_user_hid(h_id:str) -> bool:
         """
