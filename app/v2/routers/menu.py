@@ -9,7 +9,6 @@ from fastapi import APIRouter, Depends, Request
 from core.models.store import MenuModel
 from core.common.authority import TokenManagement
 from core.common.mongo import MongodbController
-from core.error.exception import CustomException
 from .src.util import Util
 from .src.meta import Meta
 
