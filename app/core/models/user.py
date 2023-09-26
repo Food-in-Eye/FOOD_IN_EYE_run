@@ -5,6 +5,11 @@ class Gender(Enum):
     male = 1
     female = 2
 
+class CAM(Enum):
+    null = 0
+    true = 1
+    false = 2
+
 # 회원 가입 시에 입력으로 받는 BaseModel
 
 class BuyerModel(BaseModel):
@@ -37,8 +42,12 @@ class BuyerModifyModel(BaseModel):
     name: str
     gender: Gender = Field(title="Gender of user [male:1/female:2]")
     age: int
+    camera: CAM
 
 class SellerModifyModel(BaseModel):
     id: str
     old_pw: str
     new_pw: str
+
+class Camera(BaseModel):
+    camera: CAM

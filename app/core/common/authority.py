@@ -1,5 +1,4 @@
 from passlib.context import CryptContext
-from passlib.exc import UnknownHashError
 from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from bson.objectid import ObjectId
@@ -10,7 +9,7 @@ from core.common.mongo import MongodbController
 
 import os
 from jose import jwt, ExpiredSignatureError
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 DB = MongodbController('FIE_DB2')
@@ -70,63 +69,52 @@ class TokenManagement:
         self.token_type = "bearer"
 
         self.ACCESS_SK = os.environ['JWT_ACCESS_SECRET_KEY']
-        self.ACCESS_TOKEN_buyer = self.init_a_token("buyer")
-        self.ACCESS_TOKEN_seller = self.init_a_token("seller")
-
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
-    def init_a_token(self, scope:str):
-        exp_time = int((Util.get_cur_time() + timedelta(minutes=30)).timestamp())
-        
+    def init_a_token(self, u_id:str, scope:str):
+        if scope == "buyer":
+            EXP = int((datetime.now() + timedelta(minutes=10)).timestamp())
+        elif scope == "seller":
+            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
+    
         data = {
             "iss": "ACCESS_Token",
-            "exp": exp_time,
-            "iat": int(Util.get_cur_time().timestamp()),
+            "sub": u_id,
+            "exp": EXP,
+            "iat": int(datetime.now().timestamp()),
             "scope": scope
         }
-
-        if scope == 'buyer':
-            self.ACCESS_TOKEN_buyer = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
-            return self.ACCESS_TOKEN_buyer
-        elif scope == 'seller':
-            self.ACCESS_TOKEN_seller = jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
-            return self.ACCESS_TOKEN_seller
+        return jwt.encode(data, self.ACCESS_SK, algorithm=self.algorithm)
     
     def init_r_token(self, u_id:str, scope:str):
         if scope == "buyer":
-            EXP = int((Util.get_cur_time() + timedelta(minutes=60)).timestamp())
+            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
         elif scope == "seller":
-            EXP = int((Util.get_cur_time() + timedelta(minutes=60*2)).timestamp())
+            EXP = int((datetime.now() + timedelta(minutes=60*2)).timestamp())
 
         data = {
             "iss": "REFRESH_Token",
             "sub": u_id,
             "exp": EXP,
-            "iat": int(Util.get_cur_time().timestamp()),
+            "iat": int(datetime.now().timestamp()),
             "scope": scope
         }
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)
 
 
-
-    def recreate_a_token(self, scope:str):
-        if scope == 'buyer':
-            a_token = self.ACCESS_TOKEN_buyer
-        elif scope == 'seller':
-            a_token = self.ACCESS_TOKEN_seller
-
+    # Todo : a_token 재생성 방법 생각해봐야 함
+    def recreate_a_token(self, a_token:str, u_id:str, scope:str):
         try:
             self.get_payload('access', a_token)
+        except CustomException:
+            return self.init_a_token(u_id, scope)
 
-        except CustomException as e:
-            return self.init_a_token(scope)
-        
         raise CustomException(status_code=403.6)
 
-    def recreate_r_token(self, token:str, u_id:str, scope:str):
-        payload = self.get_payload('refresh', token)
+    def recreate_r_token(self, r_token:str, u_id:str, scope:str):
+        payload = self.get_payload('refresh', r_token)
 
-        cur_time = int(Util.get_cur_time().timestamp())
+        cur_time = int(datetime.now().timestamp())
         exp_time = payload["exp"]
 
         if (exp_time - cur_time) > 60 * 10:
@@ -145,15 +133,11 @@ class TokenManagement:
     
 
     def auth_a_token(self, token: str = Depends(oauth2_scheme)):
-        if token == self.ACCESS_TOKEN_buyer or token == self.ACCESS_TOKEN_seller:
-            self.get_payload('access', token)
-
-            return token
-        raise CustomException(status_code=422.61)
+        self.get_payload('access', token)
+        return token
 
     def auth_r_token(self, token: str = Depends(oauth2_scheme)):
         self.get_payload('refresh', token)
-
         return token
         
 
@@ -161,11 +145,9 @@ class TokenManagement:
         try:
             token = request.headers.get("Authorization", "").split(" ")[1]
 
-            if token == self.ACCESS_TOKEN_buyer or token == self.ACCESS_TOKEN_seller:
-                payload = self.get_payload('access', token)
-                request.state.token_scope = payload.get("scope")
-            else:
-                raise CustomException(status_code=403.1)
+            payload = self.get_payload('access', token)
+            request.state.token_scope = payload.get("scope")
+
         except IndexError:
             raise CustomException(status_code=401.61)
         

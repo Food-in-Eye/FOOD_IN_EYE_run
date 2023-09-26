@@ -113,6 +113,14 @@ class ConnectionManager:
         elif data['type'] == 'connect':
             if data['result'] == "close":
                 data['result'] = 'closed'
+
+                if h_id:
+                    # user의 현재 진행중인 주문 항목 삭제
+                    _id = Util.check_id(h_id)
+                    history = DB.read_one('history', {'_id', _id})
+                    _id = Util.check_id(history['u_id'])
+                    DB.update_one('user', {'_id':_id}, {'h_id':""})
+            
                 await self.disconnect(websocket, s_id, h_id)
                 raise WebSocketDisconnect(f'The client requested to close the connection.')
             elif data['result'] == "connect":

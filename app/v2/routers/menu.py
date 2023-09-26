@@ -9,7 +9,6 @@ from fastapi import APIRouter, Depends, Request
 from core.models.store import MenuModel
 from core.common.authority import TokenManagement
 from core.common.mongo import MongodbController
-from core.error.exception import CustomException
 from .src.util import Util
 from .src.meta import Meta
 
@@ -63,7 +62,7 @@ async def create_menu(s_id:str, menu:MenuModel, request:Request):
 
     new_menu = {
         's_id': s_id,
-        'date': Util.get_cur_time().now(),
+        'date': Util.get_utc_time().now(),
         'f_list': data['f_list']
     }
 

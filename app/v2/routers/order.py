@@ -56,8 +56,8 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         query["u_id"] = u_id
         q_str_list.append(f"u_id={u_id}")
     if today:
-        today_str = Util.get_cur_time().today().strftime("%Y-%m-%d")
-        today_start = Util.get_cur_time().strptime(today_str, "%Y-%m-%d")
+        today_str = Util.get_utc_time().today().strftime("%Y-%m-%d")
+        today_start = Util.get_utc_time().strptime(today_str, "%Y-%m-%d")
         today_end = today_start + timedelta(days=1)
         query["date"] = {"$gte": today_start, "$lt": today_end}
         q_str_list.append(f"today={today}")
@@ -109,6 +109,29 @@ async def get_order(id: str, detail: bool=False):
         "f_list": response['f_list']
     }
 
+# todo: buyer check 고민
+@order_router.get("/order/h")
+async def get_order_by_hid(id:str):
+    _id = Util.check_id(id)
+    response = DB.read_one('history', {'_id':_id})
+    result = []
+    for o_id in response["orders"]:
+        _id = Util.check_id(o_id)
+        order = DB.read_one('order', {'_id':_id})
+        result.append({
+            'o_id': o_id,
+            'status': order['status'],
+            's_id': order['s_id'],
+            's_name': order['s_name'],
+            'm_id': order['m_id'],
+            'f_list': order['f_list']
+        })
+    return { 'order_list': result }
+
+@order_router.get("/history/status")
+async def get_history_status(id:str):
+    return { 'complete': Util.is_done(id)}
+
 @order_router.put("/order/status")
 async def change_status(id: str, request:Request):
     ''' 특정 주문 내역의 진행 상태를 변경한다. '''
@@ -146,7 +169,7 @@ async def new_order(body:OrderModel, request:Request):
         for food in store_order.f_list:
             store_price += food['price'] * food['count']
         order = {
-            "date": Util.get_cur_time().now(),
+            "date": Util.get_utc_time().now(),
             "u_id": body.u_id,
             "s_id": store_order.s_id,
             "m_id": store_order.m_id,
@@ -170,7 +193,7 @@ async def new_order(body:OrderModel, request:Request):
 
     history = {
         "u_id": body.u_id,
-        "date": Util.get_cur_time(),
+        "date": Util.get_utc_time(),
         "total_price": total_price,
         "raw_gaze_path": None,
         "fixation_path": None,
@@ -180,7 +203,8 @@ async def new_order(body:OrderModel, request:Request):
     }
     
     h_id = str(DB.insert_one('history', history)) 
-
+    _id = Util.check_id(body.u_id)
+    DB.update_one('user', {'_id':_id}, {'h_id':h_id})
     return {
         'h_id': h_id,
         'order_list': response_list
@@ -190,16 +214,22 @@ async def new_order(body:OrderModel, request:Request):
 @order_router.post("/order/gaze")
 async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     assert TokenManager.is_buyer(request.state.token_scope), 403.1
+    SAVE_DIR = 'EXP1'
 
     gaze_data = []
     for page in body:
         gaze_data.append(page.dict())
 
-
+    ## test 계정은 예외처리하기 위해 추가 (SYSYSY 디렉토리에 혹시몰라 저장하기는 함)
     _id = Util.check_id(h_id)
+    history = DB.read_one('history', {'_id':_id})
+    u_id = Util.check_id(history['u_id'])
+    user = DB.read_one('user', {'_id': u_id})
+    if user['id'] == "test":
+        SAVE_DIR = 'SYSYSY'
 
     try:
-        key = storage.upload(gaze_data, 'json', 'C_0714')
+        key = storage.upload(gaze_data, 'json', SAVE_DIR)
     except CustomException as e:
         raise CustomException(e.status_code, f' -> h_id: \'{h_id}\'')
 
@@ -209,7 +239,7 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
         raise CustomException(e.status_code, f' -> h_id: \'{h_id}\', S3 key: \'{key}\'')
 
     # 임시로 비활성화
-    asyncio.create_task(preprocess_and_update(key, h_id))
+    # asyncio.create_task(preprocess_and_update(key, h_id))
 
     websocket_manager.app_connections[h_id]['gaze'] = True
 
@@ -316,8 +346,8 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
     ]
     if (start_date != None) and (end_date != None):
         pipeline[0]["$match"]["date"] = {
-            "$gte": Util.get_cur_time().strptime(start_date, "%Y-%m-%d"),
-            "$lte": Util.get_cur_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            "$gte": Util.get_utc_time().strptime(start_date, "%Y-%m-%d"),
+            "$lte": Util.get_utc_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
         }
 
     aggreagted_data = DB.aggregate_pipline('order', pipeline)
@@ -344,7 +374,7 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
 async def get_history_list(request:Request, s_id: str, date: str):
     assert TokenManager.is_seller(request.state.token_scope), 403.1
 
-    start_datetime = Util.get_cur_time().strptime(date, "%Y-%m-%d")
+    start_datetime = Util.get_utc_time().strptime(date, "%Y-%m-%d")
     end_datetime = start_datetime + timedelta(days=1)
 
     query = {

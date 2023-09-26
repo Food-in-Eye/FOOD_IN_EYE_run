@@ -51,7 +51,8 @@ async def buyer_signup(data: BuyerModel):
             'name': data.name,
             'gender': data.gender.value,
             'age': data.age,
-            'R_Token': ''
+            'R_Token': '',
+            'camera': 0
         }
         u_id = str(DB.insert_one('user', user))
     else:
@@ -69,16 +70,31 @@ async def buyer_login(data: OAuth2PasswordRequestForm = Depends()):
     _id = Util.check_id(u_id)
 
     user = AuthManager.auth_user(u_id, data.password)
+
+    a_token = TokenManager.init_a_token(u_id, "buyer")
     user['R_Token'] = TokenManager.init_r_token(u_id, "buyer")
 
     DB.update_one('user', {'_id':_id}, {'R_Token': user['R_Token']})
+    response = DB.read_one('user', {'_id':_id})
 
-    return {
+    result = {
         'u_id': u_id,
+        'name': response['name'],
         'token_type': "bearer",
-        'A_Token': TokenManager.ACCESS_TOKEN_buyer,
-        'R_Token': user['R_Token']
+        'A_Token': a_token,
+        'R_Token': user['R_Token'],
+        'camera': response['camera']
     }
+    try:
+        # 현재 db에 아예 h_id field가 없는 경우가 많아서 일시적인 조치
+        h_id = response['h_id']
+    except:
+        h_id = ""
+    if h_id and Util.is_done(h_id):
+        result['h_id'] = ""
+    else:
+        result['h_id'] = h_id
+    return result
 
 
 @user_router.post('/buyer/info')
@@ -93,6 +109,7 @@ async def get_buyer_info(u_id:str, data: PwModel, token:str = Depends(TokenManag
         'name': user['name'],
         'gender': user['gender'],
         'age': user['age'],
+        'camera': user['camera']
     }
     
     
@@ -113,10 +130,22 @@ async def change_buyer_info(u_id:str, data: BuyerModifyModel, token:str = Depend
         'pw': new_hashed_pw,
         'name': data.name,
         'gender': data.gender.value,
-        'age': data.age
+        'age': data.age,
+        'camera': data.camera.value
     }
 
     DB.update_one('user', {'_id':_id}, new_data)
+    
+
+@user_router.put('/buyer/camera')
+async def change_buyer_info(u_id:str, data:Camera, token:str = Depends(TokenManager.auth_a_token)):
+    scope = TokenManager.get_payload('access', token).get("scope")
+    assert TokenManager.is_buyer(scope), 403.1
+
+    _id = Util.check_id(u_id)
+
+    DB.update_one('user', {'_id':_id}, {'camera': data.camera.value})
+
 
 
 """
@@ -149,6 +178,8 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
     _id = Util.check_id(u_id)
 
     user = AuthManager.auth_user(u_id, data.password)
+
+    a_token = TokenManager.init_a_token(u_id, "seller")
     user['R_Token'] = TokenManager.init_r_token(user['_id'], "seller")
 
     DB.update_one('user', {'_id':_id}, {"R_Token": user['R_Token']})
@@ -157,7 +188,7 @@ async def seller_login(data: OAuth2PasswordRequestForm = Depends()):
         'u_id': user['_id'],
         's_id': user['s_id'],
         'token_type': "bearer",
-        'A_Token': TokenManager.ACCESS_TOKEN_seller,
+        'A_Token': a_token,
         'R_Token': user['R_Token']
     }
 
@@ -198,31 +229,34 @@ async def change_seller_info(u_id:str, data: SellerModifyModel, token:str = Depe
 Token renewal API
 """
 
+# ToDo : a_token이 만료되었는지 확인하는 부분이 필요함(header에 2개 안 됨, str 형태 암됨)
 @user_router.get('/issue/access')
-async def get_access_token(u_id:str, token: str = Depends(TokenManager.auth_r_token)):
+async def get_access_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
     _id = Util.check_id(u_id)
     
     user = DB.read_one('user', {'_id':_id})
 
-    if user['R_Token'] != token:
+    if user['R_Token'] != r_token:
         raise CustomException(status_code=422.62)
     
-    response = TokenManager.recreate_a_token(user['scope'])
+    # response = TokenManager.recreate_a_token(r_token, u_id, user['scope'])
+    response = TokenManager.init_a_token(u_id, user['scope'])
 
     return {
         'A_Token': response
     }
 
+
 @user_router.get('/issue/refresh')
-async def get_refresh_token(u_id:str, token: str = Depends(TokenManager.auth_r_token)):
+async def get_refresh_token(u_id:str, r_token: str = Depends(TokenManager.auth_r_token)):
     _id = Util.check_id(u_id)
 
     user = DB.read_one('user', {'_id':_id})
 
-    if user['R_Token'] != token:
+    if user['R_Token'] != r_token:
         raise CustomException(status_code=422.62)
     
-    response = TokenManager.recreate_r_token(token, u_id, user['scope'])
+    response = TokenManager.recreate_r_token(r_token, u_id, user['scope'])
 
     DB.update_one('user', {'_id':_id}, {"R_Token": response})
 
