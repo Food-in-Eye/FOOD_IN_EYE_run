@@ -47,7 +47,7 @@ async def get_keys(key: str):
 
 from datetime import datetime
 from core.statistics.run import CallAnalysis
-
+from core.error.exception import CustomException
 @v2_router.get("/anlz_test")
 async def analysis_test():
     """
@@ -60,9 +60,6 @@ async def analysis_test():
     # today = Util.get_utc_time_by_datetime(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
     custom_date = datetime(2023, 9, 22, 17, 44, 16, 867255)
     today = Util.get_utc_time_by_datetime(custom_date.replace(hour=0, minute=0, second=0, microsecond=0))
-    print(f'custom time: {custom_date}')
-    print(f'UTC time: {today}')
-    print(f'local time: {Util.get_local_time(today)}')
 
     try:
         sale_report = await CallAnalysis.sale_stats(today)
