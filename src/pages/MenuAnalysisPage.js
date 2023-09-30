@@ -2,6 +2,7 @@ import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
 import CircleGraph from "../charts/CircleGraph";
 import StackBarChart from "../charts/StackBarChart";
+import PieChartWithNeedle from "../charts/PieChartWithNeedle";
 import VerticalBarChart from "../charts/VerticalBarChart";
 import dailyReport from "../data/daily_report.json";
 import menuDetailPage from "../images/menu-detail-ex.jpeg";
@@ -219,9 +220,8 @@ function MenuAnalysisPage() {
     setFixDataInDetail(fixPercentageObject);
   };
 
+  console.log("fixCount, gazeCount", fixCount, gazeCount);
   console.log("fixDataInDetail", fixDataInDetail);
-  console.log("saleRatio", saleRatio, typeof saleRatio);
-  console.log("salesPerVisitData", salesPerVisitData);
 
   return (
     <div>
@@ -283,6 +283,7 @@ function MenuAnalysisPage() {
               <div className={MAnalysis.GtoFRatioValue}>
                 <p>시선 수 대비 Fixation 수 비율</p>
                 <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
+                <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
               </div>
               <div className={MAnalysis.GtoFRatioPercent}>
                 <p>
