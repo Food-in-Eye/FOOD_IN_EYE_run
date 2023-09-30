@@ -2,6 +2,7 @@ import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
 import CircleGraph from "../charts/CircleGraph";
 import StackBarChart from "../charts/StackBarChart";
+import VerticalBarChart from "../charts/VerticalBarChart";
 import dailyReport from "../data/daily_report.json";
 import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
@@ -21,6 +22,7 @@ function MenuAnalysisPage() {
   const [visitCount, setVisitCount] = useState(0);
   const [duration, setDuration] = useState(0);
   const [salesPerVisit, setSalesPerVisit] = useState(0);
+  const [salesPerVisitData, setSalesPerVisitData] = useState(0);
 
   const [fixCount, setFixCount] = useState(0);
   const [gazeCount, setGazeCount] = useState(0);
@@ -50,7 +52,9 @@ function MenuAnalysisPage() {
 
     setMaxHour(maxHour);
     setMenuSalesCount(foodDetail.total_count);
-    setSaleRatio(((menuTotalSales / totalSales) * 100).toFixed(0));
+    setSaleRatio(parseInt(((menuTotalSales / totalSales) * 100).toFixed(0)));
+
+    console.log("menuTotalSales, totalSales", menuTotalSales, totalSales);
   };
 
   const setAoiData = () => {
@@ -106,6 +110,10 @@ function MenuAnalysisPage() {
   useEffect(() => {
     setSaleData();
     setAoiData();
+    setSalesPerVisitData({
+      menuSalesCount: menuSalesCount,
+      visitCount: visitCount,
+    });
     setSalesPerVisit(((menuSalesCount / visitCount) * 100).toFixed(0));
   }, [fNum, menuSalesCount, visitCount]);
 
@@ -212,6 +220,8 @@ function MenuAnalysisPage() {
   };
 
   console.log("fixDataInDetail", fixDataInDetail);
+  console.log("saleRatio", saleRatio, typeof saleRatio);
+  console.log("salesPerVisitData", salesPerVisitData);
 
   return (
     <div>
@@ -246,8 +256,8 @@ function MenuAnalysisPage() {
               </div>
               <div className={MAnalysis.menuSummarySales}>
                 <p>총 매출액의 매출 기여도</p>
-                <PieChartForFood saleRatio={saleRatio} />
-                {/* <span>{saleRatio} %</span> */}
+                {/* <PieChartForFood saleRatio={saleRatio} /> */}
+                <span>{saleRatio} %</span>
               </div>
             </div>
           </section>
@@ -338,7 +348,7 @@ function MenuAnalysisPage() {
                 <br />
                 <br />
                 그리고 메뉴 상세 페이지의 방문 횟수에 비해 얼마나 판매되었는지
-                방문 대비 주문율을 통해 확인할 수 있어요.
+                방문 대비 판매 건수을 통해 확인할 수 있어요.
               </p>
             </div>
             <div className={MAnalysis.menuDetailPageStatisticsBody}>
@@ -350,10 +360,13 @@ function MenuAnalysisPage() {
                 <p>총 체류시간</p>
                 <span>{duration} 초</span>
               </div>
-              <div className={MAnalysis.menuDetailOrderRatio}>
-                <p>방문 대비 주문율</p>
-                <span>{salesPerVisit} %</span>
+            </div>
+            <div className={MAnalysis.menuDetailOrderRatio}>
+              <p>방문 대비 판매 건수</p>
+              <div className={MAnalysis.vBarChart}>
+                <VerticalBarChart chartData={salesPerVisitData} />
               </div>
+              {/* <span>{salesPerVisit} %</span> */}
             </div>
           </section>
         </div>

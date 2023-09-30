@@ -79,7 +79,6 @@
 .menuPageStatistics .menuPageScore,
 .menuDetailPageStatistics .menuDetailPageVisitCount,
 .menuDetailPageStatistics .menuDetailPageDwellTime,
-.menuDetailPageStatistics .menuDetailOrderRatio,
 .GtoFRatioSection .GtoFRatioValue,
 .GtoFRatioSection .GtoFRatioPercent {
   display: flex;
@@ -90,6 +89,21 @@
   flex: 1 0 0;
   border-radius: 6px;
   border: 1px solid #444444;
+}
+
+.menuDetailPageStatistics .menuDetailOrderRatio {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  padding: 15px;
+  gap: 4px;
+  flex: 1 0 0;
+  background-color: #f2f2f2;
+  border-radius: 6px;
+  border: none;
+  /* border: 1px solid #444444; */
 }
 
 .menuSummarySection p,
@@ -201,4 +215,12 @@
   padding: 20px 0;
   white-space: nowrap;
   background-color: #fff;
+}
+
+.vBarChart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px auto;
+  padding-right: 10vw;
 }
