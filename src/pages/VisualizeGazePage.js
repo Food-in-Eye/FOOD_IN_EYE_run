@@ -219,6 +219,7 @@ function VisualizeGazePage() {
                     height: divHeight,
                     backgroundImage: `url(${imgUrls[index]})`,
                     backgroundSize: "cover",
+                    // filter: "blur(5px)",
                   }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
@@ -250,6 +251,7 @@ function VisualizeGazePage() {
                     height: divHeight,
                     backgroundImage: `url(${imgUrls[index]})`,
                     backgroundSize: "cover",
+                    // filter: "blur(5px)",
                   }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>
@@ -297,6 +299,7 @@ function VisualizeGazePage() {
                     height: divHeight,
                     backgroundImage: `url(${imgUrls[index]})`,
                     backgroundSize: "cover",
+                    // filter: "blur(5px)",
                   }}
                 >
                   <div className={VisualizeGaze.gazeScreenName}>

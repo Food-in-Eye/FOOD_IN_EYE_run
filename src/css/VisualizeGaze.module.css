@@ -8,7 +8,7 @@
 }
 
 .gazePoint {
-  background-color: red;
+  background-color: rgb(255, 0, 0);
 }
 
 .overGazePoint {
@@ -21,7 +21,7 @@
 }
 
 .fixCircle {
-  fill: rgb(122, 126, 184);
+  fill: rgb(0, 10, 157);
 }
 
 .fixCircle,
@@ -38,7 +38,8 @@
   /* margin: 20px; */
 }
 
-.gazePlotRow {
+.gazePlotRow,
+.backgroundImage {
   display: flex;
   margin-bottom: 20px;
 }
