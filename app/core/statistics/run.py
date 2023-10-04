@@ -52,13 +52,13 @@ class CallAnalysis:
         
         yesterday = today - timedelta(1)
         query = {'date':{"$gte": yesterday, "$lte": today}}
-        aoi_keys = DataLoader.get_aoi_reports(query)
+        aoi_datas = DataLoader.get_aoi_reports(query)
         
         aoi_daily_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/daily"
         headers = {"Content-Type": "application/json"}
 
         payload = {
-            "keys": aoi_keys
+            "aoi_datas": aoi_datas
         }
 
         async with httpx.AsyncClient() as client:
@@ -69,7 +69,7 @@ class CallAnalysis:
 
     async def daily_summary():
         # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        today = datetime(2023, 8, 19)
+        today = datetime(2023, 8, 17)
         sale_report = await CallAnalysis.sale_stats(today)
         aoi_report = await CallAnalysis.aoi_stats(today)
         

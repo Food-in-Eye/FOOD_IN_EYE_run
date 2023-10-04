@@ -46,9 +46,11 @@ class DataLoader:
     def get_aoi_reports(query):
         result = []
         try:
-            historys = DB.read_all('history', query, {'aoi_analysis':1})
+            historys = DB.read_all('history', query, {'date':1, 'aoi_analysis':1})
             for history in historys:
-                result.append(history['aoi_analysis'])
+                result.append({
+                    "date": str(history['date']),
+                    "aoi_key": history['aoi_analysis']})
             return result
 
         except Exception as e:
