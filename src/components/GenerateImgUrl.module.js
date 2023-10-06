@@ -5,7 +5,7 @@ function GenerateImgUrl(s_num, f_num) {
   const storeFoodKeys = {
     store0: ["96dc63e5-1dae-4d1b-ad49-d545397fef58.jpg"],
     store1: [
-      "77d577e1-428b-466e-be7e-3cfe35fa0359.jpg",
+      "2701ddc2-5f5f-4c31-ad31-b4bda646f4e9.jpg",
       "e600c7f5-94dc-4c83-88ce-0a2e26499a6b.jpg",
       "c66c7035-1724-474f-a9a5-7c0b81a8fb5e.jpg",
       "ea972fd4-03e9-49da-b2b3-c41d278a36d2.jpg",
@@ -35,7 +35,7 @@ function GenerateImgUrl(s_num, f_num) {
       "9d549ea4-cb7d-46a2-9ed2-32b4b7ce40df.jpg",
     ],
     store4: [
-      "2701ddc2-5f5f-4c31-ad31-b4bda646f4e9.jpg",
+      "95ebde9b-a0ed-4789-9812-4670083f2d1e.jpg",
       "12dce916-319f-4004-9ebc-78eff0243939.jpg",
       "873ac286-153b-4ae1-a564-8b117fe0ac1d.jpg",
       "67ed3b9e-8e56-471f-a0bd-fdca946a16ad.jpg",
@@ -44,7 +44,7 @@ function GenerateImgUrl(s_num, f_num) {
       "544fb103-d016-4b53-bb49-0773c03147a2.jpg",
     ],
     store5: [
-      "95ebde9b-a0ed-4789-9812-4670083f2d1e.jpg",
+      "77d577e1-428b-466e-be7e-3cfe35fa0359.jpg",
       "5e97bcbf-3225-4647-834a-b8921784b327.jpg",
       "d63b1f06-c1d5-411f-8f59-734fa75ee857.jpg",
       "5902b33b-c89b-4e1a-8f42-caf444aeab7b.jpg",
