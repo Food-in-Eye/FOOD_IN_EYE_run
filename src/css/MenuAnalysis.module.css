@@ -71,9 +71,9 @@
   align-self: stretch;
 }
 
+.menuSummarySection .menuSummarySaleCount,
 .menuSummarySection .menuSummaryTime,
 .menuSummarySection .menuSummarySales,
-.menuPageStatistics .menuPageSaleCount,
 .menuPageStatistics .menuPageDwellTime,
 .menuPageStatistics .menuPageGazeRatio,
 .menuPageStatistics .menuPageScore,
@@ -121,11 +121,20 @@
   background: none;
 }
 
+.GtoFRatioValue span {
+  margin: 0px auto;
+  color: #1e1e1e;
+  font-family: "Hahmlet-Medium";
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 36px;
+  white-space: nowrap;
+}
+
 .menuSummarySection span,
 .menuPageStatistics span,
 .menuDetailPageStatistics span,
-.GtoFRatioPercent span,
-.GtoFRatioValue span {
+.GtoFRatioPercent span {
   margin-left: 0px;
   margin-right: auto;
   color: #1e1e1e;
@@ -167,6 +176,10 @@
   font-size: 28px;
   font-weight: 800;
 } */
+
+.GtoFRatioPieChart {
+  margin-top: -35%;
+}
 
 .divForButton {
   position: fixed;

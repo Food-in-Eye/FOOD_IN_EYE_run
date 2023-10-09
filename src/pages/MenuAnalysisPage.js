@@ -181,7 +181,29 @@ function MenuAnalysisPage() {
           data.length) *
         100;
 
-      return percentile;
+      if (percentile <= 5) {
+        return 5;
+      } else if (percentile <= 10) {
+        return 10;
+      } else if (percentile <= 20) {
+        return 20;
+      } else if (percentile <= 30) {
+        return 30;
+      } else if (percentile <= 40) {
+        return 40;
+      } else if (percentile <= 50) {
+        return 50;
+      } else if (percentile <= 60) {
+        return 60;
+      } else if (percentile <= 70) {
+        return 70;
+      } else if (percentile <= 80) {
+        return 80;
+      } else if (percentile <= 90) {
+        return 90;
+      } else {
+        return percentile;
+      }
     };
 
     // 정규화된 데이터 반환
@@ -250,6 +272,10 @@ function MenuAnalysisPage() {
               </p>
             </div>
             <div className={MAnalysis.menuSummaryBody}>
+              <div className={MAnalysis.menuSummarySaleCount}>
+                <p>판매 개수</p>
+                <span>{menuSalesCount} 개</span>
+              </div>
               <div className={MAnalysis.menuSummaryTime}>
                 <p>인기 시간대</p>
                 <span>{maxHour} 시</span>
@@ -283,16 +309,21 @@ function MenuAnalysisPage() {
               <div className={MAnalysis.GtoFRatioValue}>
                 <p>시선 수 대비 Fixation 수 비율</p>
                 <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
-                <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
+                <div className={MAnalysis.GtoFRatioPieChart}>
+                  <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
+                </div>
               </div>
               <div className={MAnalysis.GtoFRatioPercent}>
                 <p>
-                  전 메뉴 중 상위{" "}
+                  전 메뉴 중{" "}
                   <strong style={{ fontSize: "20px", color: "#051c77" }}>
-                    {foodsPercentage} %
+                    상위{" "}
                   </strong>
                 </p>
-                <span>{foodRankOfGtoF} 등</span>
+                <p>
+                  <span>{foodsPercentage} % </span>이내
+                </p>
+                {/* <span>{foodRankOfGtoF} 등</span> */}
               </div>
             </div>
             {/* <div className={MAnalysis.GtoFRatioGraphDesc}></div> */}
@@ -301,12 +332,12 @@ function MenuAnalysisPage() {
       </div>
       <div ref={tabs[2].element} className={MAnalysis.tabElement}>
         <div>
-          <span>메뉴 페이지 통계</span>
+          <span>메뉴판 페이지 통계</span>
           <section className={MAnalysis.menuPageStatistics}>
             <div className={MAnalysis.menuPageStatisticsDesc}>
               <p>
-                메뉴의 판매 개수, 사용자들이 메뉴판 페이지에서 이 메뉴에 얼마나
-                관심을 갖고 바라봤는지, <br />
+                사용자들이 메뉴판 페이지에서 이 메뉴에 얼마나 관심을 갖고
+                바라봤는지, <br />
                 메뉴판 페이지에서 해당 메뉴에 간 시선은 사용자의 전체 시선
                 중에서 얼만큼을 차지하는지를 알 수 있어요!
                 <br />
@@ -316,10 +347,6 @@ function MenuAnalysisPage() {
               </p>
             </div>
             <div className={MAnalysis.menuPageStatisticsBody}>
-              <div className={MAnalysis.menuPageSaleCount}>
-                <p>판매 개수</p>
-                <span>{menuSalesCount} 개</span>
-              </div>
               <div className={MAnalysis.menuPageDwellTime}>
                 <p>총 체류시간</p>
                 <span>{dwellTime} 초</span>

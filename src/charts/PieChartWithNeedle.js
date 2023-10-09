@@ -54,14 +54,21 @@ function PieChartWithNeedle({ fc, gc }) {
         outerRadius={oR}
         fill="#8884d8"
         stroke="none"
-        // label
       >
         <Label
           value={`전체 시선 수: ${gc}`}
           position="outsideBottom"
           dy={100}
+          style={{ fontSize: "16px", fontWeight: "bold" }}
+          fill="#8884d8"
         />
-        <Label value={`Fixation 수: ${fc}`} position="outsideBottom" dy={120} />
+        <Label
+          value={`Fixation 수: ${fc}`}
+          position="outsideBottom"
+          dy={120}
+          style={{ fontSize: "16px", fontWeight: "bold" }}
+          fill="#d0d000"
+        />
         {data.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={entry.color} />
         ))}
