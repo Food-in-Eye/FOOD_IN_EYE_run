@@ -33,6 +33,9 @@ async def read_menus_of_store(s_id:str, request:Request):
     Util.check_id(s_id)
     response = DB.read_all('menu', {'s_id': s_id}) 
 
+    for menu in response:
+        menu['date'] = Util.get_local_time(menu['date'])
+
     return {
         'menu_list' : response
     }
@@ -47,7 +50,7 @@ async def read_menu(id:str):
     return {
         "_id": id,
         "s_id": response['s_id'],
-        "date": response['date'],
+        "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
 
@@ -105,7 +108,7 @@ async def read_menu_with_foods(id:str):
     return {
         "_id": id,
         "s_id": response['s_id'],
-        "date": response['date'],
+        "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
 
