@@ -1,7 +1,5 @@
 import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
-import CircleGraph from "../charts/CircleGraph";
-import StackBarChart from "../charts/StackBarChart";
 import PieChartWithNeedle from "../charts/PieChartWithNeedle";
 import VerticalBarChart from "../charts/VerticalBarChart";
 import dailyReport from "../data/daily_report.json";
@@ -9,6 +7,7 @@ import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
 import { useEffect, useRef, useState } from "react";
 import PieChartForFood from "../charts/PieChartForFood";
+import BarChartWithAvg from "../charts/BarChartWithAvg";
 
 function MenuAnalysisPage() {
   const aoiData = dailyReport["Store 1"].aoi_summary;
@@ -22,7 +21,7 @@ function MenuAnalysisPage() {
   const [score, setScore] = useState(0);
   const [visitCount, setVisitCount] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [salesPerVisit, setSalesPerVisit] = useState(0);
+  // const [salesPerVisit, setSalesPerVisit] = useState(0);
   const [salesPerVisitData, setSalesPerVisitData] = useState(0);
 
   const [fixCount, setFixCount] = useState(0);
@@ -30,7 +29,9 @@ function MenuAnalysisPage() {
   const [foodsPercentage, setFoodsPercentage] = useState(0);
 
   const [fixDataInDetail, setFixDataInDetail] = useState([]);
-  const [foodRankOfGtoF, setFoodRankOfGtoF] = useState([]);
+
+  const [menuPageDwellTime, setMenuPageDwellTime] = useState([]);
+  const [menuDetailDwellTime, setMenuDetailDwellTime] = useState([]);
 
   console.log("aoiData", aoiData);
   console.log("saleData", saleData);
@@ -60,7 +61,6 @@ function MenuAnalysisPage() {
 
   const setAoiData = () => {
     const foodDetail = aoiData.total_food_report[fNum];
-
     const menuFixCount = foodDetail.fix_count;
     const totalFixCount = aoiData.total_fix_count;
 
@@ -71,6 +71,37 @@ function MenuAnalysisPage() {
     setDuration((foodDetail.in_detail.duration / 10000).toFixed(2));
 
     getPercentageOfFixData(foodDetail.in_detail.fix_count);
+  };
+
+  const setDwellTimes = () => {
+    const menuPageDurations = [];
+    const menuDetailDurations = [];
+
+    for (const foodName in aoiData.total_food_report) {
+      if (foodName !== "ETC" && foodName !== "Store INFO") {
+        const foodReport = aoiData.total_food_report[foodName];
+        const duration = (foodReport.duration / 10000).toFixed(2);
+        const detailDuration = (foodReport.in_detail.duration / 10000).toFixed(
+          2
+        );
+
+        const foodDuration = {
+          name: foodName,
+          duration: duration,
+        };
+
+        const foodDetailDuration = {
+          name: foodName,
+          duration: detailDuration,
+        };
+
+        menuPageDurations.push(foodDuration);
+        menuDetailDurations.push(foodDetailDuration);
+      }
+    }
+
+    setMenuPageDwellTime(menuPageDurations);
+    setMenuDetailDwellTime(menuDetailDurations);
   };
 
   const updateFixAndGazeCountList = () => {
@@ -111,11 +142,12 @@ function MenuAnalysisPage() {
   useEffect(() => {
     setSaleData();
     setAoiData();
+    setDwellTimes();
     setSalesPerVisitData({
       menuSalesCount: menuSalesCount,
       visitCount: visitCount,
     });
-    setSalesPerVisit(((menuSalesCount / visitCount) * 100).toFixed(0));
+    // setSalesPerVisit(((menuSalesCount / visitCount) * 100).toFixed(0));
   }, [fNum, menuSalesCount, visitCount]);
 
   useEffect(() => {
@@ -209,12 +241,12 @@ function MenuAnalysisPage() {
     // 정규화된 데이터 반환
     const normalizedData = normalizeData(data, minValue, maxValue);
     console.log("normalizedData", normalizedData);
-    const sortedData = normalizedData
-      .slice()
-      .sort((a, b) => b.normalized_ratio - a.normalized_ratio);
-    const rank = sortedData.findIndex((item) => item.name === fNum) + 1;
+    // const sortedData = normalizedData
+    //   .slice()
+    //   .sort((a, b) => b.normalized_ratio - a.normalized_ratio);
+    // const rank = sortedData.findIndex((item) => item.name === fNum) + 1;
 
-    setFoodRankOfGtoF(rank);
+    // setFoodRankOfGtoF(rank);
 
     // 'Food 6' 메뉴의 상위 백분위수 계산
     const percentileFood = findPercentile(normalizedData, fNum);
@@ -315,10 +347,7 @@ function MenuAnalysisPage() {
               </div>
               <div className={MAnalysis.GtoFRatioPercent}>
                 <p>
-                  전 메뉴 중{" "}
-                  <strong style={{ fontSize: "20px", color: "#051c77" }}>
-                    상위{" "}
-                  </strong>
+                  전 메뉴 중 <strong style={{ fontSize: "20px" }}>상위 </strong>
                 </p>
                 <p>
                   <span>{foodsPercentage} % </span>이내
@@ -347,17 +376,20 @@ function MenuAnalysisPage() {
               </p>
             </div>
             <div className={MAnalysis.menuPageStatisticsBody}>
+              <div className={MAnalysis.menuPageScore}>
+                <p>집중도(0점 ~ 5점)</p>
+                <span>{score} 점</span>
+              </div>
               <div className={MAnalysis.menuPageDwellTime}>
                 <p>총 체류시간</p>
-                <span>{dwellTime} 초</span>
+                <div className={MAnalysis.barChartWithAvg1}>
+                  <BarChartWithAvg data={menuPageDwellTime} />
+                </div>
+                {/* <span>{dwellTime} 초</span> */}
               </div>
               <div className={MAnalysis.menuPageGazeRatio}>
                 <p>총 시선 점유율</p>
                 <span>{fixRatio} %</span>
-              </div>
-              <div className={MAnalysis.menuPageScore}>
-                <p>집중도(0점 ~ 5점)</p>
-                <span>{score} 점</span>
               </div>
             </div>
           </section>
@@ -380,13 +412,16 @@ function MenuAnalysisPage() {
               </p>
             </div>
             <div className={MAnalysis.menuDetailPageStatisticsBody}>
-              <div className={MAnalysis.menuDetailPageVisitCount}>
+              {/* <div className={MAnalysis.menuDetailPageVisitCount}>
                 <p>방문 횟수</p>
                 <span>{visitCount} 회</span>
-              </div>
+              </div> */}
               <div className={MAnalysis.menuDetailPageDwellTime}>
                 <p>총 체류시간</p>
-                <span>{duration} 초</span>
+                <div className={MAnalysis.barChartWithAvg2}>
+                  <BarChartWithAvg data={menuDetailDwellTime} />
+                </div>
+                {/* <span>{duration} 초</span> */}
               </div>
             </div>
             <div className={MAnalysis.menuDetailOrderRatio}>
@@ -420,7 +455,6 @@ function MenuAnalysisPage() {
               </div>
             </div>
             {/* <div className={MAnalysis.menuDetailPageGazeBody}> */}
-            {/* <StackBarChart fixData={fixDataInDetail} /> */}
             {/* </div> */}
           </section>
         </div>
