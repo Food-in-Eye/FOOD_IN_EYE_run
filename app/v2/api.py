@@ -54,7 +54,7 @@ async def get_keys(key: str):
 #         3. 분석 보고서를 리턴한다.
 #     """
     
-#     # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+#     # today = Util.get_utc_time_by_datetime(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
 #     # today = datetime(2023, 7, 26)
 #     today = datetime(2023, 8, 19)
 #     try:

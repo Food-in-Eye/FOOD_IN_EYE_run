@@ -68,7 +68,7 @@ class CallAnalysis:
         return data
 
     async def daily_summary():
-        # today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        # today = Util.get_utc_time_by_datetime(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
         today = datetime(2023, 8, 17)
         sale_report = await CallAnalysis.sale_stats(today)
         aoi_report = await CallAnalysis.aoi_stats(today)

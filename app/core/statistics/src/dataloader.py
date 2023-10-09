@@ -37,7 +37,7 @@ class DataLoader:
         try:
             orders = DB.read_all('order', query, {'s_id': 1, 'date':1, 'f_list':1})
             for order in orders:
-                order['date'] = order['date'].strftime('%Y-%m-%d %H:%M:%S')
+                order['date'] = str(order['date'])
             return orders
 
         except Exception as e:
