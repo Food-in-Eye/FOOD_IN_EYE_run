@@ -2,9 +2,11 @@
 order_router
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Request
 from core.models import OrderModel, RawGazeModel
 from core.common.mongo import MongodbController
+from core.error.exception import CustomException
+from core.common.authority import TokenManagement
 from core.common.s3 import Storage
 from .src.util import Util
 from .src.meta import Meta
@@ -20,7 +22,10 @@ from datetime import datetime, timedelta
 
 from .websocket import websocket_manager as websocket_manager
 
-order_router = APIRouter(prefix="/orders")
+TokenManager = TokenManagement()
+
+order_router = APIRouter(prefix="/orders", dependencies=[Depends(TokenManager.dispatch)])
+
 
 PREFIX = 'api/v2/orders'
 DB = MongodbController('FIE_DB2')
@@ -31,6 +36,7 @@ storage = Storage('foodineye2')
 async def hello():
     return {"message": f"Hello '{PREFIX}'"}
 
+# 아래 코드는 사용성 조사 필요. 안쓴다면 삭제 예정
 @order_router.get("/q")
 async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: str=None, asc: bool=True):
     ''' 특정 조건을 만족하는 주문 내역 전체를 반환한다.
@@ -50,8 +56,8 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         query["u_id"] = u_id
         q_str_list.append(f"u_id={u_id}")
     if today:
-        today_str = datetime.today().strftime("%Y-%m-%d")
-        today_start = datetime.strptime(today_str, "%Y-%m-%d")
+        today_str = Util.get_utc_time().today().strftime("%Y-%m-%d")
+        today_start = Util.get_utc_time().strptime(today_str, "%Y-%m-%d")
         today_end = today_start + timedelta(days=1)
         query["date"] = {"$gte": today_start, "$lt": today_end}
         q_str_list.append(f"today={today}")
@@ -64,193 +70,179 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         for str in q_str_list:
             q_str = q_str + "&" + str
 
-    try:
-        response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
-    
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}{q_str}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+
+    response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
     
     return {
-        'request': f'GET {PREFIX}{q_str}',
-        'status': 'OK',
-        'response': response
+        'order_list' : response
     }
 
 @order_router.get("/order")
 async def get_order(id: str, detail: bool=False):
     ''' 특정 id에 대한 주문내역을 찾아서 반환'''
     q_str = ""
-    try:
-        q_str += f"id={id}"
-        _id = Util.check_id(id)
-        response = DB.read_one('order', {'_id':_id})
-        if detail:
-            q_str += f"&detail={detail}"
-            f_list = response["f_list"]
-            new_list = []
-            for dict in f_list:
-                _id = Util.check_id(dict["f_id"])
-                food_detail = DB.read_one("food", {'_id':_id})
-                new_list.append({
-                    "name": food_detail["name"],
-                    "count": dict["count"],
-                    "price": food_detail["price"]
-                })
-            response["f_list"] = new_list
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/order?{q_str}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    q_str += f"id={id}"
+    _id = Util.check_id(id)
+    response = DB.read_one('order', {'_id':_id})
+    if detail:
+        q_str += f"&detail={detail}"
+        f_list = response["f_list"]
+        new_list = []
+        for dict in f_list:
+            _id = Util.check_id(dict["f_id"])
+            food_detail = DB.read_one("food", {'_id':_id})
+            new_list.append({
+                "name": food_detail["name"],
+                "count": dict["count"],
+                "price": food_detail["price"]
+            })
+        response["f_list"] = new_list
     
     return {
-        'request': f'GET {PREFIX}/order?{q_str}',
-        'status': 'OK',
-        'response': response
+        "_id": id,
+        "date": response['date'],
+        "u_id": response['u_id'],
+        "s_id": response['s_id'],
+        "m_id": response['m_id'],
+        "status": response['status'],
+        "f_list": response['f_list']
     }
+
+# todo: buyer check 고민
+@order_router.get("/order/h")
+async def get_order_by_hid(id:str):
+    _id = Util.check_id(id)
+    response = DB.read_one('history', {'_id':_id})
+    result = []
+    for o_id in response["orders"]:
+        _id = Util.check_id(o_id)
+        order = DB.read_one('order', {'_id':_id})
+        result.append({
+            'o_id': o_id,
+            'status': order['status'],
+            's_id': order['s_id'],
+            's_name': order['s_name'],
+            'm_id': order['m_id'],
+            'f_list': order['f_list']
+        })
+    return { 'order_list': result }
+
+@order_router.get("/history/status")
+async def get_history_status(id:str):
+    return { 'complete': Util.is_done(id)}
 
 @order_router.put("/order/status")
-async def change_status(id: str):
+async def change_status(id: str, request:Request):
     ''' 특정 주문 내역의 진행 상태를 변경한다. '''
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+
+    _id = Util.check_id(id)
+    response = DB.read_one('order', {'_id':_id})
+    s = response['status']
     
-    try:
-        _id = Util.check_id(id)
-        response = DB.read_one('order', {'_id':_id})
-        s = response['status']
+    if s < 2:
+        DB.update_one('order', {'_id':_id}, {'status': s+1})
 
-        # websocket으로 전송 결과를 받기 위함 
-        s_id = response['s_id']
-        
-        if s < 2:
-            DB.update_one('order', {'_id':_id}, {'status': s+1})
+        await websocket_manager.send_update(id)
 
-            # websocket으로 전달하기
-            await websocket_manager.send_update(id)
-
-        else:
-            raise Exception('status is already finish')
-
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'PUT {PREFIX}/order?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    else:
+        raise CustomException(403.71)
     
     return {
-        'request': f'PUT {PREFIX}/order?id={id}',
-        'status': 'OK',
-        'message': f'status is now {s+1}'
+        'status': {s+1}
     }
 
+
 @order_router.post("/order")
-async def new_order(body:OrderModel):
-    ''' app으로 부터 주문을 받고 처리한다.        
-        [check 할 사항들]
-        1. 사용자로부터 주문을 받아 가게별 주문으로 나누어 order DB에 저장한다. (O)
-        2. 주문에 해당하는 가게에 websocket을 통해 메시지를 보낸다.
-        3. 주문에 대한 데이터를 history DB에 추가한다. 
-            -> (주문자 정보, 주문 날짜, 주문 총 가격, 시선데이터 경로, 주문 식별자 리스트)
-        
-        모든 과정이 마무리되면 OK 응답을 보낸다.
-    '''
-    try:
-        # u_id 채크도 나중에 추가할 것
-        
-        response_list = []
-        order_id_list = []
-        store_name_list = []
+async def new_order(body:OrderModel, request:Request):
+    ''' app으로 부터 주문을 받고 처리한다. '''
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
+    
+    response_list = []
+    order_id_list = []
+    store_name_list = []
 
-        total_price = 0           
-        for store_order in body.content:
-            store_price = 0
-            for food in store_order.f_list:
-                store_price += food['price'] * food['count']
-            order = {
-                "date": datetime.now(),
-                "u_id": body.u_id,
-                "s_id": store_order.s_id,
-                "m_id": store_order.m_id,
-                "s_name": store_order.s_name,
-                "f_list": store_order.f_list,
-                "total_price": store_price,
-                "status": 0
-            }
-
-            total_price += store_price
-
-            o_id =  str(DB.insert_one('order', order))         
-            order_id_list.append(o_id)
-            store_name_list.append(store_order.s_name)
-            response_list.append({
-                "s_id": store_order.s_id,
-                "o_id": o_id
-            })
-
-        history = {
-           "u_id": body.u_id,
-           "date": datetime.now(),
-           "total_price": total_price,
-           "raw_gaze_path": None,
-           "fixation_path": None,
-           "aoi_analysis": None,
-           "orders": order_id_list,
-           "s_names": store_name_list
+    total_price = 0           
+    for store_order in body.content:
+        store_price = 0
+        for food in store_order.f_list:
+            store_price += food['price'] * food['count']
+        order = {
+            "date": Util.get_utc_time().now(),
+            "u_id": body.u_id,
+            "s_id": store_order.s_id,
+            "m_id": store_order.m_id,
+            "s_name": store_order.s_name,
+            "f_list": store_order.f_list,
+            "total_price": store_price,
+            "status": 0
         }
-        
-        h_id = str(DB.insert_one('history', history))
 
-        return {
-            'request': f'POST {PREFIX}/order',
-            'status': 'OK',
-            'h_id': h_id,
-            'response': response_list
+        total_price += store_price
+
+        o_id =  str(DB.insert_one('order', order))         
+        order_id_list.append(o_id)
+        store_name_list.append(store_order.s_name)
+        response_list.append({
+            "s_id": store_order.s_id,
+            "o_id": o_id
+        })
+
+        await websocket_manager.send_create(store_order.s_id)
+
+    history = {
+        "u_id": body.u_id,
+        "date": Util.get_utc_time(),
+        "total_price": total_price,
+        "raw_gaze_path": None,
+        "fixation_path": None,
+        "aoi_analysis": None,
+        "orders": order_id_list,
+        "s_names": store_name_list
+    }
+    
+    h_id = str(DB.insert_one('history', history)) 
+    _id = Util.check_id(body.u_id)
+    DB.update_one('user', {'_id':_id}, {'h_id':h_id})
+    return {
+        'h_id': h_id,
+        'order_list': response_list
         }
             
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'POST {PREFIX}/order',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
 
 @order_router.post("/order/gaze")
-async def new_order(h_id: str, body: list[RawGazeModel]):
+async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
+    SAVE_DIR = 'EXP1'
 
     gaze_data = []
     for page in body:
         gaze_data.append(page.dict())
 
+    ## test 계정은 예외처리하기 위해 추가 (SYSYSY 디렉토리에 혹시몰라 저장하기는 함)
+    _id = Util.check_id(h_id)
+    history = DB.read_one('history', {'_id':_id})
+    u_id = Util.check_id(history['u_id'])
+    user = DB.read_one('user', {'_id': u_id})
+    if user['id'] == "test":
+        SAVE_DIR = 'SYSYSY'
+
     try:
-        _id = Util.check_id(h_id)
-        key = storage.upload(gaze_data, 'json', 'C_0714')
+        key = storage.upload(gaze_data, 'json', SAVE_DIR)
+    except CustomException as e:
+        raise CustomException(e.status_code, f' -> h_id: \'{h_id}\'')
 
-        if DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key}):
-            # 임시로 비활성화
-            asyncio.create_task(preprocess_and_update(key, h_id))
+    try:
+        DB.update_one('history', {'_id':_id}, {'raw_gaze_path': key})
+    except CustomException as e:
+        raise CustomException(e.status_code, f' -> h_id: \'{h_id}\', S3 key: \'{key}\'')
 
-            # websocket으로 gaze 요청 그만 보내기
-            # websocket_manager.app_connections[h_id]['gaze'] = True
-            
-            return {
-            'request': f'POST {PREFIX}/order/gaze?h_id={h_id}',
-            'status': 'OK'
-            }
+    # 임시로 비활성화
+    # asyncio.create_task(preprocess_and_update(key, h_id))
 
-        return {'success': 'call the admin'}
-        
-    except:
-        return {'success': False}
+    websocket_manager.app_connections[h_id]['gaze'] = True
+
 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
     load_dotenv()
@@ -259,105 +251,92 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
     headers = {"Content-Type": "application/json"}
 
     async with httpx.AsyncClient() as client:
+
+        print(f'Request - h_id: \'{h_id}\'')
+
         _id = Util.check_id(h_id)
         doc = DB.read_one('history', {'_id':_id})
         payload = {
         "raw_data_key": raw_data_key,
         "meta_info": Meta.get_meta_detail(doc['date'])
         }
+        print(f'Request payload: \'{payload}\'')
+
         response = await client.post(filter_url, json=payload, headers=headers)
         data = response.json()
         fix_key = data["fixation_key"]
+        print(f'Result POST - fix_key: \'{fix_key}\'')
 
         response = await client.get(aoi_url + f'?key={fix_key}')
         data = response.json()
         aoi_key = data["aoi_key"]
         print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
+        print(f'Result GET - aoi_key: \'{aoi_key}\'')
         
         DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
 
 
 
 @order_router.get("/historys")
-async def get_history_list(u_id: str, batch: int = 1):
-    try:
-        historys = DB.read_all('history', {'u_id':u_id}, asc_by='date', asc=False)
+async def get_history_list(u_id: str, request:Request, batch: int = 1):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
 
-        if batch > 0 and batch < math.ceil(len(historys) / 10) + 1:
-            response_list = []
+    historys = DB.read_all('history', {'u_id':u_id}, asc_by='date', asc=False)
 
-            batch_items = historys[10*(batch-1):10*batch]
-            for h in batch_items:
-                if 's_names' in h.keys(): s_names = h['s_names']
-                else: s_names = ["nothing", "is", 'here']
-                response_list.append({
-                    "h_id": h['_id'],
-                    "date": h['date'],
-                    "total_price": h['total_price'],
-                    "s_names": s_names
-                })
-        else:
-            raise Exception('requested batch exceeds range')
-        
-        return {
-            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
-            'status': 'OK',
-            'max_batch': math.ceil(len(historys) / 10),
-            'response': response_list
-        }
-     
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/historys?u_id={u_id}&batch={batch}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    if batch > 0 and batch < math.ceil(len(historys) / 10) + 1:
+        response_list = []
+
+        batch_items = historys[10*(batch-1):10*batch]
+        for h in batch_items:
+            if 's_names' in h.keys(): s_names = h['s_names']
+            else: s_names = ["nothing", "is", 'here']
+            response_list.append({
+                "h_id": h['_id'],
+                "date": h['date'],
+                "total_price": h['total_price'],
+                "s_names": s_names
+            })
+    else:
+        raise CustomException(403.72)
+    
+    return {
+        'max_batch': math.ceil(len(historys) / 10),
+        'history_list': response_list
+    }
     
 @order_router.get("/history")
-async def get_order_list(id: str):
-    try:
-        _id = Util.check_id(id)     
-        response_list = {}
+async def get_order_list(id: str, request:Request):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
 
-        history = DB.read_one('history', {'_id':_id})
+    _id = Util.check_id(id)     
 
-        food_list = []
-        for o_id in history['orders']:
-            _id = Util.check_id(o_id)  
-            order = DB.read_one('order', {'_id':_id})
-            s_name = order['s_name']
-            for f in order['f_list']:
-                if 'f_name' in f.keys(): f_name = f['f_name']
-                else: f_name = 'unknown'
-                food_list.append({
-                    "s_name": s_name,
-                    "f_name": f_name,
-                    "count": f['count'],
-                    "price": f['price']
-                })
+    history = DB.read_one('history', {'_id':_id})
 
-        response_list = {
-            "date": history['date'],
-            "orders": food_list
-        }
-        
-        return {
-            'request': f'GET {PREFIX}/history?id={id}',
-            'status': 'OK',
-            'response': response_list
-        }
-     
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/history?id={id}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    order_list = []
+    for o_id in history['orders']:
+        _id = Util.check_id(o_id)  
+        order = DB.read_one('order', {'_id':_id})
+        s_name = order['s_name']
+        for f in order['f_list']:
+            if 'f_name' in f.keys(): f_name = f['f_name']
+            else: f_name = 'unknown'
+            order_list.append({
+                "s_name": s_name,
+                "f_name": f_name,
+                "count": f['count'],
+                "price": f['price']
+            })
+    
+    return {
+        'date': history['date'],
+        'order_list': order_list
+    }
+
 
 @order_router.get("/store/dates")
-async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str = None):
+async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = None, end_date:str = None):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+    
     PER_PAGE = 7
     pipeline = [
         { "$match": { "s_id": s_id } },
@@ -367,74 +346,55 @@ async def get_dates(s_id: str, batch: int=1, start_date:str = None, end_date:str
     ]
     if (start_date != None) and (end_date != None):
         pipeline[0]["$match"]["date"] = {
-            "$gte": datetime.strptime(start_date, "%Y-%m-%d"),
-            "$lte": datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
-        }
-    try:
-        aggreagted_data = DB.aggregate_pipline('order', pipeline)
-        
-        distinct_dates = []
-        for entry in aggreagted_data:
-            distinct_dates.append({
-                "date": entry["_id"],
-                "total_price": entry["total_price"]
-            })
-
-        total_dates = len(distinct_dates)
-        start_idx = (batch - 1) * PER_PAGE
-        end_idx = start_idx + PER_PAGE
-        paginated_dates = distinct_dates[start_idx:end_idx]
-
-        return {
-            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
-            'status': 'OK',
-            'max_batch': math.ceil(total_dates / PER_PAGE),
-            'response': paginated_dates
+            "$gte": Util.get_utc_time().strptime(start_date, "%Y-%m-%d"),
+            "$lte": Util.get_utc_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
         }
 
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/store/dates?s_id={s_id}&batch={batch}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    aggreagted_data = DB.aggregate_pipline('order', pipeline)
+    
+    distinct_dates = []
+    for entry in aggreagted_data:
+        distinct_dates.append({
+            "date": entry["_id"],
+            "total_price": entry["total_price"]
+        })
+
+    total_dates = len(distinct_dates)
+    start_idx = (batch - 1) * PER_PAGE
+    end_idx = start_idx + PER_PAGE
+    paginated_dates = distinct_dates[start_idx:end_idx]
+
+    return {
+        'max_batch': math.ceil(total_dates / PER_PAGE),
+        'order_list': paginated_dates
+    }
         
 
 @order_router.get("/store/date")
-async def get_history_list(s_id: str, date: str):
-    try:
-        start_datetime = datetime.strptime(date, "%Y-%m-%d")
-        end_datetime = start_datetime + timedelta(days=1)
+async def get_history_list(request:Request, s_id: str, date: str):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
 
-        query = {
-            "date": {"$gte": start_datetime, "$lt": end_datetime},
-            "s_id": s_id
-        }
+    start_datetime = Util.get_utc_time().strptime(date, "%Y-%m-%d")
+    end_datetime = start_datetime + timedelta(days=1)
 
-        orders = DB.read_all('order', query, asc_by='date', asc=False)
+    query = {
+        "date": {"$gte": start_datetime, "$lt": end_datetime},
+        "s_id": s_id
+    }
 
-        result = []
+    orders = DB.read_all('order', query, asc_by='date', asc=False)
 
-        for o in orders:
-            result.append({
-                'o_id': o['_id'],
-                'date': o['date'],
-                'detail': o['f_list'],
-                'total': o['total_price']
-            })
-        
-        return {
-            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
-            'status': 'OK',
-            'response': result
-        }
-     
-    except Exception as e:
-        print('ERROR', e)
-        return {
-            'request': f'GET {PREFIX}/store/date?s_id={s_id}&date={date}',
-            'status': 'ERROR',
-            'message': f'ERROR {e}'
-        }
+    result = []
+
+    for o in orders:
+        result.append({
+            'o_id': o['_id'],
+            'date': o['date'],
+            'detail': o['f_list'],
+            'total': o['total_price']
+        })
     
+    return {
+        'order_list' : result
+    }
+     

@@ -3,7 +3,7 @@ WebSocket
 """
 
 from core.common.mongo import MongodbController
-
+from v2.routers.src.util import Util
 from fastapi import WebSocket, WebSocketDisconnect
 import json
 
@@ -43,27 +43,26 @@ class ConnectionManager:
         failed_data = {"type": "connect", "result": "falied"}
 
         await self.check_connections(s_id, h_id)
-
         if s_id != None and h_id == None:
-
             if check_client_in_db('store', s_id) == False:
                 await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
             self.web_connections[s_id] = websocket 
             await self.send_client_data(websocket, connected_data)
-
+    
         elif  h_id != None and s_id == None:
-            
             if check_client_in_db('history', h_id) == False:
                 await self.send_client_data(websocket, failed_data)
                 raise WebSocketDisconnect(f'The ID is not exist.')
             
+            _id = Util.check_id(h_id)
             order_dict = {}
-            history = DB.read_one('history', {'_id': h_id})
+            history = DB.read_one('history', {'_id': _id})
             
             for o_id in history['orders']:
-                order = DB.read_one('order', {'_id': o_id})
+                _id = Util.check_id(o_id)
+                order = DB.read_one('order', {'_id': _id})
                 order_dict[o_id] = order['s_id']
 
             self.app_connections[h_id] = {
@@ -114,6 +113,14 @@ class ConnectionManager:
         elif data['type'] == 'connect':
             if data['result'] == "close":
                 data['result'] = 'closed'
+
+                if h_id:
+                    # user의 현재 진행중인 주문 항목 삭제
+                    _id = Util.check_id(h_id)
+                    history = DB.read_one('history', {'_id', _id})
+                    _id = Util.check_id(history['u_id'])
+                    DB.update_one('user', {'_id':_id}, {'h_id':""})
+            
                 await self.disconnect(websocket, s_id, h_id)
                 raise WebSocketDisconnect(f'The client requested to close the connection.')
             elif data['result'] == "connect":
@@ -171,12 +178,13 @@ class ConnectionManager:
         if h_id in self.app_connections and self.app_connections[h_id]["ws"] == websocket:
             del self.app_connections[h_id]
 
+
     async def get_app_websocekt(self, input_o_id: str) -> WebSocket:
         """ o_id를 가지는 websocket(app)를 반환한다.
             - input : o_id
             - return 
-                - app이 연결되지 않은 경우 : False
                 - app이 연결되어 있는 경우 : websocket
+                - app이 연결되지 않은 경우 : False
         """
         if self.app_connections == None:
             return False
@@ -185,64 +193,36 @@ class ConnectionManager:
             if input_o_id in h_value["order"]:
                 return h_value["ws"]
         return False
-                   
-    async def get_web_websockets(self, input_h_id:str) -> dict:
-        """ app_connections에서 h_id로 저장된 s_id를 찾아 web_connections에서 websocket(web)를 반환한다.
-            - input : h_id
-            - return
-                - web이 연결되어 있는 경우 : {o_id : {s_id : websocket}}
-                - web이 연결되지 않은 경우 : {o_id : {s_id : websocket}}
-        """
-        clients = {}
-        if self.web_connections == None:
-            return clients
-        
-        if input_h_id in self.app_connections:
-            for o_id, s_id in self.app_connections[input_h_id]["order"].items():
-                clients[o_id] = {s_id : ""}
-        
-        for o_id, o_value in clients.items():
-            for s_id in o_value:
-                if s_id in self.web_connections:
-                    clients[o_id][s_id] = self.web_connections[s_id]
-                
-        return clients
+
                 
     async def get_web_websocket(self, input_s_id: str) -> WebSocket:
         """ s_id의 websocket을 반환한다. (router/order.py 에서 store에게 전송 여부를 전송한다.)
             - input : s_id
             - return 
+                - web이 연결되어 있는 경우 : s_websocket
                 - web이 연결되지 않은 경우 : False
-                - web이 연결되어 있는 경우 : client{s_id, s_websocket}
         """
         if input_s_id in self.web_connections:
             return self.web_connections[input_s_id]
         else:
-            False
+            return False
         
             
 
-    async def send_create(self, h_id:str):
+    async def send_create(self, s_id:str):
         """ (POST order) app 생성한 주문을 web에게 알린다.
-            - input : h_id
+            - input : s_id
             - 전송 성공 
                 - web : {"type": "create_order", "result": "success"}
                 - app : result = {"type": "create_order", "result": "success"}
-            - return : result(전송 여부 list)
         """
         result = {"type": "create_order", "result": "success"}
-        web_clients = await self.get_web_websockets(h_id)
+        web_clients = await self.get_web_websocket(s_id)
 
         if web_clients:
-            for o_value in web_clients.values():
-                for s_id, ws in o_value.items():
-                    if ws != "":
-                        await self.send_client_data(ws, result)
-                        print({"type": "create_order", "result": "success", "reason": s_id})
-                    else:
-                        print({"type": "create_order", "result": "fali", "reason": f'web client({s_id}) is not connected'})
+            await self.send_client_data(web_clients, result)
         else:
-            print({"type": "create_order", "result": "fali", "reason": f'all web client is not connected'})
+            print(f'ERROR Cannot create_order \'all web client is not connected\'')
 
     
     async def send_update(self, o_id : str):
@@ -253,22 +233,22 @@ class ConnectionManager:
                 - web : {"type": "update_status", "result": "success"}
             - 전송 실패 
                 - app :  {"type": "update_status", "result": "fail"}
-            - return : data(전송 여부)
         """
         result = {"type": "update_status", "result": "success", "o_id" : o_id}
         app_client = await self.get_app_websocekt(o_id)
 
+        _id = Util.check_id(o_id)
+
         if app_client:
-            response = DB.read_one('order', {'_id': o_id})
+            response = DB.read_one('order', {'_id': _id})
             status = response['status']
             if status < 3:
                 result['status'] = status
                 await self.send_client_data(app_client, result)
-                print({"type": "update_status", "result": "success"})
             else:
-                print({"type": "update_status", "result": "fail", "reason": "status is already finish"})
+                print(f'ERRPR Cannot update_status \'status is already finish\'')
         else:
-            print({"type": "update_status", "result": "fail", "reason": "app client is not connected"})
+            print(f'ERROR Cannot update_status \'app client is not connected\'')
 
 
     async def send_alarm_gaze(self, websocekt : WebSocket, h_id : str):
@@ -276,22 +256,26 @@ class ConnectionManager:
             - input : websocekt, websocekt
             - return : X
         """
+        _id = Util.check_id(h_id)
+
         result = {"type": "request", "result": "gaze_omission"}
-        history = DB.read_one('history', {'_id': h_id})
+        history = DB.read_one('history', {'_id': _id})
         
-        if history['gaze_path'] == None:
+        if history['raw_gaze_path'] == None:
             while self.app_connections[h_id]['gaze'] != True:
                 await asyncio.sleep(3)
                 await self.send_client_data(websocekt, result)
-                print(result)
+
+        self.app_connections[h_id]['gaze'] = True
 
         result["result"] = "gaze_success"
         await self.send_client_data(websocekt, result)
-        print(result)
 
 
 
 def check_client_in_db(db:str, id:str):
+    id = Util.check_id(id)
+
     try:
         if DB.read_one(db, {'_id': id}):
             return True
