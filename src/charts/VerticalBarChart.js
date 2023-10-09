@@ -121,8 +121,8 @@ function VerticalBarChart({ chartData }) {
         <YAxis dataKey="name" type="category" scale="band" />
         <Tooltip content={<CustomTooltip />} />
         <Legend content={<CustomLegend />} />
-        <Bar dataKey="mc" barSize={20} fill="#1e2f4d" name="판매 개수" />
-        <Bar dataKey="vc" barSize={20} fill="#feb930" name="방문 횟수" />
+        <Bar dataKey="vc" barSize={20} fill="#1e2f4d" name="방문 횟수" />
+        <Bar dataKey="mc" barSize={20} fill="#feb930" name="판매 개수" />
       </ComposedChart>
     </div>
   );
