@@ -58,8 +58,8 @@ function BarChartWithAvg({ data }) {
 
   return (
     <BarChart
-      width={500}
-      height={300}
+      width={800}
+      height={500}
       data={data}
       margin={{
         top: 5,
@@ -79,7 +79,6 @@ function BarChartWithAvg({ data }) {
         name="메뉴별 체류시간"
         barSize={30}
       />
-      {/* <Bar dataKey="uv" fill="#82ca9d" /> */}
       <ReferenceLine
         y={averageDuration}
         label={{

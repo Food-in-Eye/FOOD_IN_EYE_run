@@ -71,6 +71,24 @@
   align-self: stretch;
 }
 
+.menuPageStatisticsSection {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+}
+
+.menuPageStatistics .menuPageScore {
+  margin-left: 0px;
+  margin-right: auto;
+  margin-bottom: 30px;
+}
+
+.menuPageStatistics .menuPageGazeRatio {
+  margin-top: 30px;
+  margin-left: 0px;
+  margin-right: auto;
+}
+
 .menuSummarySection .menuSummarySaleCount,
 .menuSummarySection .menuSummaryTime,
 .menuSummarySection .menuSummarySales,

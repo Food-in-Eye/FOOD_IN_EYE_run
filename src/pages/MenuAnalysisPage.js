@@ -394,10 +394,6 @@ function MenuAnalysisPage() {
               </p>
             </div>
             <div className={MAnalysis.menuPageStatisticsBody}>
-              <div className={MAnalysis.menuPageScore}>
-                <p>집중도(0점 ~ 5점)</p>
-                <span>{score} 점</span>
-              </div>
               <div className={MAnalysis.menuPageDwellTime}>
                 <p>총 체류시간</p>
                 <div className={MAnalysis.barChartWithAvg1}>
@@ -405,12 +401,18 @@ function MenuAnalysisPage() {
                 </div>
                 {/* <span>{dwellTime} 초</span> */}
               </div>
-              <div className={MAnalysis.menuPageGazeRatio}>
-                <p>총 시선 점유율</p>
-                <div className={MAnalysis.pieChartForFix}>
-                  <PieChartForFixation data={fixRatio} />
+              <div className={MAnalysis.menuPageStatisticsSection}>
+                <div className={MAnalysis.menuPageScore}>
+                  <p>집중도(0점 ~ 5점)</p>
+                  <span>{score} 점</span>
                 </div>
-                {/* <span>{fixRatio} %</span> */}
+                <div className={MAnalysis.menuPageGazeRatio}>
+                  <p>총 시선 점유율</p>
+                  <div className={MAnalysis.pieChartForFix}>
+                    <PieChartForFixation data={fixRatio} fNum={fNum} />
+                  </div>
+                  {/* <span>{fixRatio} %</span> */}
+                </div>
               </div>
             </div>
           </section>

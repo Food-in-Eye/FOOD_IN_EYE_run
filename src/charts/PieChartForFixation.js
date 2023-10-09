@@ -109,8 +109,8 @@ function PieChartForFixation({ data, fNum }) {
         data={data}
         cx={350}
         cy={150}
-        innerRadius={60}
-        outerRadius={80}
+        innerRadius={80}
+        outerRadius={100}
         fill="#8884d8"
         dataKey="value"
         onMouseEnter={onPieEnter}
