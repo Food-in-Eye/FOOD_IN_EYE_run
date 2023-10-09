@@ -6,7 +6,6 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  Text,
   ReferenceLine,
 } from "recharts";
 

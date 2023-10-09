@@ -7,6 +7,7 @@ import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
 import { useEffect, useRef, useState } from "react";
 import PieChartForFood from "../charts/PieChartForFood";
+import PieChartForFixation from "../charts/PieChartForFixation";
 import BarChartWithAvg from "../charts/BarChartWithAvg";
 
 function MenuAnalysisPage() {
@@ -16,11 +17,10 @@ function MenuAnalysisPage() {
   const [maxHour, setMaxHour] = useState(-1);
   const [saleRatio, setSaleRatio] = useState(0);
   const [menuSalesCount, setMenuSalesCount] = useState(0);
-  const [dwellTime, setDwellTime] = useState(0);
-  const [fixRatio, setFixRatio] = useState(0);
+  // const [dwellTime, setDwellTime] = useState(0);
   const [score, setScore] = useState(0);
   const [visitCount, setVisitCount] = useState(0);
-  const [duration, setDuration] = useState(0);
+  // const [duration, setDuration] = useState(0);
   // const [salesPerVisit, setSalesPerVisit] = useState(0);
   const [salesPerVisitData, setSalesPerVisitData] = useState(0);
 
@@ -29,7 +29,7 @@ function MenuAnalysisPage() {
   const [foodsPercentage, setFoodsPercentage] = useState(0);
 
   const [fixDataInDetail, setFixDataInDetail] = useState([]);
-
+  const [fixRatio, setFixRatio] = useState([]);
   const [menuPageDwellTime, setMenuPageDwellTime] = useState([]);
   const [menuDetailDwellTime, setMenuDetailDwellTime] = useState([]);
 
@@ -64,11 +64,11 @@ function MenuAnalysisPage() {
     const menuFixCount = foodDetail.fix_count;
     const totalFixCount = aoiData.total_fix_count;
 
-    setDwellTime((foodDetail.duration / 10000).toFixed(2));
+    // setDwellTime((foodDetail.duration / 10000).toFixed(2));
     setFixRatio(((menuFixCount / totalFixCount) * 100).toFixed(1));
     setScore(foodDetail.score);
     setVisitCount(foodDetail.in_detail.visit);
-    setDuration((foodDetail.in_detail.duration / 10000).toFixed(2));
+    // setDuration((foodDetail.in_detail.duration / 10000).toFixed(2));
 
     getPercentageOfFixData(foodDetail.in_detail.fix_count);
   };
@@ -79,11 +79,9 @@ function MenuAnalysisPage() {
 
     for (const foodName in aoiData.total_food_report) {
       if (foodName !== "ETC" && foodName !== "Store INFO") {
-        const foodReport = aoiData.total_food_report[foodName];
-        const duration = (foodReport.duration / 10000).toFixed(2);
-        const detailDuration = (foodReport.in_detail.duration / 10000).toFixed(
-          2
-        );
+        const foodData = aoiData.total_food_report[foodName];
+        const duration = (foodData.duration / 10000).toFixed(2);
+        const detailDuration = (foodData.in_detail.duration / 10000).toFixed(2);
 
         const foodDuration = {
           name: foodName,
@@ -102,6 +100,25 @@ function MenuAnalysisPage() {
 
     setMenuPageDwellTime(menuPageDurations);
     setMenuDetailDwellTime(menuDetailDurations);
+  };
+
+  const setFixationRatios = () => {
+    const fixationValues = [];
+
+    for (const foodName in aoiData.total_food_report) {
+      if (foodName !== "ETC" && foodName !== "Store INFO") {
+        const foodData = aoiData.total_food_report[foodName];
+        const fixCount = foodData.fix_count;
+
+        const foodFixCount = {
+          name: foodName,
+          value: fixCount,
+        };
+
+        fixationValues.push(foodFixCount);
+      }
+    }
+    setFixRatio(fixationValues);
   };
 
   const updateFixAndGazeCountList = () => {
@@ -143,6 +160,7 @@ function MenuAnalysisPage() {
     setSaleData();
     setAoiData();
     setDwellTimes();
+    setFixationRatios();
     setSalesPerVisitData({
       menuSalesCount: menuSalesCount,
       visitCount: visitCount,
@@ -389,7 +407,10 @@ function MenuAnalysisPage() {
               </div>
               <div className={MAnalysis.menuPageGazeRatio}>
                 <p>총 시선 점유율</p>
-                <span>{fixRatio} %</span>
+                <div className={MAnalysis.pieChartForFix}>
+                  <PieChartForFixation data={fixRatio} />
+                </div>
+                {/* <span>{fixRatio} %</span> */}
               </div>
             </div>
           </section>
