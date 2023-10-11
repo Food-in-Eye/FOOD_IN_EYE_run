@@ -1,6 +1,7 @@
 
 from core.common.mongo import MongodbController
 from core.error.exception import CustomException
+from v2.routers.src.util import Util
 
 DB = MongodbController('FIE_DB2')
 
@@ -38,7 +39,7 @@ class DataLoader:
         try:
             orders = DB.read_all('order', query, {'s_id': 1, 'date':1, 'f_list':1})
             for order in orders:
-                order['date'] = str(order['date'])
+                order['date'] = str(Util.get_utc_time_by_datetime(order['date']))
             return orders
 
         except CustomException as e:
@@ -50,7 +51,7 @@ class DataLoader:
             historys = DB.read_all('history', query, {'date':1, 'aoi_analysis':1})
             for history in historys:
                 result.append({
-                    "date": str(history['date']),
+                    "date": str(Util.get_utc_time_by_datetime(history['date'])),
                     "aoi_key": history['aoi_analysis']})
             return result
 

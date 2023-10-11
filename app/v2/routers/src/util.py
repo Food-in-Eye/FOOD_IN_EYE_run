@@ -41,6 +41,13 @@ class Util:
         return utc_time
     
     @staticmethod
+    def get_utc_time_by_str(date:str) -> datetime:
+        """ local 시간("%Y%m%d")을 입력받아 UTC timezone으로 리턴한다. """
+        timestamp = datetime.strptime(date, '%Y-%m-%d')
+        utc_time = timestamp.astimezone(pytz.utc)
+        return utc_time
+    
+    @staticmethod
     def get_local_time(date:datetime) -> datetime:
         """ UTC 시간을 입력 받아 Asia/Seoul timezone으로 리턴한다. """
         local_time = date.astimezone(pytz.timezone('Asia/Seoul'))

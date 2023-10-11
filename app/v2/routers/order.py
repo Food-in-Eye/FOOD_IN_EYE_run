@@ -346,11 +346,11 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
         { "$group": { "_id": "$date", "total_price": { "$sum": "$total_price" } } },
         { "$sort": { "_id": 1 } }
     ]
-    # todo: datetime이 utc로 쿼리될 것 같음... 수정 필요
+
     if (start_date != None) and (end_date != None):
         pipeline[0]["$match"]["date"] = {
-            "$gte": Util.get_utc_time().strptime(start_date, "%Y-%m-%d"),
-            "$lte": Util.get_utc_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            "$gte": Util.get_utc_time_by_str(start_date),
+            "$lte": Util.get_utc_time_by_str(end_date) + timedelta(days=1)
         }
 
     aggreagted_data = DB.aggregate_pipline('order', pipeline)

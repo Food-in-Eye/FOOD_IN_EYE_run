@@ -74,7 +74,7 @@ class CallAnalysis:
         aoi_report = await CallAnalysis.aoi_stats(today)
         
         result = {
-            'date': today,
+            'date': today.strptime('%Y-%m-%d'),
             'update_date': datetime.now(),
             'msg': 'for test Scheduler...'
         }
