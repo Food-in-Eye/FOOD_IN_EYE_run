@@ -39,7 +39,7 @@ class DataLoader:
         try:
             orders = DB.read_all('order', query, {'s_id': 1, 'date':1, 'f_list':1})
             for order in orders:
-                order['date'] = str(Util.get_utc_time_by_datetime(order['date']))
+                order['date'] = str(Util.get_local_time(order['date']))
             return orders
 
         except CustomException as e:
@@ -51,7 +51,7 @@ class DataLoader:
             historys = DB.read_all('history', query, {'date':1, 'aoi_analysis':1})
             for history in historys:
                 result.append({
-                    "date": str(Util.get_utc_time_by_datetime(history['date'])),
+                    "date": str(Util.get_local_time(history['date'])),
                     "aoi_key": history['aoi_analysis']})
             return result
 

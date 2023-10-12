@@ -1,5 +1,5 @@
 from bson.objectid import ObjectId
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from core.error.exception import CustomException
 from core.common.mongo import MongodbController
@@ -43,7 +43,7 @@ class Util:
     @staticmethod
     def get_utc_time_by_str(date:str) -> datetime:
         """ local 시간("%Y%m%d")을 입력받아 UTC timezone으로 리턴한다. """
-        timestamp = datetime.strptime(date, '%Y-%m-%d')
+        timestamp = datetime.strptime(date, '%Y-%m-%d') - timedelta(hours=9)
         utc_time = timestamp.astimezone(pytz.utc)
         return utc_time
     

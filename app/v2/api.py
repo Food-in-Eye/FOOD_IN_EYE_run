@@ -45,6 +45,33 @@ async def get_keys(key: str):
 
         return "ERROR"
 
+
+from datetime import datetime
+from core.statistics.run import CallAnalysis
+
+@v2_router.get("/daily")
+async def get_report(date:str):
+    new_date = Util.get_utc_time_by_str(date)
+    return await CallAnalysis.daily_summary(new_date)
+
+from core.common.mongo import MongodbController
+from v2.routers.order import preprocess_and_update
+
+DB = MongodbController('FIE_DB2')
+
+@v2_router.get("/aoi_create")
+async def get_report():
+    start_date = Util.get_utc_time_by_str("2023-08-12")
+    end_date = Util.get_utc_time_by_str("2023-08-15")
+
+    pipeline = [
+        { "$match": { "date": { "$gte": start_date, "$lt": end_date }}},
+        { "$project": { "_id": 1, "fixation_path": 1 }}
+    ]
+
+    historys = DB.aggregate_pipline('order', pipeline)
+    print(historys)
+
 # from datetime import datetime
 # from pytz import timezone
 # from core.statistics.run import CallAnalysis
