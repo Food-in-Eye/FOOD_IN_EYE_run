@@ -401,3 +401,53 @@ async def get_history_list(request:Request, s_id: str, date: str):
         'order_list' : result
     }
      
+
+@order_router.get("/orders/report")
+async def get_history_list(request:Request, s_id: str, date: str):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+
+    id = Util.check_id(s_id)
+    store = DB.read_one('store', {"_id": id})
+    
+    date = Util.get_utc_time_by_str(date)
+
+    pipeline = [
+        { "$match": { "date": date } },
+        { "$project": { "_id":0, f'Store {store["num"]}':1 }}
+    ]
+    aggreagted_data = DB.aggregate_pipline('daily', pipeline)
+
+    if aggreagted_data == []:
+        raise CustomException(404.11)
+    if aggreagted_data[0] == {}:
+        raise CustomException(404.12)
+
+    return {
+        "date": Util.get_local_time(date),
+        "daily_repory": aggreagted_data[0][f'Store {store["num"]}']
+    }
+
+@order_router.get("/orders/report/all")
+async def get_history_list(request:Request, s_id: str, date: str):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+
+    id = Util.check_id(s_id)
+    store = DB.read_one('store', {"_id": id})
+    
+    date = Util.get_utc_time_by_str(date)
+
+    pipeline = [
+        { "$match": { "date": date } },
+        { "$project": { "_id":0, f'Store {store["num"]}':1 }}
+    ]
+    aggreagted_data = DB.aggregate_pipline('daily', pipeline)
+    print(aggreagted_data)
+    if aggreagted_data == []:
+        raise CustomException(404.11)
+    if aggreagted_data[0] == {}:
+        raise CustomException(404.12)
+
+    return {
+        "date": Util.get_local_time(date),
+        "daily_repory": aggreagted_data[0][f'Store {store["num"]}']
+    }
