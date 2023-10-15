@@ -18,7 +18,6 @@ import trendingUp from "../images/trending-up.png";
 import update from "../images/update.png";
 import shoppingCart from "../images/shopping-cart.png";
 import calendar from "../images/calendar.png";
-import foodineye from "../images/foodineye.png";
 
 function LoginPage() {
   const navigate = useNavigate();

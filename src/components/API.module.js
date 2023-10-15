@@ -101,6 +101,11 @@ export const getOrderHistory = (query) => {
   return apiInstance.get(requestUrl);
 };
 
+export const getDailyReport = (query) => {
+  const requestUrl = `${ORDER_URL}/report?${query}`;
+  return apiInstance.get(requestUrl);
+};
+
 export const getMenus = (query) => {
   const requestUrl = `${MENUS_URL}${query}`;
   return apiInstance.get(requestUrl);

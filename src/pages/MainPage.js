@@ -38,6 +38,7 @@ function MainPage() {
   const [loading, setLoading] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [selectedOrderIndex, setSelectedOrderIndex] = useState(false);
+  const [storeReports, setStoreReports] = useState([]);
 
   useEffect(() => {
     connectWS(sID);

@@ -73,10 +73,7 @@ function MenuBar() {
             </a>
             <ul className={style.menubarSubOfSub}>
               <li>
-                <a href="./daily-report">데일리 리포트</a>
-              </li>
-              <li>
-                <a href="./select-menu">메뉴별 분석</a>
+                <a href="./choose-report">데일리 리포트</a>
               </li>
               <li>
                 <a href="./gaze-visualize">Gaze 시각화</a>

@@ -1,5 +1,5 @@
 import MenuBar from "../components/MenuBar";
-import DR from "../css/DailyReport.module.css";
+import TR from "../css/TotalReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
 import { useRef } from "react";
@@ -9,7 +9,7 @@ import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
 import dailyReport from "../data/daily_report.json";
 
-function DailyReportPage() {
+function TotalReportPage() {
   useTokenRefresh();
   const navigate = useNavigate();
 
@@ -58,11 +58,11 @@ function DailyReportPage() {
         <MenuBar />
       </section>
 
-      <div className={DR.tabsTable}>
+      <div className={TR.tabsTable}>
         {Array.from(tabs).map((tab, index) => (
           <div
             key={index}
-            className={DR.tabsToClick}
+            className={TR.tabsToClick}
             onClick={tab.onMoveToElement}
           >
             {tab.name}
@@ -70,10 +70,10 @@ function DailyReportPage() {
         ))}
       </div>
 
-      <div ref={tabs[0].element} className={DR.tabElement}>
-        <span className={DR.tabElementFirstSpan}>오늘의 리포트</span>
-        <div className={DR.todaysReport}>
-          <section className={DR.todaysReportLeft}>
+      <div ref={tabs[0].element} className={TR.tabElement}>
+        <span className={TR.tabElementFirstSpan}>오늘의 리포트</span>
+        <div className={TR.todaysReport}>
+          <section className={TR.todaysReportLeft}>
             <span>
               <strong>총 매출액: </strong>
               {saleData.total_sales}원
@@ -87,7 +87,7 @@ function DailyReportPage() {
               {saleData.average_sales_per_order}원
             </span>
           </section>
-          <section className={DR.todaysReportRight}>
+          <section className={TR.todaysReportRight}>
             <div>
               <span>오늘의 방문 누적 시간</span>
               <CircleWithText
@@ -114,7 +114,7 @@ function DailyReportPage() {
             </div>
           </section>
         </div>
-        <div className={DR.ReportDesc}>
+        <div className={TR.ReportDesc}>
           <p>
             * 시선의 응집 정도
             <br />
@@ -122,23 +122,23 @@ function DailyReportPage() {
           </p>
         </div>
       </div>
-      <div ref={tabs[1].element} className={DR.tabElement}>
-        <span className={DR.tabElementFirstSpan}>
+      <div ref={tabs[1].element} className={TR.tabElement}>
+        <span className={TR.tabElementFirstSpan}>
           시간당 판매건수 및 체류 시간
         </span>
-        <div className={DR.barChart}>
+        <div className={TR.barChart}>
           <BarChart />
         </div>
       </div>
-      <div ref={tabs[2].element} className={DR.tabElement}>
-        <span className={DR.tabElementFirstSpan}>시선/체류 시간과 주문량</span>
-        <section className={DR.scatterChart}>
-          <div className={DR.scatterChartLeftDiv}>
+      <div ref={tabs[2].element} className={TR.tabElement}>
+        <span className={TR.tabElementFirstSpan}>시선/체류 시간과 주문량</span>
+        <section className={TR.scatterChart}>
+          <div className={TR.scatterChartLeftDiv}>
             <DailyScatterChart />
           </div>
-          <div className={DR.scatterChartRightDiv}>
-            <div className={DR.scatterChartDesc}>
-              <div className={DR.scatterChartDescUp}>
+          <div className={TR.scatterChartRightDiv}>
+            <div className={TR.scatterChartDesc}>
+              <div className={TR.scatterChartDescUp}>
                 <span>✏️ 다음 분석에 대한 설명</span>
                 <p>
                   * 각 메뉴마다 시선이 얼마나 가는지에 따라 주문량에 영향이
@@ -149,7 +149,7 @@ function DailyReportPage() {
                   영향이 있는지 알 수 있습니다.
                 </p>
               </div>
-              <div className={DR.scatterChartDescDown}>
+              <div className={TR.scatterChartDescDown}>
                 <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
                 <p>
                   시선 수가 많을수록 주문량이 많은 메뉴는 사용자의 눈길을 끌고
@@ -173,23 +173,23 @@ function DailyReportPage() {
           </div>
         </section>
       </div>
-      <div ref={tabs[3].element} className={DR.tabElement}>
-        <span className={DR.tabElementFirstSpan}>내 가게 메뉴판</span>
-        <div className={DR.buttonToMenuAnalysis}>
+      <div ref={tabs[3].element} className={TR.tabElement}>
+        <span className={TR.tabElementFirstSpan}>내 가게 메뉴판</span>
+        <div className={TR.buttonToMenuAnalysis}>
           <button onClick={moveToMenusAnalysis}>메뉴별 분석 보러가기 ⇨</button>
         </div>
-        <div className={DR.menuChart}>
-          {/* <div className={DR.menuChartDesc}> */}
+        <div className={TR.menuChart}>
+          {/* <div className={TR.menuChartDesc}> */}
           <p>
             원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!
             <br />
             👀사용자의 시선이 포함된 기준들: 체류시간, 집중도
           </p>
           {/* </div> */}
-          {/* <div className={DR.menuChartDownDiv}>
+          {/* <div className={TR.menuChartDownDiv}>
           <p>원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!</p>
-            <div className={DR.menuChartDesc}>
-              <div className={DR.menuChartDescUp}>
+            <div className={TR.menuChartDesc}>
+              <div className={TR.menuChartDescUp}>
                 <span>✏️ 다음 분석에 대한 설명</span>
                 
                 <p>
@@ -197,7 +197,7 @@ function DailyReportPage() {
                   웹에서 사용하는 공식을 통해 도출한 점수입니다.
                 </p>
               </div>
-              <div className={DR.menuChartDescDown}>
+              <div className={TR.menuChartDescDown}>
                 <span>💡다음 분석은 이렇게 활용할 수 있어요!</span>
                 <p>
                   어떤 메뉴가 잘 팔리는지, 인기가 많은지 등을 한눈에 비교해볼 수
@@ -210,13 +210,13 @@ function DailyReportPage() {
               </div>
             </div>
           </div> */}
-          <div className={DR.menuChartUpDiv}>
+          <div className={TR.menuChartUpDiv}>
             <TheMenuChart />
           </div>
         </div>
       </div>
-      <div className={DR.divForButton}>
-        <button className={DR.goUpButton} onClick={moveToTop}>
+      <div className={TR.divForButton}>
+        <button className={TR.goUpButton} onClick={moveToTop}>
           ⇪
         </button>
       </div>
@@ -224,4 +224,4 @@ function DailyReportPage() {
   );
 }
 
-export default DailyReportPage;
+export default TotalReportPage;

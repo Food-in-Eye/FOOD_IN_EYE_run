@@ -10,7 +10,7 @@ import PieChartForFood from "../charts/PieChartForFood";
 import PieChartForFixation from "../charts/PieChartForFixation";
 import BarChartWithAvg from "../charts/BarChartWithAvg";
 
-function MenuAnalysisPage() {
+function MenuReportPage() {
   const aoiData = dailyReport["Store 1"].aoi_summary;
   const saleData = dailyReport["Store 1"].sale_summary;
   const fNum = "Food 6";
@@ -492,4 +492,4 @@ function MenuAnalysisPage() {
   );
 }
 
-export default MenuAnalysisPage;
+export default MenuReportPage;
