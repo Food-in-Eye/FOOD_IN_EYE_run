@@ -8,13 +8,12 @@ class CustomException(Exception):
 class APIException(Exception):
     STATUS_DICT = {
         200.0 : "OK",
-        
         204.0 :	"No content",
-        # .1 : order_router/report ERROR
-        204.11 : "Report Not found about input date",
-        204.12 : "Report Not found about input id", 
 
         400.0 : "Bad request",
+        # .1 : order_router/report ERROR
+        400.11 : "Report Not found about input date",
+        400.12 : "Report Not found about input id", 
 
         401.0 : "Access denied",
         401.1 : "Logon failed.",
@@ -32,7 +31,6 @@ class APIException(Exception):
         403.72 : "Batch is out of range.",
 
         404.0 : "Not found",
-
 
         405.0 : "Method not allowed",
 

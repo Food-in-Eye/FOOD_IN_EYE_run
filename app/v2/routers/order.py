@@ -418,9 +418,9 @@ async def get_history_list(request:Request, s_id: str, date: str):
     aggreagted_data = DB.aggregate_pipline('daily', pipeline)
 
     if aggreagted_data == []:
-        raise CustomException(204.11)
+        raise CustomException(400.11)
     if aggreagted_data[0] == {}:
-        raise CustomException(204.12)
+        raise CustomException(400.12)
 
     return {
         "date": Util.get_local_time(date).strftime("%Y-%m-%d"),
