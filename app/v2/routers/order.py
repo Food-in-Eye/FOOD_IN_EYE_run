@@ -402,7 +402,7 @@ async def get_history_list(request:Request, s_id: str, date: str):
     }
      
 
-@order_router.get("/orders/report")
+@order_router.get("/report")
 async def get_history_list(request:Request, s_id: str, date: str):
     assert TokenManager.is_seller(request.state.token_scope), 403.1
 
@@ -418,11 +418,11 @@ async def get_history_list(request:Request, s_id: str, date: str):
     aggreagted_data = DB.aggregate_pipline('daily', pipeline)
 
     if aggreagted_data == []:
-        raise CustomException(404.11)
+        raise CustomException(204.11)
     if aggreagted_data[0] == {}:
-        raise CustomException(404.12)
+        raise CustomException(204.12)
 
     return {
         "date": Util.get_local_time(date).strftime("%Y-%m-%d"),
-        "daily_repory": aggreagted_data[0][f'Store {store["num"]}']
+        "daily_report": aggreagted_data[0][f'Store {store["num"]}']
     }
