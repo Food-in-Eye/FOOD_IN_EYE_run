@@ -22,6 +22,7 @@ import {
   putOrderStatus,
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { SocketProvider } from "../components/SocketContext.module";
 import useTokenRefresh from "../components/useTokenRefresh";
 
@@ -32,13 +33,13 @@ function MainPage() {
   const sID = localStorage.getItem("s_id");
   const [socket, setSocket] = useState(null);
 
+  const navigate = useNavigate();
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
   const [value, onChange] = useState(new Date());
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [selectedOrderIndex, setSelectedOrderIndex] = useState(false);
-  const [storeReports, setStoreReports] = useState([]);
 
   useEffect(() => {
     connectWS(sID);
@@ -218,6 +219,10 @@ function MainPage() {
     });
   };
 
+  const handleClickDate = (date) => {
+    navigate("/choose-report", { state: { date } });
+  };
+
   return (
     <SocketProvider>
       <div>
@@ -235,8 +240,11 @@ function MainPage() {
               <span>📊 데일리 리포트</span>
               <Calendar
                 className={Main.calender}
-                onChange={onChange}
+                onChange={handleClickDate}
                 value={value}
+                tileDisabled={({ date, view }) => {
+                  return date > new Date() && view === "month";
+                }}
               />
             </section>
             <section className={Main.shortcut}>

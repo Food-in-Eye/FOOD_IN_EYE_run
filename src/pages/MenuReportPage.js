@@ -6,11 +6,16 @@ import dailyReport from "../data/daily_report.json";
 import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
 import { useEffect, useRef, useState } from "react";
-import PieChartForFood from "../charts/PieChartForFood";
+import { useLocation } from "react-router-dom";
 import PieChartForFixation from "../charts/PieChartForFixation";
 import BarChartWithAvg from "../charts/BarChartWithAvg";
 
 function MenuReportPage() {
+  const location = useLocation();
+
+  const sID = localStorage.getItem("s_id");
+  const { reportDate, s3Key } = location?.state || {};
+
   const aoiData = dailyReport["Store 1"].aoi_summary;
   const saleData = dailyReport["Store 1"].sale_summary;
   const fNum = "Food 6";
@@ -332,7 +337,6 @@ function MenuReportPage() {
               </div>
               <div className={MAnalysis.menuSummarySales}>
                 <p>총 매출액의 매출 기여도</p>
-                {/* <PieChartForFood saleRatio={saleRatio} /> */}
                 <span>{saleRatio} %</span>
               </div>
             </div>

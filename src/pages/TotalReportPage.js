@@ -2,8 +2,8 @@ import MenuBar from "../components/MenuBar";
 import TR from "../css/TotalReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import DailyScatterChart from "../charts/DailyScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
@@ -12,6 +12,50 @@ import dailyReport from "../data/daily_report.json";
 function TotalReportPage() {
   useTokenRefresh();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const s3Url = `https://foodineye2.s3.ap-northeast-2.amazonaws.com/`;
+  const { reportDate, s3Key } = location?.state || {};
+  const [jsonData, setJsonData] = useState(null);
+
+  useEffect(() => {
+    const getJSsonFile = async () => {
+      try {
+        const response = await fetch(s3Url + s3Key);
+        if (!response.ok) {
+          throw new Error("Failed to fetch JSON data");
+        }
+
+        const jsonData = await response.json();
+        return jsonData;
+      } catch (error) {
+        console.error("Error loading JSON data from S3:", error);
+        return null;
+      }
+    };
+
+    getJSsonFile().then((jsonData) => {
+      if (jsonData) {
+        console.log(jsonData);
+      } else {
+        console.error("Failed to load JSON data");
+      }
+    });
+    // fetch(s3Url + s3Key)
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error("No data available");
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((data) => console.log(data))
+    //   .catch((error) => {
+    //     console.error("Error loading JSON data from S3:", error);
+    //   });
+  }, []);
+
+  console.log("props", reportDate, s3Key);
+  // console.log("reportDate", props.location?.state.reportDate);
 
   const aoiData = dailyReport["Store 1"].aoi_summary;
   const saleData = dailyReport["Store 1"].sale_summary;
@@ -71,7 +115,7 @@ function TotalReportPage() {
       </div>
 
       <div ref={tabs[0].element} className={TR.tabElement}>
-        <span className={TR.tabElementFirstSpan}>오늘의 리포트</span>
+        <span className={TR.tabElementFirstSpan}>{reportDate}의 리포트</span>
         <div className={TR.todaysReport}>
           <section className={TR.todaysReportLeft}>
             <span>

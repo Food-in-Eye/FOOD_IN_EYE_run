@@ -37,11 +37,6 @@ async function retryOriginalRequest(error) {
     return apiInstance(originalRequest);
   } catch (retryError) {
     resetLogin();
-    // if (retryError.response.status === 401) {
-
-    // } else {
-    //   return Promise.reject(retryError);
-    // }
   }
 }
 

@@ -5,13 +5,18 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.module.css";
 import { getDailyReport } from "../components/API.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function ChooseReportPage() {
   useTokenRefresh();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const sID = localStorage.getItem("s_id");
-  const [selectedDate, setSelectedDate] = useState("");
+  const selectedDateFromMain = location?.state?.date || "";
+  console.log(selectedDateFromMain);
+  const [selectedDate, setSelectedDate] = useState(selectedDateFromMain || "");
   const [formatDate, setFormatDate] = useState("");
   const [hasReport, setHasReport] = useState(true);
   const [reportDate, setReportDate] = useState("");
@@ -47,11 +52,32 @@ function ChooseReportPage() {
     try {
       const resPromise = getDailyReport(`s_id=${sID}&date=${formatDate}`);
       resPromise.then((res) => {
-        console.log(res);
         setReportDate(res.data.date);
         setS3Key(res.data.daily_report);
       });
     } catch (error) {
+      if (error.response.status === 400) {
+        if (
+          error.response.data.detail === "Report Not found about input date"
+        ) {
+          toast.success(
+            "선택한 날짜에 리포트가 없습니다. 이날은 가게를 열지 않았나봐요!",
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 2000,
+            }
+          );
+          setHasReport(false);
+        } else if (
+          error.response.data.detail === "Report Not found about input id"
+        ) {
+          setHasReport(false);
+          toast.success("아직 사장님 가게의 리포트는 만들어지지 않았습니다.", {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000,
+          });
+        }
+      }
       console.error(error);
     }
   };
@@ -63,6 +89,14 @@ function ChooseReportPage() {
 
   console.log("selectedDate", selectedDate);
   console.log("formattedDate", formatDate);
+
+  const handlePickTotalReport = () => {
+    navigate("/total-report", { state: { reportDate, s3Key } });
+  };
+
+  const handlePickMenuReport = () => {
+    navigate("/select-menu", { state: { reportDate, s3Key } });
+  };
 
   return (
     <div>
@@ -93,11 +127,8 @@ function ChooseReportPage() {
               </section>
             </div>
             <div className={CR.pickReport}>
-              <Link
-                to={{
-                  pathname: "/total-report",
-                  state: { reportDate, s3Key },
-                }}
+              <section
+                onClick={handlePickTotalReport}
                 className={`${CR.mvToTotalReport} ${
                   !hasReport || !selectedDate ? CR.disabledSection : ""
                 }`}
@@ -105,12 +136,9 @@ function ChooseReportPage() {
                 <div>
                   <span>전체 리포트</span>
                 </div>
-              </Link>
-              <Link
-                to={{
-                  pathname: "/menu-report",
-                  state: { reportDate, s3Key },
-                }}
+              </section>
+              <section
+                onClick={handlePickMenuReport}
                 className={`${CR.mvToMenuReport} ${
                   !hasReport || !selectedDate ? CR.disabledSection : ""
                 }`}
@@ -118,7 +146,7 @@ function ChooseReportPage() {
                 <div>
                   <span>메뉴별 리포트</span>
                 </div>
-              </Link>
+              </section>
             </div>
           </section>
         </div>
