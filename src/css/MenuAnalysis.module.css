@@ -126,12 +126,15 @@
   /* border: 1px solid #444444; */
 }
 
+.menuDetailPageStatistics .menuDetailPageDwellTime,
+.menuDetailPageStatistics .menuDetailOrderRatio {
+  width: 50vw;
+}
+
 .menuSummarySection p,
 .menuPageStatistics p,
 .menuDetailPageStatistics p,
 .GtoFRatioSection p {
-  margin-left: 0px;
-  margin-right: auto;
   color: #4d4d4d;
   font-family: "Hahmlet-Regular";
   font-size: 18px;
@@ -141,11 +144,32 @@
   background: none;
 }
 
+.menuSummarySection p,
+.menuPageStatistics p,
+.menuDetailPageStatistics p,
+.GtoFRatioPercent p {
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+.GtoFRatioValue p {
+  margin: 0 auto;
+}
+
+.GtoFRatioPieChart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  width: 13vw;
+  height: 8vw;
+}
+
 .GtoFRatioValue span {
-  margin: 0px auto;
   color: #1e1e1e;
   font-family: "Hahmlet-Medium";
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 36px;
   white-space: nowrap;
@@ -191,9 +215,19 @@
   background-color: #fff;
 }
 
-.GtoFRatioPieChart {
-  margin-top: -35%;
+/* @media (max-width: 768px) {
+  .GtoFRatioPieChart {
+    margin-left: -15%;
+    margin-top: -35%;
+  }
 }
+
+@media (min-width: 769px) {
+  .GtoFRatioPieChart {
+    margin-left: 16%;
+    margin-top: -20%;
+  }
+} */
 
 .divForButton {
   position: fixed;

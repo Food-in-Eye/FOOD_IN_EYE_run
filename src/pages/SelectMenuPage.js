@@ -26,7 +26,7 @@ function SelectMenuPage() {
   }, [getMenuLists]);
 
   const handleClickedMenu = async (e) => {
-    navigate("/menu-analysis");
+    navigate("/menu-report");
   };
 
   return (

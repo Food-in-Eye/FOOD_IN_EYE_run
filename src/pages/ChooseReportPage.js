@@ -17,7 +17,7 @@ function ChooseReportPage() {
   const selectedDateFromMain = location?.state?.date || "";
   console.log(selectedDateFromMain);
   const [selectedDate, setSelectedDate] = useState(selectedDateFromMain || "");
-  const [formatDate, setFormatDate] = useState("");
+  // const [formatDate, setFormatDate] = useState("");
   const [hasReport, setHasReport] = useState(true);
   const [reportDate, setReportDate] = useState("");
   const [s3Key, setS3Key] = useState("");
@@ -44,13 +44,28 @@ function ChooseReportPage() {
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const day = date.getDate().toString().padStart(2, "0");
 
-      setFormatDate(`${year}-${month}-${day}`);
+      return `${year}-${month}-${day}`;
     }
+  };
+
+  const handlePickTotalReport = () => {
+    navigate("/total-report", { state: { reportDate, s3Key } });
+  };
+
+  const handlePickMenuReport = () => {
+    navigate("/select-menu", { state: { reportDate, s3Key } });
+  };
+
+  const handleDateChange = async (date) => {
+    hasReport === false && setHasReport(true);
+    setSelectedDate(date);
+    changeFormatDate(date);
   };
 
   const getReports = () => {
     try {
-      const resPromise = getDailyReport(`s_id=${sID}&date=${formatDate}`);
+      const formattedDate = changeFormatDate(selectedDate);
+      const resPromise = getDailyReport(`s_id=${sID}&date=${formattedDate}`);
       resPromise.then((res) => {
         setReportDate(res.data.date);
         setS3Key(res.data.daily_report);
@@ -60,6 +75,9 @@ function ChooseReportPage() {
         if (
           error.response.data.detail === "Report Not found about input date"
         ) {
+          setHasReport(false);
+          setSelectedDate("");
+
           toast.success(
             "선택한 날짜에 리포트가 없습니다. 이날은 가게를 열지 않았나봐요!",
             {
@@ -67,36 +85,35 @@ function ChooseReportPage() {
               autoClose: 2000,
             }
           );
-          setHasReport(false);
+
+          // navigate("/choose-report");
         } else if (
           error.response.data.detail === "Report Not found about input id"
         ) {
           setHasReport(false);
+          setSelectedDate("");
+
           toast.success("아직 사장님 가게의 리포트는 만들어지지 않았습니다.", {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 2000,
           });
+
+          // navigate("/choose-report");
         }
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
       console.error(error);
     }
   };
 
   useEffect(() => {
-    changeFormatDate(selectedDate);
-    formatDate && getReports();
-  }, [selectedDate, formatDate]);
+    selectedDate && getReports();
+  }, [selectedDate]);
 
   console.log("selectedDate", selectedDate);
-  console.log("formattedDate", formatDate);
-
-  const handlePickTotalReport = () => {
-    navigate("/total-report", { state: { reportDate, s3Key } });
-  };
-
-  const handlePickMenuReport = () => {
-    navigate("/select-menu", { state: { reportDate, s3Key } });
-  };
 
   return (
     <div>
@@ -122,7 +139,8 @@ function ChooseReportPage() {
                   maxDate={new Date()}
                   dayClassName={(d) => getDayClassName(d)}
                   selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
+                  // onChange={(date) => setSelectedDate(date)}
+                  onChange={handleDateChange}
                 />
               </section>
             </div>

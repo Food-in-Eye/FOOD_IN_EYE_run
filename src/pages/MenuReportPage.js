@@ -11,6 +11,14 @@ import PieChartForFixation from "../charts/PieChartForFixation";
 import BarChartWithAvg from "../charts/BarChartWithAvg";
 
 function MenuReportPage() {
+  useEffect(() => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    console.log(`현재 화면 너비: ${screenWidth}px`);
+    console.log(`현재 화면 높이: ${screenHeight}px`);
+  }, [window]);
+
   const location = useLocation();
 
   const sID = localStorage.getItem("s_id");
@@ -22,11 +30,9 @@ function MenuReportPage() {
   const [maxHour, setMaxHour] = useState(-1);
   const [saleRatio, setSaleRatio] = useState(0);
   const [menuSalesCount, setMenuSalesCount] = useState(0);
-  // const [dwellTime, setDwellTime] = useState(0);
+
   const [score, setScore] = useState(0);
   const [visitCount, setVisitCount] = useState(0);
-  // const [duration, setDuration] = useState(0);
-  // const [salesPerVisit, setSalesPerVisit] = useState(0);
   const [salesPerVisitData, setSalesPerVisitData] = useState(0);
 
   const [fixCount, setFixCount] = useState(0);
@@ -361,8 +367,10 @@ function MenuReportPage() {
             </div>
             <div className={MAnalysis.GtoFRatioBody}>
               <div className={MAnalysis.GtoFRatioValue}>
-                <p>시선 수 대비 Fixation 수 비율</p>
-                <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
+                <p>
+                  시선 수 대비 Fixation 수 비율:{" "}
+                  <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
+                </p>
                 <div className={MAnalysis.GtoFRatioPieChart}>
                   <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
                 </div>

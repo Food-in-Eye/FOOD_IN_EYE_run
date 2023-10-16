@@ -21,7 +21,10 @@ function TotalReportPage() {
   useEffect(() => {
     const getJSsonFile = async () => {
       try {
-        const response = await fetch(s3Url + s3Key);
+        const response = await fetch(s3Url + s3Key, {
+          mode: "no-cors",
+        });
+        console.log("response", response);
         if (!response.ok) {
           throw new Error("Failed to fetch JSON data");
         }
