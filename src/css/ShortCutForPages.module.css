@@ -1,4 +1,6 @@
 .body {
+  display: flex;
+  flex-direction: column;
   margin-top: 10%;
   margin-bottom: 10%;
 }
@@ -12,7 +14,7 @@
 
 .body span {
   margin-left: 0;
-  max-width: 40%;
+  max-width: 35%;
   padding: 2%;
   border-radius: 0 20px 0 0;
   font-family: "Hahmlet-SemiBold";
@@ -23,13 +25,12 @@
 
 .icons {
   box-sizing: border-box;
-  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-flow: row;
-  padding: 5%;
-  margin-top: 10px;
+  height: auto;
+  padding: 5% 2%;
   border: 1px solid #d7d7d7;
   border-radius: 0 20px 20px 0;
 }
@@ -44,6 +45,13 @@
   /* border: 2px solid #337db1; */
 }
 
+.icons button {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .icons button,
 .icons button p {
   border: none;
@@ -51,12 +59,12 @@
 }
 
 .icons button p {
-  margin: 2% 0 10% 15%;
+  margin: 5% auto;
   white-space: nowrap;
   font-family: "Hahmlet-Light";
 }
 
 .icons button img {
-  max-width: 45%;
+  max-width: 28%;
   height: auto;
 }

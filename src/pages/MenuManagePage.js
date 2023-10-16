@@ -365,7 +365,7 @@ function MenuManagePage() {
                     )}
                   </div>
                 </div>
-                <div className={Menu.buttons}>
+                <div className={Menu.infoButtons}>
                   {editMenu ? (
                     <button
                       className={Button.saveMenu}
