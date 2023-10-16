@@ -22,8 +22,8 @@ async def hello():
 
 @exhibition_router.get("/historys")
 async def get_todat_history():
-    # today = Util.get_utc_time()
-    today = Util.get_utc_time_by_str("2023-09-17")
+    today = Util.get_utc_time()
+    # today = Util.get_utc_time_by_str("2023-09-20")
 
     pipeline = [
         { "$match": { "date": {"$gte": today, "$lt": today + timedelta(days=1)} } },
