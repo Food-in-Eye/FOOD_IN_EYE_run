@@ -24,7 +24,8 @@ from .websocket import websocket_manager as websocket_manager
 
 TokenManager = TokenManagement()
 
-order_router = APIRouter(prefix="/orders", dependencies=[Depends(TokenManager.dispatch)])
+# order_router = APIRouter(prefix="/orders", dependencies=[Depends(TokenManager.dispatch)])
+order_router = APIRouter(prefix="/orders")
 
 
 PREFIX = 'api/v2/orders'
@@ -404,7 +405,7 @@ async def get_history_list(request:Request, s_id: str, date: str):
 
 @order_router.get("/report")
 async def get_history_list(request:Request, s_id: str, date: str):
-    assert TokenManager.is_seller(request.state.token_scope), 403.1
+    # assert TokenManager.is_seller(request.state.token_scope), 403.1
 
     id = Util.check_id(s_id)
     store = DB.read_one('store', {"_id": id})
@@ -421,8 +422,10 @@ async def get_history_list(request:Request, s_id: str, date: str):
         raise CustomException(400.11)
     if aggreagted_data[0] == {}:
         raise CustomException(400.12)
-
+    
+    report_key = aggreagted_data[0][f'Store {store["num"]}']
+    
     return {
         "date": Util.get_local_time(date).strftime("%Y-%m-%d"),
-        "daily_report": aggreagted_data[0][f'Store {store["num"]}']
+        "daily_report": storage.get_json(report_key)
     }
