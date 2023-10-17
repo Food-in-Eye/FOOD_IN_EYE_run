@@ -37,3 +37,25 @@ async def get_todat_history():
         history['date'] = Util.get_local_time(history['date'])
     
     return historys
+
+@exhibition_router.get("/visualize")
+async def get_fixation_data(fix_key:str):
+    fix_data = storage.get_json(fix_key)
+    result = []
+    
+    for page in fix_data:
+        new_fixs = []
+        for fix in page['fixations']:
+            new_fixs.append({
+                'x':int(fix['cx']),
+                'y':int(fix['cy']),
+                'd':fix['et'] - fix['st']
+            })
+        result.append({
+            "page": page['page'],
+            "s_num": page['s_num'],
+            "f_num": page['f_num'],
+            "fixations": new_fixs
+        })
+        
+    return result
