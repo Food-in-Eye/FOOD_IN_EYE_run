@@ -66,45 +66,43 @@ function ChooseReportPage() {
     try {
       const formattedDate = changeFormatDate(selectedDate);
       const resPromise = getDailyReport(`s_id=${sID}&date=${formattedDate}`);
-      resPromise.then((res) => {
-        setReportDate(res.data.date);
-        setS3Key(res.data.daily_report);
-      });
-    } catch (error) {
-      if (error.response.status === 400) {
-        if (
-          error.response.data.detail === "Report Not found about input date"
-        ) {
-          setHasReport(false);
-          setSelectedDate("");
+      resPromise
+        .then((res) => {
+          setReportDate(res.data.date);
+          setS3Key(res.data.daily_report);
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            if (
+              error.response.data.detail === "Report Not found about input date"
+            ) {
+              setHasReport(false);
+              setSelectedDate("");
 
-          toast.success(
-            "선택한 날짜에 리포트가 없습니다. 이날은 가게를 열지 않았나봐요!",
-            {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: 2000,
+              toast.success(
+                "선택한 날짜에 리포트가 없습니다. 이날은 가게를 열지 않았나봐요!",
+                {
+                  position: toast.POSITION.TOP_RIGHT,
+                  autoClose: 2000,
+                }
+              );
+            } else if (
+              error.response.data.detail === "Report Not found about input id"
+            ) {
+              setHasReport(false);
+              setSelectedDate("");
+
+              toast.success(
+                "아직 사장님 가게의 리포트는 만들어지지 않았습니다.",
+                {
+                  position: toast.POSITION.TOP_RIGHT,
+                  autoClose: 2000,
+                }
+              );
             }
-          );
-
-          // navigate("/choose-report");
-        } else if (
-          error.response.data.detail === "Report Not found about input id"
-        ) {
-          setHasReport(false);
-          setSelectedDate("");
-
-          toast.success("아직 사장님 가게의 리포트는 만들어지지 않았습니다.", {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 2000,
-          });
-
-          // navigate("/choose-report");
-        }
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
+          }
+        });
+    } catch (error) {
       console.error(error);
     }
   };
