@@ -1,6 +1,7 @@
 
 from core.common.mongo import MongodbController
 from core.error.exception import CustomException
+from v2.routers.src.util import Util
 
 DB = MongodbController('FIE_DB2')
 
@@ -13,10 +14,8 @@ class DataLoader:
             stores = DB.read_all('store', {}, {'_id': 1, 'num':1})
             result = {}
             for store in stores:
-               print(store)
                result[store['_id']] = store['num']
             
-            print(result)
             return result
 
         except CustomException as e:
@@ -30,7 +29,6 @@ class DataLoader:
             result = {}
             for food in foods:
                result[food['_id']] = food['num']
-            print(result)
             return result
 
         except CustomException as e:
@@ -41,8 +39,21 @@ class DataLoader:
         try:
             orders = DB.read_all('order', query, {'s_id': 1, 'date':1, 'f_list':1})
             for order in orders:
-                order['date'] = order['date'].strftime('%Y-%m-%d %H:%M:%S')
+                order['date'] = str(Util.get_local_time(order['date']))
             return orders
+
+        except CustomException as e:
+            print(e)
+
+    def get_aoi_reports(query):
+        result = []
+        try:
+            historys = DB.read_all('history', query, {'date':1, 'aoi_analysis':1})
+            for history in historys:
+                result.append({
+                    "date": str(Util.get_local_time(history['date'])),
+                    "aoi_key": history['aoi_analysis']})
+            return result
 
         except CustomException as e:
             print(e)

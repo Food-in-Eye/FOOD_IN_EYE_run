@@ -5,10 +5,12 @@ import os
 import httpx
 
 from core.common.mongo import MongodbController
+from core.common.s3 import Storage
 from .src import DataLoader
+from v2.routers.src.util import Util
 
 DB = MongodbController('FIE_DB2')
-
+storage = Storage('foodineye2')
 
 class CallAnalysis:
     @staticmethod
@@ -25,9 +27,12 @@ class CallAnalysis:
         yesterday = today - timedelta(1)
         
         # orderDB에서 어제 하루동안의 모든 주문내역 불러오기
-        query = {'date':{"$gte": yesterday, "$lte": today}}
+        query = {
+            'date':{"$gte": yesterday, "$lte": today}
+            }
         # orders = DB.read_all_by_query('order', query)
         orders = DataLoader.get_orders(query)
+
         # s_num table, f_num table 불러옴 (각 _id 와 num이 매칭되어있음)
         s_table = DataLoader.get_store_table()
         f_table = DataLoader.get_food_table()
@@ -41,11 +46,61 @@ class CallAnalysis:
         }
         
         async with httpx.AsyncClient() as client:
-            print(anlz_sale_url)
             response = await client.post(anlz_sale_url, json=payload, headers=headers)
             data = response.json()
 
         return data
 
+    @staticmethod
+    async def aoi_stats(today:datetime):
+        load_dotenv()
+        
+        yesterday = today - timedelta(1)
+        query = {
+            'date':{"$gte": yesterday, "$lte": today},
+            'aoi_analysis':{"$ne":None}
+            }
+        aoi_datas = DataLoader.get_aoi_reports(query)
 
+        aoi_daily_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/daily"
+        headers = {"Content-Type": "application/json"}
 
+        payload = {
+            "aoi_datas": aoi_datas
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(aoi_daily_url, json=payload, headers=headers)
+            data = response.json()
+
+        return data
+
+    async def daily_summary(today:datetime):
+        # today = Util.get_utc_time_by_datetime(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
+        # today = datetime(2023, 8, 17)
+        
+        sale_report = await CallAnalysis.sale_stats(today)
+        aoi_report = await CallAnalysis.aoi_stats(today)
+
+        result = {
+            'date': Util.get_utc_time_by_datetime(today) - timedelta(days=1),
+            'update_date': datetime.now()
+        }
+
+        for store in sale_report.keys():
+            report_data = {
+                'sale_summary': sale_report[store],
+                'aoi_summary': aoi_report[store]
+            }
+            key = str(storage.upload(report_data, "json", "temp/dailyreport"))
+
+            result[store] = key
+
+        try:
+            object_id = DB.insert_one('daily', result)
+            return str(object_id)
+
+        except Exception as e:
+            print(e)
+            return False
+        

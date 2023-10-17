@@ -56,8 +56,8 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
         query["u_id"] = u_id
         q_str_list.append(f"u_id={u_id}")
     if today:
-        today_str = Util.get_cur_time().today().strftime("%Y-%m-%d")
-        today_start = Util.get_cur_time().strptime(today_str, "%Y-%m-%d")
+        today_str = Util.get_utc_time().today().strftime("%Y-%m-%d")
+        today_start = Util.get_utc_time().strptime(today_str, "%Y-%m-%d")
         today_end = today_start + timedelta(days=1)
         query["date"] = {"$gte": today_start, "$lt": today_end}
         q_str_list.append(f"today={today}")
@@ -72,6 +72,8 @@ async def get_order(s_id: str=None, u_id: str=None, today: bool=False, asc_by: s
 
 
     response = DB.read_all('order', query, asc_by=asc_by, asc=asc)
+    for order in response:
+        order['date'] = Util.get_local_time(order['date'])
     
     return {
         'order_list' : response
@@ -101,7 +103,7 @@ async def get_order(id: str, detail: bool=False):
     
     return {
         "_id": id,
-        "date": response['date'],
+        "date": Util.get_local_time(response['date']),
         "u_id": response['u_id'],
         "s_id": response['s_id'],
         "m_id": response['m_id'],
@@ -169,7 +171,7 @@ async def new_order(body:OrderModel, request:Request):
         for food in store_order.f_list:
             store_price += food['price'] * food['count']
         order = {
-            "date": Util.get_cur_time().now(),
+            "date": Util.get_utc_time(),
             "u_id": body.u_id,
             "s_id": store_order.s_id,
             "m_id": store_order.m_id,
@@ -193,7 +195,7 @@ async def new_order(body:OrderModel, request:Request):
 
     history = {
         "u_id": body.u_id,
-        "date": Util.get_cur_time(),
+        "date": order['date'],
         "total_price": total_price,
         "raw_gaze_path": None,
         "fixation_path": None,
@@ -292,7 +294,7 @@ async def get_history_list(u_id: str, request:Request, batch: int = 1):
             else: s_names = ["nothing", "is", 'here']
             response_list.append({
                 "h_id": h['_id'],
-                "date": h['date'],
+                "date": Util.get_local_time(h['date']),
                 "total_price": h['total_price'],
                 "s_names": s_names
             })
@@ -328,7 +330,7 @@ async def get_order_list(id: str, request:Request):
             })
     
     return {
-        'date': history['date'],
+        'date': Util.get_local_time(history['date']),
         'order_list': order_list
     }
 
@@ -344,10 +346,11 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
         { "$group": { "_id": "$date", "total_price": { "$sum": "$total_price" } } },
         { "$sort": { "_id": 1 } }
     ]
+
     if (start_date != None) and (end_date != None):
         pipeline[0]["$match"]["date"] = {
-            "$gte": Util.get_cur_time().strptime(start_date, "%Y-%m-%d"),
-            "$lte": Util.get_cur_time().strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            "$gte": Util.get_utc_time_by_str(start_date),
+            "$lte": Util.get_utc_time_by_str(end_date) + timedelta(days=1)
         }
 
     aggreagted_data = DB.aggregate_pipline('order', pipeline)
@@ -374,7 +377,7 @@ async def get_dates(request:Request, s_id: str, batch: int=1, start_date:str = N
 async def get_history_list(request:Request, s_id: str, date: str):
     assert TokenManager.is_seller(request.state.token_scope), 403.1
 
-    start_datetime = Util.get_cur_time().strptime(date, "%Y-%m-%d")
+    start_datetime = Util.get_utc_time().strptime(date, "%Y-%m-%d")
     end_datetime = start_datetime + timedelta(days=1)
 
     query = {
@@ -389,7 +392,7 @@ async def get_history_list(request:Request, s_id: str, date: str):
     for o in orders:
         result.append({
             'o_id': o['_id'],
-            'date': o['date'],
+            'date': Util.get_local_time(o['date']),
             'detail': o['f_list'],
             'total': o['total_price']
         })
@@ -398,3 +401,30 @@ async def get_history_list(request:Request, s_id: str, date: str):
         'order_list' : result
     }
      
+
+@order_router.get("/report")
+async def get_history_list(request:Request, s_id: str, date: str):
+    assert TokenManager.is_seller(request.state.token_scope), 403.1
+
+    id = Util.check_id(s_id)
+    store = DB.read_one('store', {"_id": id})
+    
+    date = Util.get_utc_time_by_str(date)
+
+    pipeline = [
+        { "$match": { "date": date } },
+        { "$project": { "_id":0, f'Store {store["num"]}':1 }}
+    ]
+    aggreagted_data = DB.aggregate_pipline('daily', pipeline)
+
+    if aggreagted_data == []:
+        raise CustomException(404.11)
+    if aggreagted_data[0] == {}:
+        raise CustomException(404.12)
+    
+    report_key = aggreagted_data[0][f'Store {store["num"]}']
+    
+    return {
+        "date": Util.get_local_time(date).strftime("%Y-%m-%d"),
+        "daily_report": storage.get_json(report_key)
+    }

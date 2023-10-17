@@ -1,5 +1,4 @@
 from passlib.context import CryptContext
-from passlib.exc import UnknownHashError
 from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from bson.objectid import ObjectId
@@ -73,10 +72,15 @@ class TokenManagement:
         self.REFRESH_SK = os.environ['JWT_REFRESH_SECRET_KEY']
     
     def init_a_token(self, u_id:str, scope:str):
+        if scope == "buyer":
+            EXP = int((datetime.now() + timedelta(minutes=10)).timestamp())
+        elif scope == "seller":
+            EXP = int((datetime.now() + timedelta(minutes=60)).timestamp())
+    
         data = {
             "iss": "ACCESS_Token",
             "sub": u_id,
-            "exp": int((datetime.now() + timedelta(seconds=10)).timestamp()),
+            "exp": EXP,
             "iat": int(datetime.now().timestamp()),
             "scope": scope
         }
@@ -92,7 +96,7 @@ class TokenManagement:
             "iss": "REFRESH_Token",
             "sub": u_id,
             "exp": EXP,
-            "iat": int(Util.get_cur_time().timestamp()),
+            "iat": int(datetime.now().timestamp()),
             "scope": scope
         }
         return jwt.encode(data, self.REFRESH_SK, algorithm=self.algorithm)

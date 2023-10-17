@@ -9,7 +9,6 @@ from fastapi import APIRouter, Depends, Request
 from core.models.store import MenuModel
 from core.common.authority import TokenManagement
 from core.common.mongo import MongodbController
-from core.error.exception import CustomException
 from .src.util import Util
 from .src.meta import Meta
 
@@ -34,6 +33,9 @@ async def read_menus_of_store(s_id:str, request:Request):
     Util.check_id(s_id)
     response = DB.read_all('menu', {'s_id': s_id}) 
 
+    for menu in response:
+        menu['date'] = Util.get_local_time(menu['date'])
+
     return {
         'menu_list' : response
     }
@@ -48,7 +50,8 @@ async def read_menu(id:str):
     return {
         "_id": id,
         "s_id": response['s_id'],
-        "date": response['date'],
+        "s_num": response['s_num'],
+        "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
 
@@ -60,10 +63,12 @@ async def create_menu(s_id:str, menu:MenuModel, request:Request):
     data = menu.dict()
     
     _id = Util.check_id(s_id)
+    store = DB.read_one('store', {'_id':_id})
 
     new_menu = {
         's_id': s_id,
-        'date': Util.get_cur_time().now(),
+        's_num': store['num'],
+        'date': Util.get_utc_time().now(),
         'f_list': data['f_list']
     }
 
@@ -83,7 +88,6 @@ async def read_menu_with_foods(id:str):
 
     _id = Util.check_id(id)
     response = DB.read_one('menu', {'_id':_id})
-    
     
     food_ids = [food['f_id'] for food in response['f_list']]
     food_list = []
@@ -106,7 +110,8 @@ async def read_menu_with_foods(id:str):
     return {
         "_id": id,
         "s_id": response['s_id'],
-        "date": response['date'],
+        "s_num": response['s_num'],
+        "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
 
