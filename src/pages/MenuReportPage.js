@@ -2,7 +2,7 @@ import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
 import PieChartWithNeedle from "../charts/PieChartWithNeedle";
 import VerticalBarChart from "../charts/VerticalBarChart";
-import dailyReport from "../data/daily_report.json";
+// import dailyReport from "../data/daily_report.json";
 import menuDetailPage from "../images/menu-detail-ex.jpeg";
 
 import { useEffect, useRef, useState } from "react";
@@ -21,12 +21,15 @@ function MenuReportPage() {
 
   const location = useLocation();
 
-  const sID = localStorage.getItem("s_id");
-  const { reportDate, s3Key } = location?.state || {};
+  const { reportDate, dailyReportData, index, name, menuList } =
+    location?.state || {};
 
-  const aoiData = dailyReport["Store 1"].aoi_summary;
-  const saleData = dailyReport["Store 1"].sale_summary;
-  const fNum = "Food 6";
+  console.log("name", name);
+  console.log("menuList", menuList);
+
+  const aoiData = dailyReportData.aoi_summary;
+  const saleData = dailyReportData.sale_summary;
+  const fNum = `Food ${index + 1}`;
   const [maxHour, setMaxHour] = useState(-1);
   const [saleRatio, setSaleRatio] = useState(0);
   const [menuSalesCount, setMenuSalesCount] = useState(0);
@@ -46,6 +49,7 @@ function MenuReportPage() {
 
   console.log("aoiData", aoiData);
   console.log("saleData", saleData);
+  console.log("fNum", fNum);
 
   const setSaleData = () => {
     let maxCount = -1;
@@ -293,11 +297,12 @@ function MenuReportPage() {
     Object.entries(fixData).forEach(([key, value]) => {
       // 각 칸의 비율 계산
       const percentage =
-        (value / totalSum) * 100 !== 0
+        totalSum !== 0 &&
+        ((value / totalSum) * 100 !== 0
           ? ((value / totalSum) * 100).toFixed(1)
-          : ((value / totalSum) * 100).toFixed(0);
+          : ((value / totalSum) * 100).toFixed(0));
 
-      fixPercentageObject[key] = percentage;
+      fixPercentageObject[key] = percentage === false ? 0 : percentage;
     });
 
     setFixDataInDetail(fixPercentageObject);
@@ -324,7 +329,7 @@ function MenuReportPage() {
       </div>
       <div ref={tabs[0].element} className={MAnalysis.tabElement}>
         <div>
-          <span>메뉴 이름</span>
+          <span>{name}</span>
           <section className={MAnalysis.menuSummarySection}>
             <div className={MAnalysis.menuSummarySectionDesc}>
               <p>

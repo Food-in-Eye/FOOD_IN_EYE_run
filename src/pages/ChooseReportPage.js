@@ -20,7 +20,7 @@ function ChooseReportPage() {
   // const [formatDate, setFormatDate] = useState("");
   const [hasReport, setHasReport] = useState(true);
   const [reportDate, setReportDate] = useState("");
-  const [s3Key, setS3Key] = useState("");
+  const [dailyReportData, setDailyReportData] = useState("");
 
   const getDayClassName = (date) => {
     const isTodayOrEarlier = date <= new Date();
@@ -49,11 +49,11 @@ function ChooseReportPage() {
   };
 
   const handlePickTotalReport = () => {
-    navigate("/total-report", { state: { reportDate, s3Key } });
+    navigate("/total-report", { state: { reportDate, dailyReportData } });
   };
 
   const handlePickMenuReport = () => {
-    navigate("/select-menu", { state: { reportDate, s3Key } });
+    navigate("/select-menu", { state: { reportDate, dailyReportData } });
   };
 
   const handleDateChange = async (date) => {
@@ -68,11 +68,12 @@ function ChooseReportPage() {
       const resPromise = getDailyReport(`s_id=${sID}&date=${formattedDate}`);
       resPromise
         .then((res) => {
+          console.log(res);
           setReportDate(res.data.date);
-          setS3Key(res.data.daily_report);
+          setDailyReportData(res.data.daily_report);
         })
         .catch((error) => {
-          if (error.response.status === 400) {
+          if (error.response.status === 404) {
             if (
               error.response.data.detail === "Report Not found about input date"
             ) {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getFoods } from "../components/API.module";
 import MenuBar from "../components/MenuBar";
 import Select from "../css/SelectMenu.module.css";
@@ -7,15 +7,19 @@ import useTokenRefresh from "../components/useTokenRefresh";
 
 function SelectMenuPage() {
   useTokenRefresh();
-
   const navigate = useNavigate();
+  const location = useLocation();
+
   const sID = localStorage.getItem("s_id");
+  const { reportDate, dailyReportData } = location?.state || {};
   const [menuList, setMenuList] = useState([]);
 
   const getMenuLists = useCallback(async () => {
     try {
       const res = await getFoods(sID);
       setMenuList(res.data.food_list);
+
+      console.log(res);
     } catch (error) {
       console.log(`GET foods error:`, error);
     }
@@ -25,8 +29,10 @@ function SelectMenuPage() {
     getMenuLists();
   }, [getMenuLists]);
 
-  const handleClickedMenu = async (e) => {
-    navigate("/menu-report");
+  const handleClickedMenu = async (index, name) => {
+    navigate("/menu-report", {
+      state: { reportDate, dailyReportData, index, name, menuList },
+    });
   };
 
   return (
@@ -42,7 +48,11 @@ function SelectMenuPage() {
         <div className={Select.menus}>
           <ul>
             {menuList.map((menu, index) => (
-              <li key={menu._id} draggable={true} onClick={handleClickedMenu}>
+              <li
+                key={menu._id}
+                draggable={true}
+                onClick={() => handleClickedMenu(index, menu.name)}
+              >
                 {`${index + 1}. ${menu.name}`}
               </li>
             ))}

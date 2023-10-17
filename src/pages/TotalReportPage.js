@@ -2,78 +2,36 @@ import MenuBar from "../components/MenuBar";
 import TR from "../css/TotalReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DailyScatterChart from "../charts/DailyScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
-import dailyReport from "../data/daily_report.json";
+// import dailyReport from "../data/daily_report.json";
 
 function TotalReportPage() {
   useTokenRefresh();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const s3Url = `https://foodineye2.s3.ap-northeast-2.amazonaws.com/`;
-  const { reportDate, s3Key } = location?.state || {};
-  const [jsonData, setJsonData] = useState(null);
+  const { reportDate, dailyReportData } = location?.state || {};
 
-  useEffect(() => {
-    const getJSsonFile = async () => {
-      try {
-        const response = await fetch(s3Url + s3Key, {
-          mode: "no-cors",
-        });
-        console.log("response", response);
-        if (!response.ok) {
-          throw new Error("Failed to fetch JSON data");
-        }
+  console.log("dailyReport", dailyReportData);
 
-        const jsonData = await response.json();
-        return jsonData;
-      } catch (error) {
-        console.error("Error loading JSON data from S3:", error);
-        return null;
-      }
-    };
+  const aoiData = dailyReportData.aoi_summary;
+  const saleData = dailyReportData.sale_summary;
 
-    getJSsonFile().then((jsonData) => {
-      if (jsonData) {
-        console.log(jsonData);
-      } else {
-        console.error("Failed to load JSON data");
-      }
-    });
-    // fetch(s3Url + s3Key)
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       throw new Error("No data available");
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => console.log(data))
-    //   .catch((error) => {
-    //     console.error("Error loading JSON data from S3:", error);
-    //   });
-  }, []);
-
-  console.log("props", reportDate, s3Key);
-  // console.log("reportDate", props.location?.state.reportDate);
-
-  const aoiData = dailyReport["Store 1"].aoi_summary;
-  const saleData = dailyReport["Store 1"].sale_summary;
-
-  // const totalDwellTime = `${(aoiData.total_dwell_time / 60000).toFixed(1)} 분`;
-  // const visitCount = `${aoiData.store_visit} 회`;
-  // const gToFRatio = `${(
-  //   (aoiData.total_fix_count / aoiData.total_gaze_count) *
-  //   100
-  // ).toFixed(2)} %`;
+  const totalDwellTime = `${(aoiData.total_dwell_time / 60000).toFixed(1)} 분`;
+  const visitCount = `${aoiData.store_visit} 회`;
+  const gToFRatio = `${(
+    (aoiData.total_fix_count / aoiData.total_gaze_count) *
+    100
+  ).toFixed(1)} %`;
 
   /**임시 데이터 */
-  const totalDwellTime = `96.3분`;
-  const visitCount = `61회`;
-  const gToFRatio = `13%`;
+  // const totalDwellTime = `96.3분`;
+  // const visitCount = `61회`;
+  // const gToFRatio = `13%`;
 
   const useMoveScroll = (elementId) => {
     const element = useRef(null);
@@ -131,7 +89,7 @@ function TotalReportPage() {
             </span>
             <span>
               <strong>주문 당 평균 금액: </strong>
-              {saleData.average_sales_per_order}원
+              {saleData.average_sales_per_order.toFixed(0)}원
             </span>
           </section>
           <section className={TR.todaysReportRight}>
@@ -226,13 +184,13 @@ function TotalReportPage() {
           <button onClick={moveToMenusAnalysis}>메뉴별 분석 보러가기 ⇨</button>
         </div>
         <div className={TR.menuChart}>
-          {/* <div className={TR.menuChartDesc}> */}
-          <p>
-            원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!
-            <br />
-            👀사용자의 시선이 포함된 기준들: 체류시간, 집중도
-          </p>
-          {/* </div> */}
+          <div className={TR.menuChartDesc}>
+            <p>
+              원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!
+              <br />
+              👀사용자의 시선이 포함된 기준들: 체류시간, 집중도
+            </p>
+          </div>
           {/* <div className={TR.menuChartDownDiv}>
           <p>원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!</p>
             <div className={TR.menuChartDesc}>
