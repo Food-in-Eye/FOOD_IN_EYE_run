@@ -50,6 +50,7 @@ async def read_menu(id:str):
     return {
         "_id": id,
         "s_id": response['s_id'],
+        "s_num": response['s_num'],
         "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
@@ -62,9 +63,11 @@ async def create_menu(s_id:str, menu:MenuModel, request:Request):
     data = menu.dict()
     
     _id = Util.check_id(s_id)
+    store = DB.read_one('store', {'_id':_id})
 
     new_menu = {
         's_id': s_id,
+        's_num': store['num'],
         'date': Util.get_utc_time().now(),
         'f_list': data['f_list']
     }
@@ -85,7 +88,6 @@ async def read_menu_with_foods(id:str):
 
     _id = Util.check_id(id)
     response = DB.read_one('menu', {'_id':_id})
-    
     
     food_ids = [food['f_id'] for food in response['f_list']]
     food_list = []
@@ -108,6 +110,7 @@ async def read_menu_with_foods(id:str):
     return {
         "_id": id,
         "s_id": response['s_id'],
+        "s_num": response['s_num'],
         "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
