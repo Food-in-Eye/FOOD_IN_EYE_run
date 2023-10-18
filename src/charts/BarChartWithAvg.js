@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload, label }) => {
             fontSize: "18px",
             fontFamily: "NotoSansKR-Regular",
           }}
-        >{`메뉴: ${label}`}</p>
+        >{`메뉴: ${payload[0].payload.name}`}</p>
         <p
           style={{
             width: "auto",
@@ -47,10 +47,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function BarChartWithAvg({ data }) {
+function BarChartWithAvg({ data, index }) {
   /** duration type: string -> float */
-  data.forEach((item) => {
+
+  data.forEach((item, i) => {
     item.duration = parseFloat(item.duration);
+    item.fill = index === i ? "#1e2f4d" : "#c0c0c0";
   });
 
   const totalDuration = data.reduce((sum, item) => sum + item.duration, 0);
@@ -69,16 +71,11 @@ function BarChartWithAvg({ data }) {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
+      <XAxis dataKey={(item) => `Food ${item.index + 1}`} />
       <YAxis />
       <Tooltip content={<CustomTooltip />} />
       <Legend />
-      <Bar
-        dataKey="duration"
-        fill="#8884d8"
-        name="메뉴별 체류시간"
-        barSize={30}
-      />
+      <Bar dataKey="duration" fill="fill" name="메뉴별 체류시간" barSize={30} />
       <ReferenceLine
         y={averageDuration}
         label={{

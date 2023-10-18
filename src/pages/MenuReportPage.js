@@ -98,20 +98,55 @@ function MenuReportPage() {
         const duration = (foodData.duration / 10000).toFixed(2);
         const detailDuration = (foodData.in_detail.duration / 10000).toFixed(2);
 
+        const foodIndex = parseInt(foodName.replace("Food ", "")) - 1;
+        const foodNameFromMenuList = menuList[foodIndex]?.name;
+
         const foodDuration = {
-          name: foodName,
+          index: foodIndex,
+          name: foodNameFromMenuList,
           duration: duration,
         };
 
         const foodDetailDuration = {
-          name: foodName,
+          index: foodIndex,
+          name: foodNameFromMenuList,
           duration: detailDuration,
         };
+
+        console.log(
+          "foodNameFromMenuList, duration",
+          foodNameFromMenuList,
+          duration
+        );
 
         menuPageDurations.push(foodDuration);
         menuDetailDurations.push(foodDetailDuration);
       }
     }
+
+    for (let i = 0; i < menuList.length; i++) {
+      if (!menuPageDurations.some((item) => item.name === menuList[i].name)) {
+        menuPageDurations.push({
+          index: i,
+          name: menuList[i].name,
+          duration: 0,
+        });
+      }
+
+      if (!menuDetailDurations.some((item) => item.name === menuList[i].name)) {
+        menuDetailDurations.push({
+          index: i,
+          name: menuList[i].name,
+          duration: 0,
+        });
+      }
+    }
+
+    menuPageDurations.sort((a, b) => a.index - b.index);
+    menuDetailDurations.sort((a, b) => a.index - b.index);
+
+    console.log("menuPageDurations", menuPageDurations);
+    console.log("menuDetailDurations", menuDetailDurations);
 
     setMenuPageDwellTime(menuPageDurations);
     setMenuDetailDwellTime(menuDetailDurations);
@@ -125,14 +160,31 @@ function MenuReportPage() {
         const foodData = aoiData.total_food_report[foodName];
         const fixCount = foodData.fix_count;
 
+        const foodIndex = parseInt(foodName.replace("Food ", "")) - 1;
+        const foodNameFromMenuList = menuList[foodIndex]?.name;
+
         const foodFixCount = {
-          name: foodName,
+          index: foodIndex,
+          name: foodNameFromMenuList,
           value: fixCount,
         };
 
         fixationValues.push(foodFixCount);
       }
     }
+
+    for (let i = 0; i < menuList.length; i++) {
+      if (!fixationValues.some((item) => item.name === menuList[i].name)) {
+        fixationValues.push({
+          index: i,
+          name: menuList[i].name,
+          value: 0,
+        });
+      }
+    }
+
+    fixationValues.sort((a, b) => a.index - b.index);
+
     setFixRatio(fixationValues);
   };
 
@@ -281,7 +333,6 @@ function MenuReportPage() {
 
     // setFoodRankOfGtoF(rank);
 
-    // 'Food 6' 메뉴의 상위 백분위수 계산
     const percentileFood = findPercentile(normalizedData, fNum);
     console.log("percentile", percentileFood);
     setFoodsPercentage(percentileFood.toFixed(0));
@@ -414,7 +465,7 @@ function MenuReportPage() {
               <div className={MAnalysis.menuPageDwellTime}>
                 <p>총 체류시간</p>
                 <div className={MAnalysis.barChartWithAvg1}>
-                  <BarChartWithAvg data={menuPageDwellTime} />
+                  <BarChartWithAvg data={menuPageDwellTime} index={index} />
                 </div>
                 {/* <span>{dwellTime} 초</span> */}
               </div>
@@ -459,7 +510,7 @@ function MenuReportPage() {
               <div className={MAnalysis.menuDetailPageDwellTime}>
                 <p>총 체류시간</p>
                 <div className={MAnalysis.barChartWithAvg2}>
-                  <BarChartWithAvg data={menuDetailDwellTime} />
+                  <BarChartWithAvg data={menuDetailDwellTime} index={index} />
                 </div>
                 {/* <span>{duration} 초</span> */}
               </div>

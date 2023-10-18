@@ -35,7 +35,7 @@ const renderActiveShape = (props) => {
   const ey = my;
   const textAnchor = cos >= 0 ? "start" : "end";
 
-  const sectorFill = active ? "#1e2f4d" : fill;
+  const sectorFill = active ? "#6f81a0" : fill;
 
   return (
     <g>
@@ -94,6 +94,7 @@ const renderActiveShape = (props) => {
 
 function PieChartForFixation({ data, fNum }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const fNumWithNoFood = parseInt(fNum.replace("Food", "")) - 1;
   const onPieEnter = useCallback(
     (_, index) => {
       setActiveIndex(index);
@@ -101,17 +102,24 @@ function PieChartForFixation({ data, fNum }) {
     [setActiveIndex]
   );
 
+  const coloredData = data.map((item, index) => {
+    return {
+      ...item,
+      fill: item.index === fNumWithNoFood ? "#3c485d" : "#c0c0c0",
+    };
+  });
+
   return (
     <PieChart width={700} height={300}>
       <Pie
         activeIndex={activeIndex}
         activeShape={(props) => renderActiveShape({ ...props, active: true })}
-        data={data}
+        data={coloredData}
         cx={350}
         cy={150}
         innerRadius={80}
         outerRadius={100}
-        fill="#8884d8"
+        fill="#1e2f4d"
         dataKey="value"
         onMouseEnter={onPieEnter}
       />
