@@ -15,26 +15,35 @@ function StoreSettingPage() {
   const sID = localStorage.getItem("s_id");
   const [store, setStore] = useState({});
 
-  useEffect(() => {
-    if (sID) {
-      getStore(sID)
-        .then((res) => setStore(res.data))
-        .catch((error) => console.error(error));
-    }
-  }, [sID]);
-
   console.log("store", store);
 
   const [nameCheck, setNameCheck] = useState("");
-  const [name, setName] = useState(store.name || "");
-  const [desc, setDesc] = useState(store.desc || "");
-  const [schedule, setSchedule] = useState(store.schedule || "");
-  const [notice, setNotice] = useState(store.notice || "");
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  // const [schedule, setSchedule] = useState("");
+  const [notice, setNotice] = useState("");
 
   const [selectedOpenTime, setSelectedOpenTime] = useState("");
   const [selectedCloseTime, setSelectedCloseTime] = useState("");
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [showNameDuplicateMsg, setShowNameDuplicateMsg] = useState(false);
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  useEffect(() => {
+    if (sID) {
+      getStore(sID)
+        .then((res) => {
+          const data = res.data;
+          setStore(data);
+          setName(data.name || "");
+          setDesc(data.desc || "");
+          // setSchedule(data.schedule || "");
+          setNotice(data.notice || "");
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [sID]);
 
   const handleNameDuplicate = async (e) => {
     e.preventDefault();
@@ -73,6 +82,11 @@ function StoreSettingPage() {
     setSelectedCloseTime(time);
   };
 
+  const handleImageChange = (e) => {
+    const imageFile = e.target.files[0];
+    setSelectedImage(imageFile);
+  };
+
   const updateStoreInfo = async (e) => {
     e.preventDefault();
 
@@ -87,6 +101,12 @@ function StoreSettingPage() {
         notice: notice,
         status: 1,
       });
+
+      /**가게 대표 이미지 업로드 */
+      // const formData = new FormData();
+      // if (selectedImage) {
+      //   formData.append("image", selectedImage);
+      // }
 
       if (res.status === 200) {
         localStorage.setItem("s_id", res.data.document_id);
@@ -108,6 +128,14 @@ function StoreSettingPage() {
           </section>
           <section className={StoreSet.RegisterForm}>
             <form>
+              <div className={StoreSet.storeImageDiv}>
+                <span>가게 대표 이미지</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </div>
               <div className={StoreSet.storeNameDiv}>
                 <span>가게 이름</span>
                 <div className={StoreSet.storeNameCheckDiv}>
@@ -117,6 +145,7 @@ function StoreSettingPage() {
                       type="text"
                       name="store_name"
                       placeholder="Ex)한눈에 학식"
+                      value={name}
                       onChange={(e) => {
                         setNameCheck(e.target.value);
                         setShowNameDuplicateMsg(false);

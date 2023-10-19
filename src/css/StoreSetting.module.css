@@ -61,10 +61,13 @@
   width: 30vw;
 }
 
+.storeImageDiv,
 .storeNameDiv {
   display: flex;
   flex-direction: column;
-  height: 7vw;
+  height: 5vw;
+  margin-left: 0px;
+  margin-right: auto;
 }
 
 .storeNameCheckDiv {
