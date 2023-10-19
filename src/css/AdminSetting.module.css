@@ -60,16 +60,6 @@
   width: 500px;
 }
 
-.storeNameSection {
-  display: flex;
-  flex-flow: row nowrap;
-  width: 70vw;
-}
-
-.storeNameSection button {
-  margin-top: 45px;
-}
-
 .LastStoreNameSection,
 .IDSection,
 .PWSection,

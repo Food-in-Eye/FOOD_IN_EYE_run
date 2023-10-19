@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MenuBar from "../components/MenuBar";
 import Button from "../css/Button.module.css";
 import StoreSet from "../css/StoreSetting.module.css";
 import SelectTime from "../components/SelectTime.module";
-import { postStore } from "../components/API.module";
+import { getStore, postStore } from "../components/API.module";
 import { useNavigate } from "react-router-dom";
 import useTokenRefresh from "../components/useTokenRefresh";
 
@@ -12,16 +12,33 @@ function StoreSettingPage() {
   const navigate = useNavigate();
 
   const uID = localStorage.getItem("u_id");
+  const sID = localStorage.getItem("s_id");
+  const [store, setStore] = useState({});
+
+  useEffect(() => {
+    if (sID) {
+      getStore(sID)
+        .then((res) => setStore(res.data))
+        .catch((error) => console.error(error));
+    }
+  }, [sID]);
+
+  console.log("store", store);
 
   const [nameCheck, setNameCheck] = useState("");
-  const [name, setName] = useState("");
+  const [name, setName] = useState(store.name || "");
+  const [desc, setDesc] = useState(store.desc || "");
+  const [schedule, setSchedule] = useState(store.schedule || "");
+  const [notice, setNotice] = useState(store.notice || "");
+
   const [selectedOpenTime, setSelectedOpenTime] = useState("");
   const [selectedCloseTime, setSelectedCloseTime] = useState("");
-
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [showNameDuplicateMsg, setShowNameDuplicateMsg] = useState(false);
 
   const handleNameDuplicate = async (e) => {
     e.preventDefault();
+    setIsButtonClicked(true);
     try {
       const res = await postStore(`/namecheck`, {
         name: nameCheck,
@@ -31,6 +48,7 @@ function StoreSettingPage() {
         setShowNameDuplicateMsg(false);
         setName(nameCheck);
       } else if (res.data.state === "unavailable") {
+        setIsButtonClicked(false);
         setShowNameDuplicateMsg(true);
       }
     } catch (error) {
@@ -41,6 +59,7 @@ function StoreSettingPage() {
       } else {
         console.log("Error checking store name duplicate:", error);
       }
+      setIsButtonClicked(false);
     }
 
     setName(nameCheck);
@@ -54,7 +73,7 @@ function StoreSettingPage() {
     setSelectedCloseTime(time);
   };
 
-  const onRegister = async (e) => {
+  const updateStoreInfo = async (e) => {
     e.preventDefault();
 
     const desc = document.querySelector("#store_desc").value;
@@ -74,7 +93,7 @@ function StoreSettingPage() {
         navigate("/main");
       }
     } catch (error) {
-      console.log(error);
+      console.log("가게 정보 업데이트 오류", error);
     }
   };
 
@@ -89,37 +108,48 @@ function StoreSettingPage() {
           </section>
           <section className={StoreSet.RegisterForm}>
             <form>
-              <section className={StoreSet.storeNameSection}>
-                <label htmlFor="store_name">
-                  <span>가게 이름</span>
-                  <input
-                    id="store_name"
-                    type="text"
-                    name="store_name"
-                    placeholder="Ex)한눈에 학식"
-                    onChange={(e) => {
-                      setNameCheck(e.target.value);
-                      setShowNameDuplicateMsg(false);
-                    }}
-                    style={{
-                      width: "21vw",
-                      border:
-                        name &&
-                        showNameDuplicateMsg === false &&
-                        "2px solid #52bf8b",
-                    }}
-                  />
-                </label>
-                <button
-                  className={Button.nameDuplicateCheck}
-                  onClick={handleNameDuplicate}
-                >
-                  이름 중복 확인
-                </button>
-              </section>
-              {nameCheck && showNameDuplicateMsg && (
-                <p style={{ color: "#B9062F" }}>이미 사용 중인 이름 입니다.</p>
-              )}
+              <div className={StoreSet.storeNameDiv}>
+                <span>가게 이름</span>
+                <div className={StoreSet.storeNameCheckDiv}>
+                  <label htmlFor="store_name">
+                    <input
+                      id="store_name"
+                      type="text"
+                      name="store_name"
+                      placeholder="Ex)한눈에 학식"
+                      onChange={(e) => {
+                        setNameCheck(e.target.value);
+                        setShowNameDuplicateMsg(false);
+                      }}
+                      style={{
+                        width: "21vw",
+                        border:
+                          name &&
+                          isButtonClicked &&
+                          showNameDuplicateMsg === false &&
+                          "2px solid #52bf8b",
+                      }}
+                    />
+                  </label>
+                  <button
+                    className={Button.nameDuplicateCheck}
+                    onClick={handleNameDuplicate}
+                  >
+                    이름 중복 확인
+                  </button>
+                </div>
+                <div className={StoreSet.showDuplicateMessage}>
+                  {nameCheck && isButtonClicked && showNameDuplicateMsg ? (
+                    <p style={{ color: "#B9062F" }}>
+                      이미 사용 중인 이름 입니다.
+                    </p>
+                  ) : (
+                    nameCheck &&
+                    isButtonClicked &&
+                    !showNameDuplicateMsg && <p>사용 가능한 이름 입니다.</p>
+                  )}
+                </div>
+              </div>
               <div className={StoreSet.selectTimeDiv}>
                 <span>운영 시간</span>
                 <SelectTime
@@ -127,31 +157,37 @@ function StoreSettingPage() {
                   onSelectCloseTime={handleSelectCloseTime}
                 />
               </div>
-              <label htmlFor="store_desc">
-                <span>가게 한 줄 소개</span>
-                <textarea
-                  id="store_desc"
-                  type="text"
-                  name="store_desc"
-                  cols="30"
-                  rows="2"
-                  placeholder="가게 한 줄 소개를 작성해보세요!"
-                />
-              </label>
-              <label htmlFor="store_notice">
-                <span>가게 공지사항</span>
-                <textarea
-                  id="store_notice"
-                  type="text"
-                  name="store_notice"
-                  cols="30"
-                  rows="2"
-                  placeholder="가게의 공지사항을 적어주세요!"
-                />
-              </label>
+              <div className={StoreSet.setDescAndNoticeDiv}>
+                <label htmlFor="store_desc">
+                  <span>가게 한 줄 소개</span>
+                  <textarea
+                    id="store_desc"
+                    type="text"
+                    name="store_desc"
+                    cols="30"
+                    rows="2"
+                    placeholder="가게 한 줄 소개를 작성해보세요!"
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                  />
+                </label>
+                <label htmlFor="store_notice">
+                  <span>가게 공지사항</span>
+                  <textarea
+                    id="store_notice"
+                    type="text"
+                    name="store_notice"
+                    cols="30"
+                    rows="2"
+                    placeholder="가게의 공지사항을 적어주세요!"
+                    value={notice}
+                    onChange={(e) => setNotice(e.target.value)}
+                  />
+                </label>
+              </div>
             </form>
           </section>
-          <button className={Button.registerStore} onClick={onRegister}>
+          <button className={Button.registerStore} onClick={updateStoreInfo}>
             등록하기
           </button>
         </div>

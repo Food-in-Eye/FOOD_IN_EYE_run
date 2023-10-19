@@ -43,7 +43,7 @@ function SelectTime({ onSelectOpenTime, onSelectCloseTime }) {
         </select>
       </label>
 
-      <span>-</span>
+      <span> - </span>
 
       <label htmlFor="close-time-select">
         <select
