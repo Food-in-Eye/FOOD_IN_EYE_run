@@ -106,12 +106,14 @@ async def read_menu_with_foods(id:str):
             "num": food['num']
         })
     response['f_list'] = food_list
-    
+    s_id = Util.check_id(response['s_id'])
+    store = DB.read_one('store', {'_id':s_id})
+
     return {
         "_id": id,
         "s_id": response['s_id'],
-        "s_num": response['s_num'],
-        's_name': response['name'],
+        "s_num": store['num'],
+        's_name': store['name'],
         "date": Util.get_local_time(response['date']),
         "f_list" : response['f_list']
     }
