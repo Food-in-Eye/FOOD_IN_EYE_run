@@ -133,7 +133,7 @@ function TotalReportPage() {
         <span className={TR.tabElementFirstSpan}>시선/체류 시간과 주문량</span>
         <section className={TR.scatterChart}>
           <div className={TR.scatterChartLeftDiv}>
-            <DailyScatterChart />
+            <DailyScatterChart data={dailyReportData} />
           </div>
           <div className={TR.scatterChartRightDiv}>
             <div className={TR.scatterChartDesc}>
@@ -188,7 +188,7 @@ function TotalReportPage() {
 
           <div className={TR.menuChartBody}>
             <div className={TR.menuChartUpDiv}>
-              <TheMenuChart />
+              <TheMenuChart data={dailyReportData} />
             </div>
             <div className={TR.menuChartDownDiv}>
               <div className={TR.menuChartDescUp}>

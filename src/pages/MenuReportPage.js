@@ -24,6 +24,7 @@ function MenuReportPage() {
 
   console.log("name", name);
   console.log("menuList", menuList);
+  console.log("dailyReportData", dailyReportData);
 
   const aoiData = dailyReportData.aoi_summary;
   const saleData = dailyReportData.sale_summary;
@@ -54,19 +55,20 @@ function MenuReportPage() {
     let maxHour = -1;
 
     const foodDetail = saleData.food_detail[fNum];
-    const hoursData = foodDetail.hourly_sale_info;
-    hoursData.forEach((hourlyInfo, hour) => {
-      if (hourlyInfo.count > maxCount) {
-        maxCount = hourlyInfo.count;
-        maxHour = hour;
-      }
-    });
+    const hoursData = foodDetail?.hourly_sale_info;
+    hoursData &&
+      hoursData.forEach((hourlyInfo, hour) => {
+        if (hourlyInfo.count > maxCount) {
+          maxCount = hourlyInfo.count;
+          maxHour = hour;
+        }
+      });
 
-    const menuTotalSales = foodDetail.total_sales;
+    const menuTotalSales = foodDetail?.total_sales;
     const totalSales = saleData.total_sales;
 
     setMaxHour(maxHour);
-    setMenuSalesCount(foodDetail.total_count);
+    setMenuSalesCount(foodDetail?.total_count);
     setSaleRatio(parseInt(((menuTotalSales / totalSales) * 100).toFixed(0)));
 
     console.log("menuTotalSales, totalSales", menuTotalSales, totalSales);
@@ -74,16 +76,16 @@ function MenuReportPage() {
 
   const setAoiData = () => {
     const foodDetail = aoiData.total_food_report[fNum];
-    const menuFixCount = foodDetail.fix_count;
+    const menuFixCount = aoiData.total_food_report[fNum]?.fix_count;
     const totalFixCount = aoiData.total_fix_count;
 
     // setDwellTime((foodDetail.duration / 10000).toFixed(2));
     setFixRatio(((menuFixCount / totalFixCount) * 100).toFixed(1));
-    setScore(foodDetail.score);
-    setVisitCount(foodDetail.in_detail.visit);
+    setScore(foodDetail?.score || 0);
+    setVisitCount(foodDetail?.in_detail.visit || 0);
     // setDuration((foodDetail.in_detail.duration / 10000).toFixed(2));
 
-    getPercentageOfFixData(foodDetail.in_detail.fix_count);
+    getPercentageOfFixData(foodDetail?.in_detail.fix_count || 0);
   };
 
   const setDwellTimes = () => {
@@ -286,10 +288,12 @@ function MenuReportPage() {
 
     // 'Food 6' 메뉴의 정규화된 값을 찾아 상위 몇 퍼센트에 속하는지 계산
     const findPercentile = (data, targetName) => {
+      console.log("data, targetName", data, targetName);
       const targetItem = data.find((item) => item.name === targetName);
-      setFixCount(targetItem.fixation_count);
-      setGazeCount(targetItem.gaze_count);
-      const targetValue = targetItem.normalized_ratio;
+
+      setFixCount(targetItem?.fixation_count || 0);
+      setGazeCount(targetItem?.gaze_count || 0);
+      const targetValue = targetItem?.normalized_ratio || 0;
 
       const percentile =
         (data.filter((item) => item.normalized_ratio > targetValue).length /
@@ -389,15 +393,26 @@ function MenuReportPage() {
             <div className={MAnalysis.menuSummaryBody}>
               <div className={MAnalysis.menuSummarySaleCount}>
                 <p>판매 개수</p>
-                <span>{menuSalesCount} 개</span>
+                <span>{menuSalesCount || 0} 개</span>
               </div>
-              <div className={MAnalysis.menuSummaryTime}>
-                <p>인기 시간대</p>
-                <span>{maxHour} 시</span>
-              </div>
+
+              {maxHour !== -1 && maxHour ? (
+                <div className={MAnalysis.menuSummaryTime}>
+                  <p>인기 시간대</p>
+                  <span>{maxHour} 시</span>
+                </div>
+              ) : (
+                <div
+                  className={MAnalysis.menuSummaryTime}
+                  style={{ backgroundColor: "#d2d2d2" }}
+                >
+                  <p>인기 시간대</p>
+                  <span>없음</span>
+                </div>
+              )}
               <div className={MAnalysis.menuSummarySales}>
                 <p>총 매출액의 매출 기여도</p>
-                <span>{saleRatio} %</span>
+                <span>{saleRatio || 0} %</span>
               </div>
             </div>
           </section>
@@ -420,15 +435,28 @@ function MenuReportPage() {
               </p>
             </div>
             <div className={MAnalysis.GtoFRatioBody}>
-              <div className={MAnalysis.GtoFRatioValue}>
-                <p>
-                  시선 수 대비 Fixation 수 비율:{" "}
-                  <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
-                </p>
-                <div className={MAnalysis.GtoFRatioPieChart}>
-                  <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
+              {gazeCount ? (
+                <div className={MAnalysis.GtoFRatioValue}>
+                  <p>
+                    시선 수 대비 Fixation 수 비율:{" "}
+                    <span>{((fixCount / gazeCount) * 100).toFixed(1)} %</span>
+                  </p>
+                  <div className={MAnalysis.GtoFRatioPieChart}>
+                    <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div
+                  className={MAnalysis.GtoFRatioValue}
+                  style={{ backgroundColor: "#d2d2d2" }}
+                >
+                  <p>
+                    해당 메뉴에는 시선 데이터가 없으므로 그래프가 제공되지
+                    않습니다.
+                  </p>
+                </div>
+              )}
+
               <div className={MAnalysis.GtoFRatioPercent}>
                 <p>
                   전 메뉴 중 <strong style={{ fontSize: "20px" }}>상위 </strong>
@@ -461,7 +489,9 @@ function MenuReportPage() {
             </div>
             <div className={MAnalysis.menuPageStatisticsBody}>
               <div className={MAnalysis.menuPageDwellTime}>
-                <p>총 체류시간</p>
+                <p>
+                  <strong>총 체류시간</strong>
+                </p>
                 <div className={MAnalysis.barChartWithAvg1}>
                   <BarChartWithAvg data={menuPageDwellTime} index={index} />
                 </div>
@@ -473,7 +503,10 @@ function MenuReportPage() {
                   <span>{score} 점</span>
                 </div>
                 <div className={MAnalysis.menuPageGazeRatio}>
-                  <p>총 시선 점유율</p>
+                  <p>
+                    <strong>총 시선 점유율</strong> <br /> *시선 수가 없는
+                    메뉴는 해당 그래프에 표시되지 않습니다.
+                  </p>
                   <div className={MAnalysis.pieChartForFix}>
                     <PieChartForFixation data={fixRatio} fNum={fNum} />
                   </div>
@@ -506,7 +539,9 @@ function MenuReportPage() {
                 <span>{visitCount} 회</span>
               </div> */}
               <div className={MAnalysis.menuDetailPageDwellTime}>
-                <p>총 체류시간</p>
+                <p>
+                  <strong>총 체류시간</strong>
+                </p>
                 <div className={MAnalysis.barChartWithAvg2}>
                   <BarChartWithAvg data={menuDetailDwellTime} index={index} />
                 </div>
@@ -514,7 +549,9 @@ function MenuReportPage() {
               </div>
             </div>
             <div className={MAnalysis.menuDetailOrderRatio}>
-              <p>방문 대비 판매 건수</p>
+              <p>
+                <strong>방문 대비 판매 건수</strong>
+              </p>
               <div className={MAnalysis.vBarChart}>
                 <VerticalBarChart chartData={salesPerVisitData} />
               </div>
@@ -536,11 +573,11 @@ function MenuReportPage() {
             <div className={MAnalysis.menuDetailPageGazeBody}>
               <img src={menuDetailPage} alt="menuDetailPage" />
               <div className={MAnalysis.detailDiv}>
-                <p>메뉴 이름: {fixDataInDetail.name} %</p>
-                <p>메뉴 이미지: {fixDataInDetail.image} %</p>
-                <p>메뉴 정보: {fixDataInDetail.info} %</p>
-                <p>메뉴 가격: {fixDataInDetail.price} %</p>
-                <p>그 외: {fixDataInDetail.etc} %</p>
+                <p>메뉴 이름: {fixDataInDetail?.name || 0} %</p>
+                <p>메뉴 이미지: {fixDataInDetail?.image || 0} %</p>
+                <p>메뉴 정보: {fixDataInDetail?.info || 0} %</p>
+                <p>메뉴 가격: {fixDataInDetail?.price || 0} %</p>
+                <p>그 외: {fixDataInDetail?.etc || 0} %</p>
               </div>
             </div>
             {/* <div className={MAnalysis.menuDetailPageGazeBody}> */}

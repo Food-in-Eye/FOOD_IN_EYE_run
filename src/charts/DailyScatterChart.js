@@ -22,10 +22,13 @@ import {
 //   { x: 110, y: 280, z: 200 },
 // ];
 
-function DailyScatterChart() {
+function DailyScatterChart(data) {
   const sID = "64a2d45c1fe80e3e4db82af9";
-  const aoiData = dailyReport["Store 1"].aoi_summary.total_food_report;
-  const saleData = dailyReport["Store 1"].sale_summary.food_detail;
+
+  console.log("data", data);
+
+  const aoiData = data.data.aoi_summary.total_food_report;
+  const saleData = data.data.sale_summary.food_detail;
   const [fNameList, setFNameList] = useState([]);
 
   const [xAxisType, setXAxisType] = useState("fixCount");
@@ -58,7 +61,7 @@ function DailyScatterChart() {
       ) {
         const foodData = aoiData[foodName];
         const fixCount = foodData.fix_count;
-        const duration = foodData.duration / 1000;
+        const duration = (foodData.duration / 1000).toFixed(2);
 
         let totalCount = 0;
         let totalSales = 0;

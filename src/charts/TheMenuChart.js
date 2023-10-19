@@ -3,15 +3,15 @@ import { useCallback, useState, useEffect } from "react";
 import MChart from "../css/MenuChart.module.css";
 import dailyReport from "../data/daily_report.json";
 
-function TheMenuChart() {
-  const sID = "64a2d45c1fe80e3e4db82af9";
+function TheMenuChart(data) {
+  const sID = localStorage.getItem("s_id");
   const [foodCount, setFoodCount] = useState(0);
   const [menuItems, setMenuItems] = useState([]);
   const [menuItemValue, setMenuItemValue] = useState(null);
   const [foodDataArray, setFoodDataArray] = useState([]);
 
-  const aoiData = dailyReport["Store 1"].aoi_summary.total_food_report;
-  const saleData = dailyReport["Store 1"].sale_summary.food_detail;
+  const aoiData = data.data.aoi_summary.total_food_report;
+  const saleData = data.data.sale_summary.food_detail;
 
   const handleMenuItemValueChange = (e) => {
     setMenuItemValue(e.target.value);
@@ -50,9 +50,10 @@ function TheMenuChart() {
         foodName !== "Store INFO"
       ) {
         const foodData = aoiData[foodName];
-        const inDetail = foodData.in_detail || {};
-        const visitCount = foodData.visit_count + (inDetail.visit || 0);
-        const dwellTime = (foodData.duration + (inDetail.duration || 0)) / 1000;
+        const inDetail = foodData?.in_detail || {};
+        const visitCount = foodData?.visit_count || 0 + inDetail?.visit || 0;
+        const dwellTime =
+          (foodData?.duration || 0 + inDetail?.duration || 0) / 1000;
         const score = foodData.score;
 
         let orderCount = 0;
@@ -60,17 +61,17 @@ function TheMenuChart() {
 
         for (const fieldName in saleData) {
           if (fieldName === foodName) {
-            orderCount = saleData[fieldName].total_count;
-            saleCount = saleData[fieldName].total_sales;
+            orderCount = saleData[fieldName]?.total_count || 0;
+            saleCount = saleData[fieldName]?.total_sales || 0;
 
             break;
           }
         }
 
         dataArray.push({
-          visitCount: visitCount,
+          visitCount: visitCount || 0,
           dwellTime: dwellTime.toFixed(1),
-          score: score,
+          score: score || 0,
           totalSales: saleCount,
           totalCount: orderCount,
         });
