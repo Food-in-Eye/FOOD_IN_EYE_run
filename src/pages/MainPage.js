@@ -77,7 +77,7 @@ function MainPage() {
 
       const ordersResponse = await getOrders(ordersQuery);
 
-      const orders = ordersResponse.data.order_list;
+      const orders = ordersResponse?.data.order_list;
 
       const foodsResponse = await Promise.all(
         orders.map(async (order) => {
