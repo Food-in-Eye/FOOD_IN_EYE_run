@@ -7,7 +7,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import DailyScatterChart from "../charts/DailyScatterChart";
 import BarChart from "../charts/BarChart";
 import TheMenuChart from "../charts/TheMenuChart";
-// import dailyReport from "../data/daily_report.json";
 
 function TotalReportPage() {
   useTokenRefresh();
@@ -27,11 +26,6 @@ function TotalReportPage() {
     (aoiData.total_fix_count / aoiData.total_gaze_count) *
     100
   ).toFixed(1)} %`;
-
-  /**임시 데이터 */
-  // const totalDwellTime = `96.3분`;
-  // const visitCount = `61회`;
-  // const gToFRatio = `13%`;
 
   const useMoveScroll = (elementId) => {
     const element = useRef(null);
@@ -191,12 +185,14 @@ function TotalReportPage() {
               👀사용자의 시선이 포함된 기준들: 체류시간, 집중도
             </p>
           </div>
-          {/* <div className={TR.menuChartDownDiv}>
-          <p>원하는 것을 골라서 메뉴들을 한눈에 확인하고 비교해보세요!</p>
-            <div className={TR.menuChartDesc}>
+
+          <div className={TR.menuChartBody}>
+            <div className={TR.menuChartUpDiv}>
+              <TheMenuChart />
+            </div>
+            <div className={TR.menuChartDownDiv}>
               <div className={TR.menuChartDescUp}>
                 <span>✏️ 다음 분석에 대한 설명</span>
-                
                 <p>
                   * 집중도는 사용자가 해당 메뉴에 대해 얼마나 집중하였는지 저희
                   웹에서 사용하는 공식을 통해 도출한 점수입니다.
@@ -214,9 +210,6 @@ function TotalReportPage() {
                 </p>
               </div>
             </div>
-          </div> */}
-          <div className={TR.menuChartUpDiv}>
-            <TheMenuChart />
           </div>
         </div>
       </div>

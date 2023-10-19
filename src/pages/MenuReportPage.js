@@ -2,9 +2,7 @@ import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
 import PieChartWithNeedle from "../charts/PieChartWithNeedle";
 import VerticalBarChart from "../charts/VerticalBarChart";
-// import dailyReport from "../data/daily_report.json";
 import menuDetailPage from "../images/menu-detail-ex.jpeg";
-
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import PieChartForFixation from "../charts/PieChartForFixation";
