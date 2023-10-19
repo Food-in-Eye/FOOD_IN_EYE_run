@@ -108,51 +108,51 @@ async def get_report():
 #         return e
 
 # history내의 모든 시선데이터에 대해서 filter와 aoi 통계를 일괄 적용(설정이 바뀐 경우에 한번에 적용하기에 유리)
-# from core.common.mongo import MongodbController
-# import os
-# from dotenv import load_dotenv
-# import httpx
-# from .routers.src.util import Util
-# from .routers.src.meta import Meta
+from core.common.mongo import MongodbController
+import os
+from dotenv import load_dotenv
+import httpx
+from .routers.src.util import Util
+from .routers.src.meta import Meta
 
-# @v2_router.get("/test")
-# async def testcode():
-#     DB = MongodbController('FIE_DB2')
-#     try:
-#         load_dotenv()
+@v2_router.get("/test")
+async def testcode():
+    DB = MongodbController('FIE_DB2')
+    try:
+        load_dotenv()
 
-#         filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
-#         aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/analysis"
-#         headers = {"Content-Type": "application/json"}
-        
-#         datas = DB.read_all('history', {'date':{"$gte": datetime(2023, 8, 17)} }, {'_id':1, 'raw_gaze_path':1})
-#         for d in datas:
-#             print(d)
-#             if 'raw_gaze_path' in d.keys() and d['raw_gaze_path'] != None:
-#                 h_id = str(d['_id'])
-#                 raw_data_key = d['raw_gaze_path']
-#                 print(raw_data_key)
+        filter_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/filter/execute"
+        aoi_url = os.environ['ANALYSIS_BASE_URL'] + "/anlz/v1/aoi/analysis"
+        headers = {"Content-Type": "application/json"}
+       
+        datas = DB.read_all('history', {'date':{"$gte": datetime(2023, 9, 12, 4, 45)} , 'raw_gaze_path':{'$ne': None}}, {'_id':1, 'raw_gaze_path':1})
+        result = []
+        for d in datas:
+            if 'raw_gaze_path' in d.keys() and d['raw_gaze_path'] != None:
+                h_id = str(d['_id'])
+                raw_data_key = d['raw_gaze_path']
+                print(raw_data_key)
 
-#                 async with httpx.AsyncClient() as client:
-#                     _id = Util.check_id(h_id)
-#                     doc = DB.read_one('history', {'_id':_id})
-#                     payload = {
-#                     "raw_data_key": raw_data_key,
-#                     "meta_info": Meta.get_meta_detail(doc['date'])
-#                     }
-#                     response = await client.post(filter_url, json=payload, headers=headers)
-#                     data = response.json()
-#                     fix_key = data["fixation_key"]
+                async with httpx.AsyncClient() as client:
+                    _id = Util.check_id(h_id)
+                    doc = DB.read_one('history', {'_id':_id})
+                    payload = {
+                    "raw_data_key": raw_data_key,
+                    "meta_info": Meta.get_meta_detail(doc['date'])
+                    }
+                    response = await client.post(filter_url, json=payload, headers=headers)
+                    data = response.json()
+                    fix_key = data["fixation_key"]
 
-#                     response = await client.get(aoi_url + f'?key={fix_key}')
-#                     data = response.json()
-#                     aoi_key = data["aoi_key"]
-#                     print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
+                    response = await client.get(aoi_url + f'?key={fix_key}')
+                    data = response.json()
+                    aoi_key = data["aoi_key"]
+                    print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
                 
-#                 DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
-            
-        
+                DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
+                result.append({h_id:{'fixation_path': fix_key, 'aoi_analysis': aoi_key}})
+        return result
 
-#     except Exception as e:
-#         print(e)
-#         return e
+    except Exception as e:
+        print(e)
+        return e
