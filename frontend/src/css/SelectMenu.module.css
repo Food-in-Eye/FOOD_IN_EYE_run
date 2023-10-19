@@ -18,6 +18,7 @@
 
 .inner span {
   color: #1e1e1e;
+  font-family: "Hahmlet-SemiBold";
   font-size: 30px;
   font-weight: 800;
 }
@@ -25,6 +26,7 @@
 .inner p {
   white-space: nowrap;
   color: #4d4d4d;
+  font-family: "Hahmlet-Regular";
   font-size: 20px;
   font-weight: 500;
   background: none;
@@ -46,8 +48,9 @@
   padding: 10px 20px;
   border: 1px solid #000;
   border-radius: 10px;
-  font-size: 25px;
   color: #3a3a3a;
+  font-size: 25px;
+  font-family: "Hahmlet-Medium";
   white-space: nowrap;
   transition: all 0.3s;
 }

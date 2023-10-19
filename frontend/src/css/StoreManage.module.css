@@ -15,8 +15,6 @@
   float: right;
   flex-direction: row;
   margin: 10px 50px 10px 0px;
-  /* border: 2px solid #ff9345; */
-  /* border-radius: 10px; */
 }
 
 .statusButton {
@@ -27,9 +25,7 @@
   margin: 0 10px;
   padding: 25px;
   font-size: 20px;
-  font-family: "Akaya Telivigala";
-  font-style: normal;
-  font-weight: 400;
+  font-family: "Hahmlet-SemiBold";
   line-height: 16px;
   color: #000;
   background: #fff;
@@ -43,15 +39,13 @@
 }
 
 .description h2 {
-  width: auto;
-  height: auto;
-  display: flex;
   float: left;
-  justify-content: center;
+  text-align: center;
+  width: auto;
   margin: 10px 10px 0px 50px;
-  align-items: center;
-  background: #ff9345;
   border-radius: 300px 300px 0 0;
+  font-family: "Hahmlet-SemiBold";
+  background: #ff9345;
 }
 
 .desc {
@@ -80,22 +74,18 @@
   background-color: #d9d9d9;
 }
 
-/* 공지사항 CSS*/
-
 .noticeBlock {
   width: 100%;
 }
 
 .noticeBlock h2 {
-  width: 300px;
-  height: auto;
   float: left;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
   margin: 10px 0px 0px 50px;
-  background: #337db1;
+  width: 300px;
+  font-family: "Hahmlet-SemiBold";
   border-radius: 0px 300px 0px 0px;
+  background: #337db1;
 }
 
 .notice {
@@ -116,21 +106,32 @@
 }
 
 .modifyBtn {
+  font-family: "Hahmlet-Regular";
   margin: auto 0px 0px auto;
 }
 
-p {
-  width: 70%;
+.description h3,
+.notice h3 {
+  font-family: "Hahmlet-Medium";
+  font-size: 20px;
+}
+
+.description p,
+.notice p {
+  width: 65%;
   height: auto;
-  font-size: 15px;
+  font-family: "Hahmlet-Light";
+  font-size: 18px;
   margin: 10px 50px 0px 50px;
   background-color: #d9d9d9;
 }
 
-textarea {
+.description textarea,
+.notice textarea {
   width: 70%;
   height: auto;
-  font-size: 15px;
+  font-family: "Hahmlet-Light";
+  font-size: 18px;
   margin: 10px 50px 0px 50px;
   background-color: #d9d9d9;
 }

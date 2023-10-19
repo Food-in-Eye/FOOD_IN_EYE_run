@@ -7,24 +7,23 @@
   padding: 0px;
 }
 
-.menus,
-.info {
-  height: auto;
-  display: flex;
-  flex-flow: column wrap;
-  margin-top: 50px;
-}
-
 .menus {
-  width: 500px;
-  padding: 30px;
-  margin-left: 5%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 25vw;
+  margin-top: 50px;
+  padding: 5%;
   box-shadow: 0px 2px 15px #353333;
 }
 
 .info {
+  display: flex;
+  flex-direction: column;
   width: 700px;
-  padding: 20px 80px 20px 80px;
+  margin-top: 50px;
+  padding: 5% 15%;
   border: 3px solid #000;
 }
 
@@ -33,58 +32,47 @@
   text-align: center;
 }
 
-h1 {
+.title h1 {
+  font-family: "Hahmlet-SemiBold";
   font-size: 50px;
 }
 
-h2 {
+.inner h2 {
+  white-space: nowrap;
+  font-family: "Hahmlet-SemiBold";
   font-size: 40px;
 }
 
 .menus ul {
-  width: 400px;
-  height: auto;
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-top: 30px;
+  width: 20vw;
+  height: 25vw;
+  overflow: hidden;
+  margin: 30px auto 0px auto;
   background-color: #fff;
 }
 
 .menus li {
   width: 100%;
   height: 70px;
-  margin: 20px 10px 10px 0px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+  margin: 2% 0px;
   font-size: 30px;
   border: 2px solid #2f365f;
   border-radius: 20px;
 }
 
 .menus li span {
+  font-family: "Hahmlet-Regular";
   margin: 0px auto 0px 50px;
 }
-/* 
-.menus li button {
-  width: 20%;
-  height: 100%;
-  float: right;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0px -1px 0px 0px;
-  padding: 20px;
-  border: none;
-  border-radius: 0px 20px 20px 0px;
-  font-size: 20px;
-} */
 
 .menus button {
   margin: 60px 0px 5px auto;
 }
 
-hr {
+.inner hr {
   margin-left: 10%;
 }
 
@@ -102,17 +90,26 @@ hr {
 .infoUpper {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 20vw;
+}
+
+.imgButtons {
+  margin-top: 10px;
 }
 
 .Img {
   display: flex;
-  flex: 1;
-  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* text-align: center; */
 }
 
-.infoUpper button {
+/* .infoUpper button {
   margin-right: 500px;
-}
+} */
 
 .crop {
   display: flex;
@@ -130,10 +127,11 @@ hr {
 }
 
 .Img .menuImg {
-  width: 30%;
+  width: 40%;
   height: auto;
   margin-top: 10%;
   object-fit: cover;
+  border-radius: 100%;
 }
 
 .Img form {
@@ -144,6 +142,7 @@ hr {
 
 .Img .foodImgLabel {
   margin: 20px 0 10px 0;
+  font-family: "Hahmlet-Regular";
   font-size: 20px;
   font-weight: bold;
   color: #616162;
@@ -177,6 +176,7 @@ hr {
   align-items: center;
   margin: 10px auto 20px 10px;
   padding: 20px 0px 20px 15px;
+  font-family: "Hahmlet-Medium";
   font-size: 20px;
 }
 
@@ -186,23 +186,26 @@ hr {
   float: left;
   margin-top: 6%;
   margin-right: 20%;
-  padding: 5px 0px 5px 5px;
+  padding: 0px 0px 5px 5px;
+  font-family: "Hahmlet-Regular";
   font-size: 20px;
   background-color: #fff;
 }
 
-.button {
-  width: 30%;
-
+.infoButtons {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  margin-top: 80%;
+  width: 30%;
+  margin-top: 10px;
 }
 
-textarea {
+.origin textarea {
   width: 70%;
   height: auto;
-  font-size: 20px;
   margin: 30px 30px 0px 30px;
+  font-family: "Hahmlet-Regular";
+  font-size: 20px;
   background-color: #fff;
 }
 
@@ -217,6 +220,5 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
-  font-size: 30px;
+  font-size: 25px;
 }

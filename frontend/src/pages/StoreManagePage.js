@@ -164,7 +164,6 @@ function StoreManagePage() {
               </button>
             </div>
           </div>
-
           <section className={Store.description}>
             <h2>"{store.name}" 가게</h2>
             <div className={Store.desc}>
@@ -214,7 +213,6 @@ function StoreManagePage() {
               )}
             </div>
           </section>
-
           <section className={Store.noticeBlock}>
             <h2>가게 공지사항</h2>
             <div className={Store.notice}>

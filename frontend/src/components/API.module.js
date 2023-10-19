@@ -37,11 +37,6 @@ async function retryOriginalRequest(error) {
     return apiInstance(originalRequest);
   } catch (retryError) {
     resetLogin();
-    // if (retryError.response.status === 401) {
-
-    // } else {
-    //   return Promise.reject(retryError);
-    // }
   }
 }
 
@@ -98,6 +93,11 @@ export const getOrders = (query) => {
 
 export const getOrderHistory = (query) => {
   const requestUrl = `${ORDER_URL}/store/${query}`;
+  return apiInstance.get(requestUrl);
+};
+
+export const getDailyReport = (query) => {
+  const requestUrl = `${ORDER_URL}/report?${query}`;
   return apiInstance.get(requestUrl);
 };
 

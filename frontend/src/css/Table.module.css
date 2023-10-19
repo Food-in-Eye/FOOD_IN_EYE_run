@@ -1,6 +1,7 @@
 table {
   border-collapse: collapse;
-  width: 100%;
+  /* width: 100%; */
+  width: 28vw;
 }
 
 th,
@@ -8,28 +9,28 @@ td {
   padding-bottom: 10px;
   text-align: center;
   align-items: center;
+  color: #323232;
 }
 
 th,
 .orderTH {
+  font-family: "Hahmlet-SemiBold";
   font-size: 18px;
   font-weight: 600;
+}
+
+td {
+  font-family: "Hahmlet-Regular";
 }
 
 .menuTD {
   height: 50px;
   margin-right: 5px;
-  padding-left: 40px;
-  padding-right: 20px;
-  font-size: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 15px;
+  white-space: nowrap;
 }
-
-tbody .orderTD {
-  height: 20%;
-  font-size: 25px;
-  background-color: #e9e9e9;
-}
-
 tfoot {
   border-top: 1px solid #ddd;
 }
@@ -37,7 +38,7 @@ tfoot {
 tfoot td {
   height: 10px;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .orderTimeCell {
@@ -50,4 +51,12 @@ tfoot td {
 
 .orderPriceCell {
   width: 30%;
+}
+
+.orderTable {
+  width: 50vw;
+}
+
+.orderTD {
+  height: 3vw;
 }

@@ -1,8 +1,15 @@
 import axios from "axios";
 import { stopTokenRefresh } from "./TokenRefreshService";
+import { toast } from "react-toastify";
 
 export const resetLogin = () => {
   stopTokenRefresh();
+
+  toast.success("장시간 동안 이용하지 않아 로그아웃 되었습니다.", {
+    position: toast.POSITION.TOP_CENTER,
+    autoClose: 3000,
+  });
+
   setTimeout(() => {
     localStorage.removeItem("u_id");
     localStorage.removeItem("s_id");
@@ -12,7 +19,7 @@ export const resetLogin = () => {
     localStorage.removeItem("storeNum");
 
     window.location.href = "/login";
-  }, 10000);
+  }, 2000);
 };
 
 export const handleAccessToken = async () => {

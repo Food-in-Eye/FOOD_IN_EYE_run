@@ -70,7 +70,10 @@ function OrderHistoryTable({ data }) {
       </tbody>
       <tfoot>
         <tr>
-          <td colSpan="3" style={{ textAlign: "left" }}>
+          <td
+            colSpan="3"
+            style={{ textAlign: "left", fontFamily: "Hahmlet-Medium" }}
+          >
             총합계:
           </td>
           <td style={{ textAlign: "right" }}>{total}</td>

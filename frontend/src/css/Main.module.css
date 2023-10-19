@@ -24,6 +24,7 @@
 }
 
 .cal span {
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
 }
@@ -47,6 +48,7 @@
 .sales p {
   margin-left: 0px;
   color: #575757;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 500;
   background: none;
@@ -55,18 +57,22 @@
 .sales h2 {
   margin-top: 10px;
   margin-left: 0px;
+  font-family: "Hahmlet-Regular";
   color: #323232;
 }
 
 .orders {
-  max-height: 1000px;
+  width: 50vw;
+  height: 40vw;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-content: center;
 }
 
-.orders .orderTodays {
-  width: 30vw;
+.orderTodays {
+  width: 35vw;
+  height: 40vw;
   position: relative;
   overflow-y: scroll;
   z-index: 2;
@@ -75,6 +81,8 @@
 }
 
 .orderTodaysHeader {
+  display: flex;
+  margin: 0 auto;
   text-align: center;
   background-color: #fff;
 }
@@ -95,6 +103,7 @@
 
 .orderTodays li {
   margin: 10% 0 0 0;
+  font-family: "Hahmlet-Regular";
   font-size: 25px;
   color: #444444;
 }
@@ -102,13 +111,18 @@
 .orderTodays .manageBtn {
   float: right;
   margin-top: -5%;
+}
+
+.manageBtn span {
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
-  color: #444444;
+  color: #5c5c5c;
 }
 
 .orderTodaysHeader h2 {
   white-space: nowrap;
   color: #323232;
+  font-family: "Hahmlet-SemiBold";
   font-size: 35px;
   font-weight: 800;
 }
@@ -131,6 +145,7 @@
   margin-bottom: 5px;
   border: none;
   color: #323232;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
   white-space: nowrap;
@@ -138,7 +153,7 @@
 .orderSeqBody {
   display: flex;
   flex-flow: row nowrap;
-  padding: 10px;
+  padding: 10px 30px;
   margin-top: 10px;
   border: 1px solid #d2d2d2;
   border-radius: 100px;
@@ -149,6 +164,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 0 15px;
 }
 
 .orderSeqBody div .process {
@@ -158,6 +174,7 @@
 
 .orderSeqBody div p {
   text-align: center;
+  font-family: "Hahmlet-Regular";
   font-size: 15px;
   background: none;
 }
@@ -187,21 +204,30 @@
   margin-bottom: 5px;
   border: none;
   color: #323232;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 600;
   white-space: nowrap;
 }
 
-.orderContents {
+/* .orderDetailBorder {
+  padding: 10px;
+  border: 1px solid #d2d2d2;
+} */
+
+.orderDetail .orderContents {
   display: flex;
-  justify-content: center;
-  white-space: nowrap;
-  padding: 70px;
+  justify-content: flex-start;
+  width: auto;
+  /* white-space: nowrap; */
+  padding: 20px;
   margin-top: 10px;
+  margin-right: 10px;
+  margin: 10px auto 0 0;
   border: 1px solid #d2d2d2;
 }
 
 .selectedOrderDiv {
   padding: 5px;
-  background-color: #d5d5d5;
+  background-color: #e2e2e2;
 }

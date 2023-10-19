@@ -1,9 +1,7 @@
 import Calendar from "react-calendar";
-import moment from "moment";
 import "react-calendar/dist/Calendar.css";
 
 import Main from "../css/Main.module.css";
-import Bar from "../css/UnderBar.module.css";
 import Button from "../css/Button.module.css";
 import MenuBar from "../components/MenuBar";
 import MenuTable from "../components/MenuTable.module";
@@ -24,6 +22,7 @@ import {
   putOrderStatus,
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { SocketProvider } from "../components/SocketContext.module";
 import useTokenRefresh from "../components/useTokenRefresh";
 
@@ -34,6 +33,7 @@ function MainPage() {
   const sID = localStorage.getItem("s_id");
   const [socket, setSocket] = useState(null);
 
+  const navigate = useNavigate();
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
   const [value, onChange] = useState(new Date());
   const [orderList, setOrderList] = useState([]);
@@ -163,7 +163,6 @@ function MainPage() {
   };
 
   const handleOrderButtonClick = async (index) => {
-    // setSelectedOrderIndex(index);
     const newOrders = [...orderList];
 
     if (newOrders[index].status === 0) {
@@ -220,6 +219,10 @@ function MainPage() {
     });
   };
 
+  const handleClickDate = (date) => {
+    navigate("/choose-report", { state: { date } });
+  };
+
   return (
     <SocketProvider>
       <div>
@@ -237,8 +240,11 @@ function MainPage() {
               <span>📊 데일리 리포트</span>
               <Calendar
                 className={Main.calender}
-                onChange={onChange}
+                onChange={handleClickDate}
                 value={value}
+                tileDisabled={({ date, view }) => {
+                  return date > new Date() && view === "month";
+                }}
               />
             </section>
             <section className={Main.shortcut}>
@@ -247,14 +253,13 @@ function MainPage() {
           </div>
           <div className={Main.orderDashboard}>
             <div className={Main.orders}>
-              <section className={Main.dashboardBackground} />
+              <div className={Main.orderTodaysHeader}>
+                <h2>현재 주문 내역</h2>
+              </div>
               <div className={Main.orderTodays}>
-                <div className={Main.orderTodaysHeader}>
-                  <h2>현재 주문 내역</h2>
-                </div>
+                <hr />
                 <div className={Main.ulList}>
                   <ul>
-                    <hr />
                     {orderList &&
                       orderList.map((order, index) => (
                         <div
@@ -341,7 +346,7 @@ function MainPage() {
               </div>
             </section>
             <section className={Main.orderDetail}>
-              <span>주문 내역</span>
+              <span>상세 주문 내역</span>
               <div className={Main.orderContents}>
                 <MenuTable data={orderData} />
               </div>

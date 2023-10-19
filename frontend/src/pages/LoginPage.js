@@ -145,7 +145,9 @@ function LoginPage() {
           alt="update"
           style={{ top: "67%", left: "15%" }}
         />
+        {/* <img src={foodineye} alt="logo" style={{ top: "20%", left: "50%" }} /> */}
       </section>
+
       <section className={Login.LoginForm}>
         <h2>Login</h2>
         <form>

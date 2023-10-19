@@ -1,0 +1,174 @@
+* {
+  margin: 0 auto;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.background {
+  background-color: #e7e7e7;
+  width: 100%;
+  padding-top: 30px;
+  padding-bottom: 15%;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin: 3% 10%;
+}
+
+.pageDesc {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.pageDesc h1,
+.pageDesc span {
+  margin: 0 auto;
+}
+
+.pageDesc h1 {
+  font-family: "Hahmlet-Bold";
+  font-size: 45px;
+  font-weight: 900;
+}
+
+.pageDesc span {
+  margin: 5px auto;
+  padding: 5px;
+  font: 20px/1 "Hahmlet-Medium";
+  color: #9c9c9c;
+}
+
+.pickSection {
+  display: flex;
+  flex-direction: column;
+  padding: 50px 0;
+  width: 70vw;
+  max-width: 100vw;
+  background-color: #fff;
+}
+
+.pickDate {
+  display: flex;
+  flex-direction: row;
+  margin: 10px 0;
+}
+
+.pickDate span {
+  font-family: "Hahmlet-SemiBold";
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.datePicker {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d2d2d2;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 46px;
+  color: #000;
+  font-size: 18px;
+  text-align: center;
+  padding-right: 14px;
+
+  &:focus {
+    color: #000;
+    font-weight: 700;
+    border: 2px solid #fd773e;
+  }
+}
+
+.pickReport {
+  display: flex;
+  flex-direction: row nowrap;
+  justify-content: center;
+  align-items: center;
+  margin: 10% auto;
+  width: 50vw;
+  height: 10vw;
+}
+
+.mvToTotalReport,
+.mvToMenuReport {
+  width: 15vw;
+  height: 20vw;
+  padding: 30px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid #9c9c9c;
+}
+
+.mvToMenuReport:hover,
+.mvToTotalReport:hover {
+  background-color: #ededed;
+}
+
+.mvToTotalReport div,
+.mvToMenuReport div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mvToTotalReport div span,
+.mvToMenuReport div span {
+  margin: auto 0px;
+  white-space: nowrap;
+  color: #0c0c0c;
+  font-family: "Hahmlet-SemiBold";
+  font-size: 30px;
+  font-weight: 800;
+  /* color: #f0f0f0; */
+}
+
+.selectedDay,
+.unselectedDay {
+  padding: 3px 1px 0 0;
+  width: 36px;
+  height: 36px;
+}
+
+.selectedDay {
+  color: #000;
+  background-color: #fd773e;
+  border-radius: 50%;
+
+  &:hover {
+    color: #000;
+    font-weight: 700;
+    border-radius: 50%;
+    background-color: #ff986b;
+  }
+}
+
+.unselectedDay {
+  &:hover {
+    color: #000;
+    font-weight: 700;
+    border-radius: 50%;
+    background-color: #d2d2d2;
+    opacity: 0.08;
+  }
+}
+
+.grayedOutDay {
+  color: #f0f0f0;
+  background-color: #d2d2d2;
+  pointer-events: none;
+}
+
+.disabledSection {
+  background-color: #d2d2d2;
+  pointer-events: none;
+  opacity: 0.5;
+}

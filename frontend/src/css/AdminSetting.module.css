@@ -7,7 +7,8 @@
 .background {
   background-color: #e7e7e7;
   padding-top: 30px;
-  padding-bottom: 300px;
+  /* padding-bottom: 300px; */
+  height: 500vw;
 }
 
 .body {
@@ -16,7 +17,6 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  /* margin: 0 auto; */
   margin: 3% 10%;
 }
 
@@ -28,25 +28,26 @@
 
 .desc h1,
 .desc span {
-  margin-left: 0px;
-  margin-right: auto;
+  margin: 0 auto;
 }
 
 .desc h1 {
+  font-family: "Hahmlet-Bold";
+  font-size: 45px;
   font-weight: 900;
 }
 
 .desc span {
-  margin: 0 auto;
-  font: 20px/1 "Palanquin Dark";
+  margin: 5px auto;
+  font: 20px/1 "Hahmlet-Medium";
   color: #9c9c9c;
 }
 
 .EditForm {
   display: flex;
   flex-direction: column;
-  padding: 30px 0;
-  width: 70vw;
+  padding: 50px 0;
+  width: 60vw;
   max-width: 100vw;
   background-color: #fff;
 }
@@ -75,6 +76,7 @@
 .PWCheckSection {
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
   margin-left: 0px;
   margin-right: auto;
 }
@@ -83,30 +85,36 @@
 .EditForm span,
 .EditForm label input {
   margin-top: 5px;
-  margin-left: 20px;
+  margin-left: 0px;
   margin-right: auto;
 }
 
 .EditForm label span,
 .EditForm span {
+  margin-top: 10px;
+  font-family: "Hahmlet-SemiBold";
   font-size: 20px;
   font-weight: 700;
 }
 
 .EditForm label input {
   width: 13vw;
+  padding: 10px;
+  margin-left: 0px;
   border: 1px solid #d2d2d2;
+  font-family: "Hahmlet-Regular";
 }
 
 .LastStoreNameSection p,
 .IDSection p {
   width: 10vw;
   padding: 5px 0;
-  margin-left: 20px;
+  margin-left: 0px;
   margin-right: auto;
   white-space: nowrap;
   /* border: 1px solid #000; */
   border-radius: 5px;
+  font-family: "Hahmlet-Regular";
   font-size: 18px;
   background: none;
 }
@@ -125,6 +133,8 @@
 }
 
 .pSection p {
+  margin-left: 0px;
   white-space: nowrap;
+  font-family: "Hahmlet-Medium";
   background: none;
 }

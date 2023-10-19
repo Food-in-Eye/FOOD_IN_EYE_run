@@ -8,8 +8,8 @@ function CircleWithText({ radius, text, strokeColor }) {
   };
 
   const textStyle = {
+    fontFamily: "Hahmlet-SemiBold",
     fontSize: "25px",
-    fontWeight: "bold",
     fill: "black",
     textAnchor: "middle",
     dominantBaseline: "middle",

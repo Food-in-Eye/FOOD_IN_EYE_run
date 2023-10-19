@@ -10,7 +10,7 @@
 .tabsTable {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin: 5vw 10vw;
+  margin: 3vw 10vw;
 }
 
 .tabsToClick {
@@ -22,6 +22,7 @@
   background-color: #e0e0e0;
   border: 1px solid #ccc;
   cursor: pointer;
+  font-family: "Hahmlet-Medium";
   text-align: center;
   box-sizing: border-box;
 }
@@ -43,6 +44,7 @@
 
 .tabElement div:first-child span:first-child {
   text-align: center;
+  font-family: "Hahmlet-SemiBold";
   font-size: 30px;
   font-weight: 700;
 }
@@ -55,6 +57,7 @@
 }
 
 .menuSummarySection,
+.GtoFRatioSection,
 .GtoFRatioBody,
 .menuPageStatistics,
 .menuDetailPageStatistics,
@@ -68,15 +71,30 @@
   align-self: stretch;
 }
 
+.menuPageStatisticsSection {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+}
+
+.menuPageStatistics .menuPageScore {
+  margin-left: 0px;
+  margin-right: auto;
+  margin-bottom: 30px;
+}
+
+.menuPageStatistics .menuPageGazeRatio {
+  margin-top: 30px;
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+.menuSummarySection .menuSummarySaleCount,
 .menuSummarySection .menuSummaryTime,
 .menuSummarySection .menuSummarySales,
-.menuPageStatistics .menuPageSaleCount,
-.menuPageStatistics .menuPageDwellTime,
-.menuPageStatistics .menuPageGazeRatio,
 .menuPageStatistics .menuPageScore,
-.menuDetailPageStatistics .menuDetailPageVisitCount,
-.menuDetailPageStatistics .menuDetailPageDwellTime,
-.menuDetailPageStatistics .menuDetailOrderRatio,
+/* .menuDetailPageStatistics .menuDetailPageVisitCount, */
+/* .menuDetailPageStatistics .menuDetailPageDwellTime, */
 .GtoFRatioSection .GtoFRatioValue,
 .GtoFRatioSection .GtoFRatioPercent {
   display: flex;
@@ -89,13 +107,36 @@
   border: 1px solid #444444;
 }
 
+.menuPageStatistics .menuPageDwellTime,
+.menuPageStatistics .menuPageGazeRatio,
+.menuDetailPageStatistics .menuDetailPageDwellTime,
+.menuDetailPageStatistics .menuDetailOrderRatio {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  /* width: 50vw; */
+  padding: 15px;
+  gap: 4px;
+  flex: 1 0 0;
+  background-color: #f2f2f2;
+  border-radius: 6px;
+  border: none;
+  /* border: 1px solid #444444; */
+}
+
+.menuDetailPageStatistics .menuDetailPageDwellTime,
+.menuDetailPageStatistics .menuDetailOrderRatio {
+  width: 50vw;
+}
+
 .menuSummarySection p,
 .menuPageStatistics p,
 .menuDetailPageStatistics p,
 .GtoFRatioSection p {
-  margin-left: 0px;
-  margin-right: auto;
   color: #4d4d4d;
+  font-family: "Hahmlet-Regular";
   font-size: 18px;
   font-weight: 400;
   line-height: 24px;
@@ -103,14 +144,54 @@
   background: none;
 }
 
+.menuSummarySection p,
+.menuPageStatistics p,
+.menuDetailPageStatistics p,
+.GtoFRatioPercent p {
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+.GtoFRatioValue p {
+  margin: 0 auto;
+}
+
+.GtoFRatioPieChart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  width: 13vw;
+  height: 8vw;
+}
+
+.GtoFRatioValue span {
+  color: #1e1e1e;
+  font-family: "Hahmlet-Medium";
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 36px;
+  white-space: nowrap;
+}
+
+.GtoFRatioPercent span {
+  color: #051c77;
+}
+
+.menuSummarySection span,
+.menuPageStatistics span,
+.menuDetailPageStatistics span {
+  color: #1e1e1e;
+}
+
 .menuSummarySection span,
 .menuPageStatistics span,
 .menuDetailPageStatistics span,
-.GtoFRatioPercent span,
-.GtoFRatioValue span {
+.GtoFRatioPercent span {
   margin-left: 0px;
   margin-right: auto;
-  color: #1e1e1e;
+  font-family: "Hahmlet-Medium";
   font-size: 22px;
   font-weight: 700;
   line-height: 36px;
@@ -127,25 +208,25 @@
   width: 45vw;
   text-align: center;
   color: #4d4d4d;
+  font-family: "Hahmlet-Light";
   font-size: 18px;
   font-weight: 500;
   line-height: 30px;
   background-color: #fff;
 }
 
-/* .visitAndOrder .visitCount,
-.visitAndOrder .salesCount {
-  margin: 0px;
-  color: #051c77;
-  font-size: 20px;
-  font-weight: 800;
+/* @media (max-width: 768px) {
+  .GtoFRatioPieChart {
+    margin-left: -15%;
+    margin-top: -35%;
+  }
 }
 
-.visitAndOrder .salesCount {
-  margin-left: 5px;
-  color: #051c77;
-  font-size: 28px;
-  font-weight: 800;
+@media (min-width: 769px) {
+  .GtoFRatioPieChart {
+    margin-left: 16%;
+    margin-top: -20%;
+  }
 } */
 
 .divForButton {

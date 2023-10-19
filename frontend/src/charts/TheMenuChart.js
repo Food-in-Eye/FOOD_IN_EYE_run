@@ -47,7 +47,7 @@ function TheMenuChart() {
       if (
         aoiData.hasOwnProperty(foodName) &&
         foodName !== "ETC" &&
-        foodName !== "STORE INFO"
+        foodName !== "Store INFO"
       ) {
         const foodData = aoiData[foodName];
         const inDetail = foodData.in_detail || {};

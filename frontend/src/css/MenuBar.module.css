@@ -1,3 +1,5 @@
+@import "../Fonts/Font.css";
+
 * {
   box-sizing: border-box;
   margin: 0px;
@@ -5,7 +7,7 @@
 }
 
 .util {
-  top: 20px;
+  top: 30px;
   right: 20px;
   z-index: 200;
   float: left;
@@ -18,9 +20,18 @@
 
 .util .logoutButton {
   margin-top: 10px;
-  padding: 2px;
+  padding: 5px;
+  font-family: "Hahmlet-Light";
+  color: #575757;
+  border: 1px solid #e7e7e7;
   border-radius: 5px;
-  background-color: #e7e7e7;
+  background-color: #fff;
+}
+
+.util .logoutButton:hover {
+  font-family: "Hahmlet-Light";
+  border: none;
+  background-color: #cfcfcf;
 }
 
 .header {
@@ -36,30 +47,23 @@
 .header img {
   width: 400px;
   height: auto;
-  top: 10px;
+  top: 20px;
   left: -50px;
   position: absolute;
 }
 
 .profile {
   width: 200px;
-  top: 15px;
+  top: 30px;
   right: 30px;
   position: absolute;
 }
 
-/* .profile img {
-  width: 60px;
-  height: auto;
-  padding: 0;
-  border: 1px solid black;
-  border-radius: 100%;
-} */
-
 .profile h3 {
+  font-family: "Hahmlet-Bold";
   font-size: 30px;
   font-weight: 800;
-  margin-top: 10px;
+  margin-top: 5px;
   color: #2a2a2a;
   white-space: nowrap;
 }
@@ -77,7 +81,6 @@
   justify-content: center;
   align-items: center;
   position: relative;
-
   background-color: #f5f5f5;
 }
 
@@ -92,15 +95,16 @@ ul {
 
 .menubarSub {
   display: block;
-  padding: 20px 40px;
+  padding: 15px 40px;
   transition: all 0.5s;
   position: relative;
-  font: normal 23px/1 "arial";
+  font-family: "Hahmlet-Regular";
+  font-size: 23px;
   font-weight: 700;
   white-space: nowrap;
   text-decoration: none;
   text-underline-offset: 4px;
-  color: #2a2a2a;
+  color: #424141;
   background-color: #f5f5f5;
 }
 
@@ -111,6 +115,7 @@ ul {
   position: relative;
   z-index: 40;
   border: 0;
+  font-family: "Hahmlet-Medium";
   text-decoration: underline;
   white-space: nowrap;
   background-color: #e7e7e7;
@@ -139,6 +144,7 @@ ul {
   padding: 15px;
   position: relative;
   transition: all 0.5s;
+  font-family: "Hahmlet-Regular";
   text-decoration: none;
   white-space: nowrap;
 }

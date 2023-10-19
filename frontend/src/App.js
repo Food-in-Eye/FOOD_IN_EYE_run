@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminSettingPage from "./pages/AdminSettingPage";
 import CheckPasswdPage from "./pages/CheckPasswdPage";
-import MenuAnalysisPage from "./pages/MenuAnalysisPage";
+import MenuReportPage from "./pages/MenuReportPage";
 import SelectMenuPage from "./pages/SelectMenuPage";
-import DailyReportPage from "./pages/DailyReportPage";
+import TotalReportPage from "./pages/TotalReportPage";
+import ChooseReportPage from "./pages/ChooseReportPage";
 import VisualizeGazePage from "./pages/VisualizeGazePage";
 import BenefitManagePage from "./pages/BenefitManagePage";
 import MenuPlacementPage from "./pages/MenuPlacementPage";
@@ -22,9 +23,10 @@ function App() {
       <Routes>
         <Route path="/admin-setting" element={<AdminSettingPage />} />
         <Route path="/check-passwd" element={<CheckPasswdPage />} />
-        <Route path="/menu-analysis" element={<MenuAnalysisPage />} />
+        <Route path="/menu-report" element={<MenuReportPage />} />
         <Route path="/select-menu" element={<SelectMenuPage />} />
-        <Route path="/daily-report" element={<DailyReportPage />} />
+        <Route path="/total-report" element={<TotalReportPage />} />
+        <Route path="/choose-report" element={<ChooseReportPage />} />
         <Route path="/gaze-visualize" element={<VisualizeGazePage />} />
         <Route
           path="/gaze-visualize-no-background"
