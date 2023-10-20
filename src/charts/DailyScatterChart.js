@@ -31,15 +31,15 @@ function DailyScatterChart(data) {
   const saleData = data.data.sale_summary.food_detail;
   const [fNameList, setFNameList] = useState([]);
 
-  const [xAxisType, setXAxisType] = useState("fixCount");
-  const [xAxisLabel, setXAxisLabel] = useState("시선 수");
+  const [xAxisType, setXAxisType] = useState("duration");
+  const [xAxisLabel, setXAxisLabel] = useState("체류 시간");
 
-  const handleXAxisChange = (e) => {
-    const newXAxisType = e.target.value;
+  // const handleXAxisChange = (e) => {
+  //   const newXAxisType = e.target.value;
 
-    setXAxisType(newXAxisType);
-    setXAxisLabel(newXAxisType === "fixCount" ? "시선 수" : "체류 시간");
-  };
+  //   setXAxisType(newXAxisType);
+  //   setXAxisLabel(newXAxisType === "체류 시간");
+  // };
 
   useEffect(() => {
     const getFName = async () => {
@@ -78,7 +78,7 @@ function DailyScatterChart(data) {
         foodDataArray.push({
           // name: fNameList[foodDataArray.length],
           // totalSales: totalSales,
-          x: xAxisType === "fixCount" ? fixCount : duration,
+          x: duration,
           y: totalCount,
           // fillColor: "#1e2f4d",
         });
@@ -92,7 +92,7 @@ function DailyScatterChart(data) {
 
   return (
     <div className={SChart.total}>
-      <div className={SChart.radioButtons}>
+      {/* <div className={SChart.radioButtons}>
         <label>
           <input
             type="radio"
@@ -111,7 +111,7 @@ function DailyScatterChart(data) {
           />
           체류 시간
         </label>
-      </div>
+      </div> */}
       <ResponsiveContainer width="100%" height={400}>
         <ScatterChart
           margin={{
@@ -129,9 +129,7 @@ function DailyScatterChart(data) {
             // unit={xAxisType === "fixCount" ? "" : "초"}
           >
             <Label
-              value={
-                xAxisLabel === "시선 수" ? "시선 수" : "체류시간(단위: 초)"
-              }
+              value="체류시간(단위: 초)"
               offset={-15}
               position="insideBottom"
             />
