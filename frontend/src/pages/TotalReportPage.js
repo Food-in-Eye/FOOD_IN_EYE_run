@@ -146,7 +146,7 @@ function TotalReportPage() {
           시간당 판매건수 및 체류 시간
         </span>
         <div className={TR.barChart}>
-          <BarChart />
+          <BarChart data={dailyReportData} />
         </div>
       </div>
       <div ref={tabs[2].element} className={TR.tabElement}>
