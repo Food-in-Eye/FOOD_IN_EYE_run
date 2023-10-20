@@ -125,6 +125,7 @@ function MenuReportPage() {
     }
 
     for (let i = 0; i < menuList.length; i++) {
+      console.log("menuList", menuList);
       if (!menuPageDurations.some((item) => item.name === menuList[i].name)) {
         menuPageDurations.push({
           index: i,
@@ -133,7 +134,12 @@ function MenuReportPage() {
         });
       }
 
-      if (!menuDetailDurations.some((item) => item.name === menuList[i].name)) {
+      if (
+        !menuDetailDurations.some(
+          (item) =>
+            item.name === menuList[i].name && menuList[i].name !== undefined
+        )
+      ) {
         menuDetailDurations.push({
           index: i,
           name: menuList[i].name,

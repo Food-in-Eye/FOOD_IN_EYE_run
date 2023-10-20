@@ -2,7 +2,8 @@ import MenuBar from "../components/MenuBar";
 import TR from "../css/TotalReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { useRef } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { getFoods } from "../components/API.module";
 import { useNavigate, useLocation } from "react-router-dom";
 import DailyScatterChart from "../charts/DailyScatterChart";
 import BarChart from "../charts/BarChart";
@@ -13,7 +14,24 @@ function TotalReportPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const sID = localStorage.getItem("s_id");
   const { reportDate, dailyReportData } = location?.state || {};
+  const [menuList, setMenuList] = useState([]);
+
+  const getMenuLists = useCallback(async () => {
+    try {
+      const res = await getFoods(sID);
+      setMenuList(res.data.food_list);
+
+      console.log(res);
+    } catch (error) {
+      console.log(`GET foods error:`, error);
+    }
+  }, [sID]);
+
+  useEffect(() => {
+    getMenuLists();
+  }, []);
 
   console.log("dailyReport", dailyReportData);
 
@@ -50,6 +68,8 @@ function TotalReportPage() {
   const moveToMenusAnalysis = () => {
     navigate("/select-menu");
   };
+
+  console.log("menuList", menuList);
 
   return (
     <div>
@@ -188,7 +208,7 @@ function TotalReportPage() {
 
           <div className={TR.menuChartBody}>
             <div className={TR.menuChartUpDiv}>
-              <TheMenuChart data={dailyReportData} />
+              <TheMenuChart data={dailyReportData} menus={menuList} />
             </div>
             <div className={TR.menuChartDownDiv}>
               <div className={TR.menuChartDescUp}>

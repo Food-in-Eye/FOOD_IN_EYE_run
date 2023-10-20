@@ -1,16 +1,22 @@
 .total {
   display: flex;
-  flex-flow: column;
-  width: 35vw;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50vw;
   height: 35vw;
+  margin-top: 5vw;
   margin-left: 0;
   margin-right: auto;
 }
 
-/* table {
-  border-collapse: collapse;
-  width: 30vw;
-  padding: 10%;
+.menuTableDiv {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0px;
+  margin-right: auto;
 }
 
 td {
@@ -31,28 +37,29 @@ td {
   font-size: 25px;
   font-weight: 700;
   color: #2c2c2c;
-} */
+}
 
-.checkboxButtons {
+.radioButtons {
   display: flex;
   border-radius: 10px;
   margin-left: 0;
   margin-right: auto;
 }
 
-.checkboxButtons label {
+.radioButtons label {
   display: flex;
   flex-flow: row nowrap;
   white-space: nowrap;
   width: 6vw;
   margin: 0 4px;
+  font-size: 20px;
 }
 
-.checkboxButtons label input {
+.radioButtons label input {
   margin: auto 0;
 }
 
-/* .menuItemValue {
+.menuItemValue {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -62,9 +69,9 @@ td {
   font-weight: 600;
   color: #5a5a5a;
   white-space: nowrap;
-} */
+}
 
-.radarCharts {
+/* .radarCharts {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -72,8 +79,7 @@ td {
   height: 50vw;
   margin-left: 0px;
   margin-right: auto;
-  /* margin: 0 10px; */
-  /* background-color: aqua; */
+  
 }
 
 .radarCharts .radarChart {
@@ -85,4 +91,4 @@ td {
   display: flex;
   flex-wrap: wrap;
   margin-top: 5px;
-}
+} */

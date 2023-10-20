@@ -127,17 +127,22 @@
   flex-direction: row;
 }
 
+.menuChartUpDiv {
+  width: 40%;
+  margin-left: 0px;
+  margin-right: auto;
+}
+
 .menuChart p {
   margin: -10px auto 30px 0px;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   font-family: "Hahmlet-Medium";
   font-size: 20px;
   color: #565656;
   background-color: #fff;
 }
 
-.scatterChartLeftDiv,
-.menuChartUpDiv {
+.scatterChartLeftDiv {
   width: 50%;
   margin-left: 0px;
   margin-right: auto;
@@ -146,10 +151,11 @@
 .scatterChartRightDiv,
 .menuChartDownDiv {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-flow: column;
-  margin: 0px 40px 30px 20px;
+  width: 50%;
+  margin: 0px auto 30px 10px;
 }
 
 .scatterChartDescUp span,
@@ -182,7 +188,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 50vw;
+  width: 40vw;
   padding: 20px 10px;
   margin: 5px auto;
   border: 1px solid #d2d2d2;
