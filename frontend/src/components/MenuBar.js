@@ -84,9 +84,17 @@ function MenuBar() {
             </ul>
           </li>
           <li>
-            <a href="./check-passwd" className={style.menubarSub}>
+            <a href="#!" className={style.menubarSub}>
               설정
             </a>
+            <ul className={style.menubarSubOfSub}>
+              <li>
+                <a href="./store-setting">가게 설정</a>
+              </li>
+              <li>
+                <a href="./check-passwd">사용자 설정</a>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>

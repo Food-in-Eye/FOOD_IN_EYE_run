@@ -21,15 +21,10 @@ function AdminSettingPage() {
   const storeId = localStorage.getItem("s_id");
   const [store, setStore] = useState([]);
 
-  // const [nameCheck, setNameCheck] = useState("");
   const [name, setName] = useState("");
-
-  const [newName, setNewName] = useState("");
   const [passwd, setPasswd] = useState("");
   const [newPasswd, setNewPasswd] = useState("");
 
-  // const [showNameDuplicateMsg, setShowNameDuplicateMsg] = useState(false);
-  // const [showNameUniqueMsg, setShowNameUniqueMsg] = useState(false);
   const [showPasswdMatchMsg, setShowPasswdMatchMsg] = useState(false);
   const [showValidPasswdMsg, setShowValidPasswdMsg] = useState(false);
 
@@ -102,18 +97,18 @@ function AdminSettingPage() {
         });
 
         if (res.status === 200) {
-          await putStore(storeId, {
-            ...store,
-            name: newName,
-          }).catch((error) => {
-            if (error.response.state === 409) {
-              console.log(error.response.data.detail);
-            } else if (error.response.state === 503) {
-              console.log(error.response.data.detail);
-            } else {
-              console.error("가게 이름 업데이트 중 오류 발생:", error);
-            }
-          });
+          // await putStore(storeId, {
+          //   ...store,
+          //   name: name,
+          // }).catch((error) => {
+          //   if (error.response.state === 409) {
+          //     console.log(error.response.data.detail);
+          //   } else if (error.response.state === 503) {
+          //     console.log(error.response.data.detail);
+          //   } else {
+          //     console.error("가게 이름 업데이트 중 오류 발생:", error);
+          //   }
+          // });
 
           navigate(`/main`);
         }

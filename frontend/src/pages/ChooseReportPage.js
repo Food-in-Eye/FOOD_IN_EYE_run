@@ -149,6 +149,12 @@ function ChooseReportPage() {
                 className={`${CR.mvToTotalReport} ${
                   !hasReport || !selectedDate ? CR.disabledSection : ""
                 }`}
+                style={{
+                  border:
+                    hasReport && selectedDate
+                      ? "5px solid #52BF8B"
+                      : "5px solid #B9062F",
+                }}
               >
                 <div>
                   <span>전체 리포트</span>
@@ -159,6 +165,12 @@ function ChooseReportPage() {
                 className={`${CR.mvToMenuReport} ${
                   !hasReport || !selectedDate ? CR.disabledSection : ""
                 }`}
+                style={{
+                  border:
+                    hasReport && selectedDate
+                      ? "5px solid #52BF8B"
+                      : "5px solid #B9062F",
+                }}
               >
                 <div>
                   <span>메뉴별 리포트</span>

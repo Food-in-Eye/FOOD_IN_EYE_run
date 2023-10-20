@@ -1,17 +1,18 @@
 import { getFoods, getMenus, getStore } from "../components/API.module";
 import { useCallback, useState, useEffect } from "react";
 import MChart from "../css/MenuChart.module.css";
-import dailyReport from "../data/daily_report.json";
 
-function TheMenuChart() {
-  const sID = "64a2d45c1fe80e3e4db82af9";
+function TheMenuChart({ data, menus }) {
+  const sID = localStorage.getItem("s_id");
   const [foodCount, setFoodCount] = useState(0);
   const [menuItems, setMenuItems] = useState([]);
   const [menuItemValue, setMenuItemValue] = useState(null);
   const [foodDataArray, setFoodDataArray] = useState([]);
 
-  const aoiData = dailyReport["Store 1"].aoi_summary.total_food_report;
-  const saleData = dailyReport["Store 1"].sale_summary.food_detail;
+  const aoiData = data.aoi_summary.total_food_report;
+  const saleData = data.sale_summary.food_detail;
+
+  console.log("menus", menus);
 
   const handleMenuItemValueChange = (e) => {
     setMenuItemValue(e.target.value);
@@ -49,10 +50,14 @@ function TheMenuChart() {
         foodName !== "ETC" &&
         foodName !== "Store INFO"
       ) {
+        const foodIndex = parseInt(foodName.replace("Food ", "")) - 1;
+        const foodNameFromMenuList = menus[foodIndex]?.name;
+
         const foodData = aoiData[foodName];
-        const inDetail = foodData.in_detail || {};
-        const visitCount = foodData.visit_count + (inDetail.visit || 0);
-        const dwellTime = (foodData.duration + (inDetail.duration || 0)) / 1000;
+        const inDetail = foodData?.in_detail || {};
+        const visitCount = foodData?.visit_count || 0 + inDetail?.visit || 0;
+        const dwellTime =
+          (foodData?.duration || 0 + inDetail?.duration || 0) / 1000;
         const score = foodData.score;
 
         let orderCount = 0;
@@ -60,25 +65,44 @@ function TheMenuChart() {
 
         for (const fieldName in saleData) {
           if (fieldName === foodName) {
-            orderCount = saleData[fieldName].total_count;
-            saleCount = saleData[fieldName].total_sales;
+            orderCount = saleData[fieldName]?.total_count || 0;
+            saleCount = saleData[fieldName]?.total_sales || 0;
 
             break;
           }
         }
 
         dataArray.push({
-          visitCount: visitCount,
+          index: foodIndex,
+          name: foodNameFromMenuList,
+          visitCount: visitCount || 0,
           dwellTime: dwellTime.toFixed(1),
-          score: score,
+          score: score || 0,
           totalSales: saleCount,
           totalCount: orderCount,
         });
       }
     }
+
+    for (let i = 0; i < menus.length; i++) {
+      if (!dataArray.some((item) => item.name === menus[i].name)) {
+        dataArray.push({
+          index: i,
+          name: menus[i].name,
+          visitCount: 0,
+          dwellTime: 0,
+          score: 0,
+          totalSales: 0,
+          totalCount: 0,
+        });
+      }
+    }
+
+    dataArray.sort((a, b) => a.index - b.index);
+
     console.log("dataArray", dataArray);
     setFoodDataArray(dataArray);
-  }, [aoiData, saleData, menuItems]);
+  }, [aoiData, saleData, menuItems, menus]);
 
   const totalCells = foodCount > 0 ? foodCount : 9;
 
@@ -188,9 +212,12 @@ function TheMenuChart() {
           집중도
         </label>
       </div>
-      <table className={MChart.menuTable}>
-        <tbody>{menu}</tbody>
-      </table>
+
+      <div className={MChart.menuTableDiv}>
+        <table className={MChart.menuTable}>
+          <tbody>{menu}</tbody>
+        </table>
+      </div>
     </div>
   );
 }

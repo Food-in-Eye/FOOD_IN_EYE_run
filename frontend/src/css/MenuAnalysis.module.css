@@ -154,6 +154,7 @@
 
 .GtoFRatioValue p {
   margin: 0 auto;
+  white-space: wrap;
 }
 
 .GtoFRatioPieChart {

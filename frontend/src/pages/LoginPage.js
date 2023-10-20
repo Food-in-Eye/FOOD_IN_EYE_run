@@ -25,12 +25,15 @@ function LoginPage() {
 
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
+  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
 
   const [idInput, setIdInput] = useState("");
   const [passwordInput, setPasswdInput] = useState("");
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   const onLogin = async (e) => {
     e.preventDefault();
+
     const newId = document.querySelector("#id").value;
     const newPasswd = document.querySelector("#password").value;
 
@@ -38,10 +41,13 @@ function LoginPage() {
     formData.append("username", newId);
     formData.append("password", newPasswd);
 
+    setIsButtonClicked(true);
+
     try {
       const request = await postLogin(`/seller/login`, formData);
 
       if (request.status === 200) {
+        setShowLoginSuccess(true);
         const tokenCreationTime = new Date(request.headers.date).getTime();
 
         localStorage.setItem("u_id", request.data.u_id);
@@ -64,18 +70,23 @@ function LoginPage() {
       if (error.response.status === 400) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
+          setShowLoginSuccess(false);
         } else if (error.response.data.detail === "Nonexistent ID") {
           setShowIdErrorMsg(true);
+          setShowLoginSuccess(false);
         }
       } else if (error.response.status === 401) {
         console.log(error.response.data.detail);
-        alert("로그인에 실패했습니다. 다시 로그인해주세요.");
+        setShowLoginSuccess(false);
+        // alert("로그인에 실패했습니다. 다시 로그인해주세요.");
 
         setIdInput("");
         setPasswdInput("");
       } else {
         handleError(error);
       }
+
+      setIsButtonClicked(false);
     }
   };
 
@@ -87,12 +98,14 @@ function LoginPage() {
   const handleIdChange = (e) => {
     setIdInput(e.target.value);
     setShowIdErrorMsg(false);
+    // isButtonClicked && setIsButtonClicked(false);
   };
 
   const handlePasswdChange = (e) => {
     setPasswdInput(e.target.value);
     setShowIdErrorMsg(false);
     setShowPasswdErrorMsg(false);
+    // isButtonClicked && setIsButtonClicked(false);
   };
 
   return (
@@ -162,6 +175,14 @@ function LoginPage() {
                   placeholder="아이디"
                   value={idInput}
                   onChange={handleIdChange}
+                  style={{
+                    border:
+                      isButtonClicked && idInput && showLoginSuccess
+                        ? "2px solid #52BF8B"
+                        : isButtonClicked && idInput && !showLoginSuccess
+                        ? "2px solid #B9062F"
+                        : "",
+                  }}
                 />
               </label>
             </section>
@@ -178,6 +199,14 @@ function LoginPage() {
                   placeholder="비밀번호"
                   value={passwordInput}
                   onChange={handlePasswdChange}
+                  style={{
+                    border:
+                      isButtonClicked && passwordInput && showLoginSuccess
+                        ? "2px solid #52BF8B"
+                        : isButtonClicked && passwordInput && !showLoginSuccess
+                        ? "2px solid #B9062F"
+                        : "",
+                  }}
                 />
               </label>
             </section>

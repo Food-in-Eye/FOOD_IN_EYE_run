@@ -2,7 +2,8 @@ import MenuBar from "../components/MenuBar";
 import TR from "../css/TotalReport.module.css";
 import CircleWithText from "../components/CircleWithText.module";
 import useTokenRefresh from "../components/useTokenRefresh";
-import { useRef } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { getFoods } from "../components/API.module";
 import { useNavigate, useLocation } from "react-router-dom";
 import DailyScatterChart from "../charts/DailyScatterChart";
 import BarChart from "../charts/BarChart";
@@ -13,7 +14,24 @@ function TotalReportPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const sID = localStorage.getItem("s_id");
   const { reportDate, dailyReportData } = location?.state || {};
+  const [menuList, setMenuList] = useState([]);
+
+  const getMenuLists = useCallback(async () => {
+    try {
+      const res = await getFoods(sID);
+      setMenuList(res.data.food_list);
+
+      console.log(res);
+    } catch (error) {
+      console.log(`GET foods error:`, error);
+    }
+  }, [sID]);
+
+  useEffect(() => {
+    getMenuLists();
+  }, []);
 
   console.log("dailyReport", dailyReportData);
 
@@ -38,7 +56,7 @@ function TotalReportPage() {
   const tabs = {
     0: useMoveScroll("오늘의 리포트"),
     1: useMoveScroll("시간당 주문량 및 체류시간"),
-    2: useMoveScroll("시선/체류 시간과 주문량"),
+    2: useMoveScroll("체류 시간과 주문량 비교"),
     3: useMoveScroll("내 가게 메뉴판"),
     length: 4,
   };
@@ -50,6 +68,8 @@ function TotalReportPage() {
   const moveToMenusAnalysis = () => {
     navigate("/select-menu");
   };
+
+  console.log("menuList", menuList);
 
   return (
     <div>
@@ -130,19 +150,19 @@ function TotalReportPage() {
         </div>
       </div>
       <div ref={tabs[2].element} className={TR.tabElement}>
-        <span className={TR.tabElementFirstSpan}>시선/체류 시간과 주문량</span>
+        <span className={TR.tabElementFirstSpan}>체류 시간과 주문량 비교</span>
         <section className={TR.scatterChart}>
           <div className={TR.scatterChartLeftDiv}>
-            <DailyScatterChart />
+            <DailyScatterChart data={dailyReportData} />
           </div>
           <div className={TR.scatterChartRightDiv}>
             <div className={TR.scatterChartDesc}>
               <div className={TR.scatterChartDescUp}>
                 <span>✏️ 다음 분석에 대한 설명</span>
-                <p>
+                {/* <p>
                   * 각 메뉴마다 시선이 얼마나 가는지에 따라 주문량에 영향이
                   있는지 알 수 있습니다.
-                </p>
+                </p> */}
                 <p>
                   * 메뉴에 사용자가 얼마나 머무르고 있는지에 따라 주문량에
                   영향이 있는지 알 수 있습니다.
@@ -188,7 +208,7 @@ function TotalReportPage() {
 
           <div className={TR.menuChartBody}>
             <div className={TR.menuChartUpDiv}>
-              <TheMenuChart />
+              <TheMenuChart data={dailyReportData} menus={menuList} />
             </div>
             <div className={TR.menuChartDownDiv}>
               <div className={TR.menuChartDescUp}>

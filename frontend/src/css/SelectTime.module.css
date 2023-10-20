@@ -3,20 +3,32 @@
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
+  width: 25vw;
+  margin-left: 0px;
+  margin-right: auto;
   background-color: #fff;
 }
+
 .mainDiv span {
   margin: auto 0;
 }
 
-select {
+.mainDiv select {
   display: block;
   box-sizing: content-box;
   min-width: 5vw;
-  width: 21vw;
+  width: 12vw;
   height: 2vw;
-  margin-left: 20px;
+  margin-top: 10px;
   border-radius: 5px;
   border-color: #d2d2d2;
   background-color: #fff;
+}
+
+.mainDiv select:first-child {
+  margin-right: 5px;
+}
+
+.mainDiv select:last-child {
+  margin-left: 5px;
 }
