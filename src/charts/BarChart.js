@@ -66,13 +66,16 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function BarChart() {
-  const hourlySaleInfo = dailyReport["Store 1"].sale_summary.hourly_sale_info;
+function BarChart({ data }) {
+  const hourlySaleInfo = data.sale_summary.hourly_sale_info;
+  const hourlyDwellTime = data.aoi_summary.hourly_dwell_time;
 
-  const data = hourlySaleInfo.map((hourData, index) => ({
+  console.log("hourlySaleInfo", hourlySaleInfo);
+
+  const chartData = hourlySaleInfo.map((hourData, index) => ({
     name: `${index}시`,
     oc: hourData.order,
-    dt: hourData.dwell_time / 1000,
+    dt: (hourlyDwellTime[index] / 1000).toFixed(1),
   }));
 
   return (
@@ -80,7 +83,7 @@ function BarChart() {
       <ComposedChart
         width={1500}
         height={400}
-        data={data}
+        data={chartData}
         margin={{
           top: 20,
           right: 80,
