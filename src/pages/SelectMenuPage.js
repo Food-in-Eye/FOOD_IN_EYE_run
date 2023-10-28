@@ -18,8 +18,6 @@ function SelectMenuPage() {
     try {
       const res = await getFoods(sID);
       setMenuList(res.data.food_list);
-
-      console.log(res);
     } catch (error) {
       console.log(`GET foods error:`, error);
     }

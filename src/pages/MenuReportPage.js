@@ -19,12 +19,7 @@ function MenuReportPage() {
 
   const location = useLocation();
 
-  const { reportDate, dailyReportData, index, name, menuList } =
-    location?.state || {};
-
-  console.log("name", name);
-  console.log("menuList", menuList);
-  console.log("dailyReportData", dailyReportData);
+  const { dailyReportData, index, name, menuList } = location?.state || {};
 
   const aoiData = dailyReportData.aoi_summary;
   const saleData = dailyReportData.sale_summary;
@@ -46,10 +41,6 @@ function MenuReportPage() {
   const [menuPageDwellTime, setMenuPageDwellTime] = useState([]);
   const [menuDetailDwellTime, setMenuDetailDwellTime] = useState([]);
 
-  console.log("aoiData", aoiData);
-  console.log("saleData", saleData);
-  console.log("fNum", fNum);
-
   const setSaleData = () => {
     let maxCount = -1;
     let maxHour = -1;
@@ -70,8 +61,6 @@ function MenuReportPage() {
     setMaxHour(maxHour);
     setMenuSalesCount(foodDetail?.total_count);
     setSaleRatio(parseInt(((menuTotalSales / totalSales) * 100).toFixed(0)));
-
-    console.log("menuTotalSales, totalSales", menuTotalSales, totalSales);
   };
 
   const setAoiData = () => {
@@ -113,19 +102,12 @@ function MenuReportPage() {
           duration: detailDuration,
         };
 
-        console.log(
-          "foodNameFromMenuList, duration",
-          foodNameFromMenuList,
-          duration
-        );
-
         menuPageDurations.push(foodDuration);
         menuDetailDurations.push(foodDetailDuration);
       }
     }
 
     for (let i = 0; i < menuList.length; i++) {
-      console.log("menuList", menuList);
       if (!menuPageDurations.some((item) => item.name === menuList[i].name)) {
         menuPageDurations.push({
           index: i,
@@ -150,9 +132,6 @@ function MenuReportPage() {
 
     menuPageDurations.sort((a, b) => a.index - b.index);
     menuDetailDurations.sort((a, b) => a.index - b.index);
-
-    console.log("menuPageDurations", menuPageDurations);
-    console.log("menuDetailDurations", menuDetailDurations);
 
     setMenuPageDwellTime(menuPageDurations);
     setMenuDetailDwellTime(menuDetailDurations);
@@ -294,7 +273,6 @@ function MenuReportPage() {
 
     // 'Food 6' 메뉴의 정규화된 값을 찾아 상위 몇 퍼센트에 속하는지 계산
     const findPercentile = (data, targetName) => {
-      console.log("data, targetName", data, targetName);
       const targetItem = data.find((item) => item.name === targetName);
 
       setFixCount(targetItem?.fixation_count || 0);
@@ -333,7 +311,7 @@ function MenuReportPage() {
 
     // 정규화된 데이터 반환
     const normalizedData = normalizeData(data, minValue, maxValue);
-    console.log("normalizedData", normalizedData);
+
     // const sortedData = normalizedData
     //   .slice()
     //   .sort((a, b) => b.normalized_ratio - a.normalized_ratio);
@@ -342,7 +320,7 @@ function MenuReportPage() {
     // setFoodRankOfGtoF(rank);
 
     const percentileFood = findPercentile(normalizedData, fNum);
-    console.log("percentile", percentileFood);
+
     setFoodsPercentage(percentileFood.toFixed(0));
 
     return percentileFood;
@@ -366,9 +344,6 @@ function MenuReportPage() {
 
     setFixDataInDetail(fixPercentageObject);
   };
-
-  console.log("fixCount, gazeCount", fixCount, gazeCount);
-  console.log("fixDataInDetail", fixDataInDetail);
 
   return (
     <div>

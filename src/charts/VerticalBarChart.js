@@ -100,8 +100,6 @@ function VerticalBarChart({ chartData }) {
     },
   ];
 
-  console.log("data", data);
-
   return (
     <div>
       <ComposedChart
