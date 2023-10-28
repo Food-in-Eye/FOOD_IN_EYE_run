@@ -2,7 +2,7 @@ import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
 import PieChartWithNeedle from "../charts/PieChartWithNeedle";
 import VerticalBarChart from "../charts/VerticalBarChart";
-import menuDetailPage from "../images/menu-detail-ex.jpeg";
+import menuDetailPage from "../images/menu_detail.jpg";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import PieChartForFixation from "../charts/PieChartForFixation";
@@ -464,10 +464,7 @@ function MenuReportPage() {
                 </div>
               </div>
             ) : (
-              <div
-                className={MAnalysis.GtoFRatioBodyWithNoValue}
-                style={{ backgroundColor: "#d2d2d2" }}
-              >
+              <div className={MAnalysis.GtoFRatioBodyWithNoValue}>
                 <p>
                   해당 메뉴에는 시선 데이터가 없으므로 리포트가 제공되지
                   않습니다.
