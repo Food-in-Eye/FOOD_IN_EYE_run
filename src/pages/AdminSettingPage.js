@@ -4,12 +4,7 @@ import Admin from "../css/AdminSetting.module.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useTokenRefresh from "../components/useTokenRefresh";
-import {
-  getStore,
-  putStore,
-  putUser,
-  postStore,
-} from "../components/API.module";
+import { getStore, putUser } from "../components/API.module";
 
 function AdminSettingPage() {
   useTokenRefresh();
@@ -19,7 +14,6 @@ function AdminSettingPage() {
   const id = localStorage.getItem("id");
   const uID = localStorage.getItem("u_id");
   const storeId = localStorage.getItem("s_id");
-  const [store, setStore] = useState([]);
 
   const [name, setName] = useState("");
   const [passwd, setPasswd] = useState("");
@@ -32,7 +26,6 @@ function AdminSettingPage() {
     const getStoreName = async () => {
       try {
         const res = await getStore(storeId);
-        setStore(res.data);
         setName(res.data.name);
       } catch (error) {
         console.error("가게 이름 가져오는 중 에러 발생:", error.response);
