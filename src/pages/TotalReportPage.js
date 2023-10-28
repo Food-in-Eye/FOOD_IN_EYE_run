@@ -205,7 +205,6 @@ function TotalReportPage() {
               👀사용자의 시선이 포함된 기준들: 체류시간, 집중도
             </p>
           </div>
-
           <div className={TR.menuChartBody}>
             <div className={TR.menuChartUpDiv}>
               <TheMenuChart data={dailyReportData} menus={menuList} />

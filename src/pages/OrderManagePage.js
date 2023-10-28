@@ -25,21 +25,43 @@ function OrderManagePage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const handlePageChange = (newPageNumber) => {
-    setCurrentPage(newPageNumber);
-  };
+  const getHistory = (sID, currentPage, startDate, endDate) => {
+    let query = `s_id=${sID}`;
 
-  const getHistory = (sID, batch) => {
-    getOrderHistory(`dates?s_id=${sID}&batch=${batch}`).then((res) => {
+    currentPage && (query += `&batch=${currentPage}`);
+    startDate && (query += `&start_date=${startDate}`);
+    endDate && (query += `&end_date=${endDate}`);
+
+    getOrderHistory(`dates?${query}`).then((res) => {
       setPageCount(res.data.max_batch);
-
       setOrderHistoryList(res.data.order_list);
     });
   };
 
+  const handleDateRange = async (e) => {
+    e.preventDefault();
+
+    setSelectedOrderIndex(null);
+    // setOrderHistory([]);
+    setCurrentPage();
+
+    const res = await getOrderHistory(
+      `dates?s_id=${sID}&batch=${currentPage}&start_date=${startDate}&end_date=${endDate}`
+    );
+    console.log("res", res);
+    setPageCount(res.data.max_batch);
+    // setCurrentPage(1);
+    setOrderHistoryList(res.data.order_list);
+  };
+
   useEffect(() => {
-    getHistory(sID, currentPage);
-  }, [currentPage]);
+    getHistory(sID, currentPage, startDate, endDate);
+  }, [currentPage, startDate, endDate]);
+
+  const handlePageChange = (newPageNumber) => {
+    setCurrentPage(newPageNumber);
+    getHistory(sID, newPageNumber, startDate, endDate);
+  };
 
   /**현재 페이지에 해당하는 주문 목록만 렌더링 */
   const renderOrderList = () => {
@@ -137,18 +159,6 @@ function OrderManagePage() {
     setLastSortClicked(false);
   };
 
-  const handleDateRange = async (e) => {
-    e.preventDefault();
-
-    setSelectedOrderIndex(null);
-    setOrderHistory([]);
-
-    const res = await getOrderHistory(
-      `dates?s_id=${sID}&start_date=${startDate}&end_date=${endDate}`
-    );
-    setOrderHistoryList(res.data.order_list);
-  };
-
   return (
     <div>
       <section className="header">
@@ -179,9 +189,12 @@ function OrderManagePage() {
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </label>
-              <button type="submit" className={Order.submitCheckedDate}>
-                조회
-              </button>
+              {/* <button
+              onClick={handleDateRange}
+              className={Order.submitCheckedDate}
+            >
+              조회
+            </button> */}
             </div>
           </form>
         </div>

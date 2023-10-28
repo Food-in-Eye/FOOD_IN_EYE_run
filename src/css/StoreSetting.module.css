@@ -104,7 +104,7 @@
 
 .RegisterForm span,
 .selectTimeDiv span,
-.setDescAndNoticeDiv span {
+.setInfoDiv span {
   margin-left: 0px;
   margin-right: auto;
   font-size: 20px;
@@ -127,14 +127,15 @@
 .RegisterForm label textarea {
   width: 30vw;
 }
-.setDescAndNoticeDiv {
+.setInfoDiv {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 10px;
 }
 
-.setDescAndNoticeDiv label {
+.setInfoDiv label {
   display: flex;
   flex-direction: column;
   justify-content: center;

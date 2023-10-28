@@ -20,6 +20,7 @@ import {
   getFoods,
   getFood,
   putOrderStatus,
+  getDailyReport,
 } from "../components/API.module";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +37,7 @@ function MainPage() {
   const navigate = useNavigate();
   const ordersQuery = `?s_id=${sID}&today=true&asc=false&asc_by=date`;
   const [value, onChange] = useState(new Date());
+  const [totalSale, setTotalSale] = useState(0);
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(null);
   const [orderData, setOrderData] = useState([]);
@@ -43,7 +45,10 @@ function MainPage() {
 
   useEffect(() => {
     connectWS(sID);
-  }, [sID]);
+    const currentDate = changeFormatDate(value);
+    currentDate && getTotalSales(sID, currentDate);
+    console.log("currentDate", currentDate);
+  }, [sID, value]);
 
   const connectWS = useCallback(async (storeID) => {
     try {
@@ -70,6 +75,32 @@ function MainPage() {
       console.log(error);
     }
   }, []);
+
+  const changeFormatDate = (date) => {
+    if (date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const day = (date.getDate() - 1).toString().padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+  };
+
+  const getTotalSales = async (sID, current) => {
+    try {
+      const resPromise = getDailyReport(`s_id=${sID}&date=${current}`);
+      resPromise
+        .then((res) => {
+          console.log(res);
+          setTotalSale(res.data.daily_report.sale_summary.total_sales);
+        })
+        .catch(() => {
+          setTotalSale(0);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const orderLists = useCallback(async () => {
     try {
@@ -98,9 +129,6 @@ function MainPage() {
         })
       );
 
-      console.log("orders", orders);
-      console.log("foodsResponse", foodsResponse);
-
       const names = [];
 
       await Promise.all(
@@ -120,8 +148,6 @@ function MainPage() {
         ...order,
         foodName: names[index],
       }));
-
-      console.log("orderListWithFoods", orderListWithFoods);
 
       setOrderList(orderListWithFoods);
       setLoading(false);
@@ -232,18 +258,24 @@ function MainPage() {
         <div className={Main.inner}>
           <div className={Main.rest}>
             <section className={Main.sales}>
-              <p>👑 오늘의 총 판매량</p>
-              {/* <h3>(어제보다 오늘) +5%</h3> */}
-              <h2>2,000,000원</h2>
+              <p>👑 어제 총 판매량</p>
+              <h2>{totalSale} 원</h2>
             </section>
             <section className={Main.cal}>
               <span>📊 데일리 리포트</span>
               <Calendar
-                className={Main.calender}
+                className={Main.calendar}
                 onChange={handleClickDate}
                 value={value}
-                tileDisabled={({ date, view }) => {
-                  return date > new Date() && view === "month";
+                tileDisabled={({ date }) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0); // 시간 부분을 00:00:00으로 설정
+                  return date < today ? false : true;
+                }}
+                tileClassName={({ date }) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0); // 시간 부분을 00:00:00으로 설정
+                  return date.getTime() === today.getTime() ? Main.today : "";
                 }}
               />
             </section>

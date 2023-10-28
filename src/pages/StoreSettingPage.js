@@ -20,7 +20,7 @@ function StoreSettingPage() {
   const [nameCheck, setNameCheck] = useState("");
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  // const [schedule, setSchedule] = useState("");
+  const [schedule, setSchedule] = useState("");
   const [notice, setNotice] = useState("");
 
   const [selectedOpenTime, setSelectedOpenTime] = useState("");
@@ -38,7 +38,7 @@ function StoreSettingPage() {
           setStore(data);
           setName(data.name || "");
           setDesc(data.desc || "");
-          // setSchedule(data.schedule || "");
+          setSchedule(data.schedule || "");
           setNotice(data.notice || "");
         })
         .catch((error) => console.error(error));
@@ -74,13 +74,13 @@ function StoreSettingPage() {
     setName(nameCheck);
   };
 
-  const handleSelectOpenTime = (time) => {
-    setSelectedOpenTime(time);
-  };
+  // const handleSelectOpenTime = (time) => {
+  //   setSelectedOpenTime(time);
+  // };
 
-  const handleSelectCloseTime = (time) => {
-    setSelectedCloseTime(time);
-  };
+  // const handleSelectCloseTime = (time) => {
+  //   setSelectedCloseTime(time);
+  // };
 
   const handleImageChange = (e) => {
     const imageFile = e.target.files[0];
@@ -90,6 +90,7 @@ function StoreSettingPage() {
   const updateStoreInfo = async (e) => {
     e.preventDefault();
 
+    const schedule = document.querySelector("#store_schedule").value;
     const desc = document.querySelector("#store_desc").value;
     const notice = document.querySelector("#store_notice").value;
 
@@ -97,7 +98,7 @@ function StoreSettingPage() {
       const res = await postStore(`/store?u_id=${uID}`, {
         name: name,
         desc: desc,
-        schedule: `${selectedOpenTime} - ${selectedCloseTime}`,
+        schedule: schedule,
         notice: notice,
         status: 1,
       });
@@ -179,14 +180,27 @@ function StoreSettingPage() {
                   )}
                 </div>
               </div>
-              <div className={StoreSet.selectTimeDiv}>
-                <span>운영 시간</span>
-                <SelectTime
+              <div className={StoreSet.setInfoDiv}>
+                {/* <div className={StoreSet.selectTimeDiv}> */}
+                <label htmlFor="store_schedule">
+                  <span>운영 시간</span>
+                  <textarea
+                    id="store_schedule"
+                    type="text"
+                    name="store_schedule"
+                    cols="30"
+                    rows="2"
+                    placeholder="가게의 운영 시간을 설정하세요!"
+                    value={schedule}
+                    onChange={(e) => setSchedule(e.target.value)}
+                  />
+                  {/* <SelectTime
                   onSelectOpenTime={handleSelectOpenTime}
                   onSelectCloseTime={handleSelectCloseTime}
-                />
-              </div>
-              <div className={StoreSet.setDescAndNoticeDiv}>
+                /> */}
+                </label>
+                {/* </div> */}
+
                 <label htmlFor="store_desc">
                   <span>가게 한 줄 소개</span>
                   <textarea

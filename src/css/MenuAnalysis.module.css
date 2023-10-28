@@ -95,12 +95,34 @@
 .menuPageStatistics .menuPageScore,
 /* .menuDetailPageStatistics .menuDetailPageVisitCount, */
 /* .menuDetailPageStatistics .menuDetailPageDwellTime, */
-.GtoFRatioSection .GtoFRatioValue,
+/* .GtoFRatioSection .GtoFRatioValue, */
 .GtoFRatioSection .GtoFRatioPercent {
   display: flex;
   flex-direction: column;
   width: 20vw;
   padding: 15px;
+  gap: 4px;
+  flex: 1 0 0;
+  border-radius: 6px;
+  border: 1px solid #444444;
+}
+
+.GtoFRatioSection .GtoFRatioValue {
+  display: flex;
+  flex-direction: column;
+  width: 25vw;
+  padding: 20px;
+  gap: 4px;
+  flex: 1 0 0;
+  border-radius: 6px;
+  border: 1px solid #444444;
+}
+
+.GtoFRatioBodyWithNoValue {
+  display: flex;
+  flex-direction: column;
+  width: 50vw;
+  padding: 20px;
   gap: 4px;
   flex: 1 0 0;
   border-radius: 6px;
@@ -163,8 +185,8 @@
   justify-content: center;
   align-items: center;
   margin-top: 10px;
-  width: 13vw;
-  height: 8vw;
+  width: 15vw;
+  height: 10vw;
 }
 
 .GtoFRatioValue span {

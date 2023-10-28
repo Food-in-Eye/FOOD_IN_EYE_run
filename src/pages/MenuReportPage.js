@@ -440,8 +440,8 @@ function MenuReportPage() {
                 생기는 시선들의 집합
               </p>
             </div>
-            <div className={MAnalysis.GtoFRatioBody}>
-              {gazeCount ? (
+            {gazeCount ? (
+              <div className={MAnalysis.GtoFRatioBody}>
                 <div className={MAnalysis.GtoFRatioValue}>
                   <p>
                     시선 수 대비 Fixation 수 비율:{" "}
@@ -451,28 +451,29 @@ function MenuReportPage() {
                     <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
                   </div>
                 </div>
-              ) : (
-                <div
-                  className={MAnalysis.GtoFRatioValue}
-                  style={{ backgroundColor: "#d2d2d2" }}
-                >
-                  <p>
-                    해당 메뉴에는 시선 데이터가 없으므로 그래프가 제공되지
-                    않습니다.
-                  </p>
-                </div>
-              )}
 
-              <div className={MAnalysis.GtoFRatioPercent}>
-                <p>
-                  전 메뉴 중 <strong style={{ fontSize: "20px" }}>상위 </strong>
-                </p>
-                <p>
-                  <span>{foodsPercentage} % </span>이내
-                </p>
-                {/* <span>{foodRankOfGtoF} 등</span> */}
+                <div className={MAnalysis.GtoFRatioPercent}>
+                  <p>
+                    전 메뉴 중{" "}
+                    <strong style={{ fontSize: "20px" }}>상위 </strong>
+                  </p>
+                  <p>
+                    <span>{foodsPercentage} % </span>이내
+                  </p>
+                  {/* <span>{foodRankOfGtoF} 등</span> */}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div
+                className={MAnalysis.GtoFRatioBodyWithNoValue}
+                style={{ backgroundColor: "#d2d2d2" }}
+              >
+                <p>
+                  해당 메뉴에는 시선 데이터가 없으므로 리포트가 제공되지
+                  않습니다.
+                </p>
+              </div>
+            )}
             {/* <div className={MAnalysis.GtoFRatioGraphDesc}></div> */}
           </section>
         </div>
