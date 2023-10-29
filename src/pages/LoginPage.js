@@ -46,7 +46,6 @@ function LoginPage() {
 
     try {
       const request = await postLogin(`/seller/login`, formData);
-      console.log("request", request);
 
       if (request.status === 200) {
         setShowLoginSuccess(true);
@@ -60,14 +59,6 @@ function LoginPage() {
 
         startTokenRefresh();
         login();
-
-        // if (request.data.s_id) {
-        //   console.log("loginSuccess상태", showLoginSuccess);
-        //   getStoreNum(localStorage.getItem("s_id"));
-        //   navigate("/main");
-        // } else {
-        //   navigate("/store-setting");
-        // }
       } else {
         setShowLoginSuccess(false);
       }
@@ -80,7 +71,6 @@ function LoginPage() {
         }
       } else if (error.response.status === 401) {
         console.log(error.response.data.detail);
-        // alert("로그인에 실패했습니다. 다시 로그인해주세요.");
 
         setIdInput("");
         setPasswdInput("");
@@ -103,7 +93,6 @@ function LoginPage() {
     setIdInput(e.target.value);
     setShowIdErrorMsg(false);
     setBorderStyle("");
-    // isButtonClicked && setIsButtonClicked(false);
   };
 
   const handlePasswdChange = (e) => {
@@ -125,8 +114,6 @@ function LoginPage() {
       }
     }
   }, [showLoginSuccess]);
-
-  console.log("showLoginSuccess", showLoginSuccess);
 
   return (
     <div className={Login.container}>
