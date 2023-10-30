@@ -241,7 +241,7 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
         raise CustomException(e.status_code, f' -> h_id: \'{h_id}\', S3 key: \'{key}\'')
 
     # 임시로 비활성화
-    # asyncio.create_task(preprocess_and_update(key, h_id))
+    asyncio.create_task(preprocess_and_update(key, h_id))
 
     websocket_manager.app_connections[h_id]['gaze'] = True
 
@@ -277,7 +277,12 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         
         DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
 
+        client.get(os.environ['LOCALHOST'] + f'/api/v2/exhibition/update?h_id={h_id}')
 
+# async def update_exhibition(h_id:str):
+#     load_dotenv()
+#     async with httpx.AsyncClient() as client:
+#         client.get(os.environ['LOCALHOST'] + f'/api/v2/exhibition/update?h_id={h_id}')
 
 @order_router.get("/historys")
 async def get_history_list(u_id: str, request:Request, batch: int = 1):
