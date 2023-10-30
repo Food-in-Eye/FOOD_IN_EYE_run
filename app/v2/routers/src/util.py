@@ -47,9 +47,9 @@ class Util:
             * 주의. mongoDB 쿼리 결과를 변환할 때 사용 
             ** 주의. 실행 방법(local, docker)에 따라 수정이 필요함 """
         # local에서 실행할 때
-        timestamp = datetime.strptime(date, '%Y-%m-%d')
+        # timestamp = datetime.strptime(date, '%Y-%m-%d')
         # docker에서 실행할 때 
-        # timestamp = datetime.strptime(date, '%Y-%m-%d') - timedelta(hours=9)
+        timestamp = datetime.strptime(date, '%Y-%m-%d') - timedelta(hours=9)
 
         utc_time = timestamp.astimezone(pytz.utc)
         return utc_time
@@ -59,9 +59,9 @@ class Util:
         """ UTC 시간을 입력 받아 Asia/Seoul timezone으로 리턴한다. 
             * 주의. 실행 방법(local, docker)에 따라 수정이 필요함 """
         # local에서 실행할 때
-        local_time = date.astimezone(pytz.timezone('Asia/Seoul')) + timedelta(hours=9)
+        # local_time = date.astimezone(pytz.timezone('Asia/Seoul')) + timedelta(hours=9)
         # docker에서 실행할 때
-        # local_time = date.astimezone(pytz.timezone('Asia/Seoul'))
+        local_time = date.astimezone(pytz.timezone('Asia/Seoul'))
         return local_time
 
 
