@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from v2.routers.src.util import Util
+from datetime import timedelta
 
 from .routers.store import store_router
 from .routers.menu import menu_router
@@ -7,7 +8,6 @@ from .routers.food import food_router
 from .routers.order import order_router
 from .routers.websocket import websocket_router
 from .routers.user import user_router
-
 from .routers.exhibition import exhibition_router
 
 v2_router = APIRouter(prefix="/api/v2", tags=["v2"])
@@ -17,7 +17,6 @@ v2_router.include_router(food_router)
 v2_router.include_router(order_router)
 v2_router.include_router(websocket_router)
 v2_router.include_router(user_router)
-
 v2_router.include_router(exhibition_router)
 
 
@@ -31,11 +30,9 @@ from core.common.s3 import Storage
 async def get_keys(prefix:str='/', extension:str=None):
     try:
         storage = Storage('foodineye2')
-
         return storage.get_list(prefix, extension)
     
     except:
-
         return "ERROR"
 
 
@@ -46,7 +43,6 @@ async def get_keys(key: str):
         return storage.get_json(key)
 
     except:
-
         return "ERROR"
 
 
@@ -156,8 +152,3 @@ async def testcode():
     except Exception as e:
         print(e)
         return e
-
-@v2_router.get("/json")
-async def get_json(key:str):
-    storage = Storage('foodineye2')
-    return storage.get_json(key)

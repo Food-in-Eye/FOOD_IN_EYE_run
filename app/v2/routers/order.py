@@ -216,9 +216,9 @@ async def new_order(body:OrderModel, request:Request):
             
 
 @order_router.post("/order/gaze")
-async def new_order(h_id: str, body: list[RawGazeModel]):
-    # assert TokenManager.is_buyer(request.state.token_scope), 403.1  //, request:Request
-    SAVE_DIR = 'EXP2'
+async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
+    assert TokenManager.is_buyer(request.state.token_scope), 403.1
+    SAVE_DIR = 'exhibition/gaze'
 
     gaze_data = []
     for page in body:
