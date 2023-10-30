@@ -24,7 +24,7 @@ storage = Storage('foodineye2')
 @exhibition_router.get("/hello")
 async def hello():
     # DB.insert_one('exhibition', {
-    #     'date': datetime.now(),
+    #     'date': Util.get_utc_time_by_datetime(Util.get_local_time(datetime.now()).replace(hour=0, minute=0, second=0, microsecond=0)),
     #     'stores': {
     #         '1': {
     #             'dwell': [0 for _ in range(7)],
@@ -50,14 +50,15 @@ async def hello():
     # })
     return {"message": f"Hello '{PREFIX}'"}
 
-@exhibition_router.get("/update")
-async def update_new_history(h_id:str):
-    data = DB.read_one('exhibition', {'_id':ObjectId(TODAY_ID)})
-    del data['_id']
+# @exhibition_router.get("/update")
+# async def update_new_history(h_id:str):
+#     print('update new order')
+#     data = DB.read_one('exhibition', {'_id':ObjectId(TODAY_ID)})
+#     del data['_id']
 
-    updated_data = update_data(data, h_id)
+#     updated_data = update_data(data, h_id)
 
-    DB.replace_one('exhibition', {'_id':ObjectId(TODAY_ID)}, updated_data)
+#     DB.replace_one('exhibition', {'_id':ObjectId(TODAY_ID)}, updated_data)
 
 @exhibition_router.get('/history')
 async def get_history(h_id:str):
@@ -73,7 +74,7 @@ async def get_history(h_id:str):
 
 @exhibition_router.get("/historys")
 async def get_todat_history():
-    today = Util.get_utc_time()
+    today = Util.get_utc_time_by_datetime(Util.get_local_time(datetime.now()).replace(hour=0, minute=0, second=0, microsecond=0))
     # today = Util.get_utc_time_by_str("2023-09-20")
 
     pipeline = [
@@ -83,11 +84,12 @@ async def get_todat_history():
 
     historys = DB.aggregate_pipline('history', pipeline)
 
+    result = []
     for history in historys:
-        history['_id'] = str(history['_id'])
-        history['date'] = Util.get_local_time(history['date'])
-    
-    return historys
+        date = Util.get_local_time(history['date']).strftime("%Y-%m-%d %H:%M:%S")
+        h_id = str(history['_id'])
+        result.append({date:h_id})
+    return result
 
 @exhibition_router.get("/visualize")
 async def get_fixation_data(fix_key:str):
@@ -115,7 +117,7 @@ async def get_fixation_data(fix_key:str):
 async def get_food(s_num:int, f_num:int):
     s_id = find_key_by_value(s_num)
     food = DB.read_one('food', {'num':f_num, 's_id':s_id})
-    return food
+    return food['name']
         
 def find_key_by_value(value):
     for k, v in S_ID_Table.items():
@@ -130,8 +132,10 @@ def get_status(data):
         name = str(s_num) + '-'
         for i in range(len(store['dwell'])):
             labels.append(name+str(i+1))
-            dwells.append(store['dwell'][i])
-            counts.append(store['count'][i])
+            # dwells.append(store['dwell'][i])
+            # counts.append(store['count'][i])
+            dwells.append(random.randint(0,100))
+            counts.append(random.randint(0,50))
 
     df = pd.DataFrame({
         'labels': labels,
@@ -140,19 +144,23 @@ def get_status(data):
     })
 
     df['ratio'] = df['dwells'] / df['counts']
-
+    
     df_sorted = df.sort_values(by='ratio')
 
-    top3_high_dwell_time = df_sorted.tail(3)
-    top3_low_dwell_time = df_sorted.head(3)
-    
+    filtered_df_sorted = df_sorted[(df_sorted['dwells'] != 0) & (df_sorted['counts'] != 0)]
+
+    # 필터링된 데이터프레임에서 상위 3개 및 하위 3개 선택
+    top3_high_dwell_time = filtered_df_sorted.tail(3)
+    top3_low_dwell_time = filtered_df_sorted.head(3)
+
+    # 'ratio' 열을 문자열로 변환
     top3_high_dwell_time['ratio'] = top3_high_dwell_time['ratio'].astype(str)
     top3_low_dwell_time['ratio'] = top3_low_dwell_time['ratio'].astype(str)
 
-    return ({
+    return {
         'top3': top3_high_dwell_time.set_index('labels').to_dict(orient='index'),
         'low3': top3_low_dwell_time.set_index('labels').to_dict(orient='index')
-    })
+    }
     
 
 def update_data(data, h_id):
@@ -176,13 +184,13 @@ def update_data(data, h_id):
         S_NUM = store[6:]
         for food, f_value  in s_value['food_report'].items():
             F_NUM = food[5:]
-            if 'ETC' in food or len(F_NUM) > 2:
+            if 'ETC' in food or 'TAB' in food or len(F_NUM) > 2:
                 continue
-            
-            F_NUM = int(F_NUM)
+
+            F_NUM = int(F_NUM)-1
             COUNT = f_value['gaze_count']
             data['stores'][S_NUM]['dwell'][F_NUM] += COUNT
-    
+        
     return data
             
 def get_detail(id):
@@ -246,3 +254,11 @@ def get_personal(aoi_key):
     
     sorted_data = sorted(total.items(), key=lambda x: x[1], reverse=True)
     return sorted_data[:3]
+
+def update_new_history2(h_id:str):
+    data = DB.read_one('exhibition', {'_id':ObjectId(TODAY_ID)})
+    del data['_id']
+
+    updated_data = update_data(data, h_id)
+
+    DB.replace_one('exhibition', {'_id':ObjectId(TODAY_ID)}, updated_data)

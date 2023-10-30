@@ -12,6 +12,8 @@ from .src.util import Util
 from .src.meta import Meta
 from dotenv import load_dotenv
 
+from v2.routers.exhibition import update_new_history2
+
 import os
 import requests
 import asyncio
@@ -214,9 +216,9 @@ async def new_order(body:OrderModel, request:Request):
             
 
 @order_router.post("/order/gaze")
-async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
-    assert TokenManager.is_buyer(request.state.token_scope), 403.1
-    SAVE_DIR = 'EXP1'
+async def new_order(h_id: str, body: list[RawGazeModel]):
+    # assert TokenManager.is_buyer(request.state.token_scope), 403.1  //, request:Request
+    SAVE_DIR = 'EXP2'
 
     gaze_data = []
     for page in body:
@@ -243,7 +245,7 @@ async def new_order(h_id: str, body: list[RawGazeModel], request:Request):
     # 임시로 비활성화
     asyncio.create_task(preprocess_and_update(key, h_id))
 
-    websocket_manager.app_connections[h_id]['gaze'] = True
+    # websocket_manager.app_connections[h_id]['gaze'] = True
 
 
 async def preprocess_and_update(raw_data_key:str, h_id:str):
@@ -254,7 +256,7 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
 
     async with httpx.AsyncClient() as client:
 
-        print(f'Request - h_id: \'{h_id}\'')
+        # print(f'Request - h_id: \'{h_id}\'')
 
         _id = Util.check_id(h_id)
         doc = DB.read_one('history', {'_id':_id})
@@ -262,27 +264,30 @@ async def preprocess_and_update(raw_data_key:str, h_id:str):
         "raw_data_key": raw_data_key,
         "meta_info": Meta.get_meta_detail(doc['date'])
         }
-        print(f'Request payload: \'{payload}\'')
+        # print(f'Request payload: \'{payload}\'')
 
         response = await client.post(filter_url, json=payload, headers=headers)
         data = response.json()
         fix_key = data["fixation_key"]
-        print(f'Result POST - fix_key: \'{fix_key}\'')
+        print(f'----------Result POST - fix_key: \'{fix_key}\'')
 
         response = await client.get(aoi_url + f'?key={fix_key}')
         data = response.json()
         aoi_key = data["aoi_key"]
-        print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
-        print(f'Result GET - aoi_key: \'{aoi_key}\'')
+        # print(f'fixkey= {fix_key}, aoikey = {aoi_key}')
+        print(f'----------Result GET - aoi_key: \'{aoi_key}\'')
         
         DB.update_one('history', {'_id':_id}, {'fixation_path': fix_key, 'aoi_analysis': aoi_key})
 
-        client.get(os.environ['LOCALHOST'] + f'/api/v2/exhibition/update?h_id={h_id}')
+        update_new_history2(h_id)
 
 # async def update_exhibition(h_id:str):
 #     load_dotenv()
 #     async with httpx.AsyncClient() as client:
-#         client.get(os.environ['LOCALHOST'] + f'/api/v2/exhibition/update?h_id={h_id}')
+#         url = f'/api/v2/exhibition/update?h_id={h_id}'
+#         response = await client.get(url)
+#         print(response.json())
+
 
 @order_router.get("/historys")
 async def get_history_list(u_id: str, request:Request, batch: int = 1):
