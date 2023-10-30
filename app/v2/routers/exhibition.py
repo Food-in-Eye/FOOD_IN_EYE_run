@@ -23,7 +23,6 @@ storage = Storage('foodineye2')
 
 @exhibition_router.get("/hello")
 async def hello():
-    get_personal('EXP1_aoi/fc276b8e-df96-430e-b954-238058cef023.json')
     # DB.insert_one('exhibition', {
     #     'date': datetime.now(),
     #     'stores': {
@@ -111,6 +110,17 @@ async def get_fixation_data(fix_key:str):
         })
         
     return result
+
+@exhibition_router.get("/info")
+async def get_food(s_num:int, f_num:int):
+    s_id = find_key_by_value(s_num)
+    food = DB.read_one('food', {'num':f_num, 's_id':s_id})
+    return food
+        
+def find_key_by_value(value):
+    for k, v in S_ID_Table.items():
+        if int(v) == value:
+            return k
 
 def get_status(data):
     labels = []

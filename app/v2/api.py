@@ -156,3 +156,8 @@ async def testcode():
     except Exception as e:
         print(e)
         return e
+
+@v2_router.get("/json")
+async def get_json(key:str):
+    storage = Storage('foodineye2')
+    return storage.get_json(key)
