@@ -22,8 +22,6 @@ function TotalReportPage() {
     try {
       const res = await getFoods(sID);
       setMenuList(res.data.food_list);
-
-      console.log(res);
     } catch (error) {
       console.log(`GET foods error:`, error);
     }
@@ -32,8 +30,6 @@ function TotalReportPage() {
   useEffect(() => {
     getMenuLists();
   }, []);
-
-  console.log("dailyReport", dailyReportData);
 
   const aoiData = dailyReportData.aoi_summary;
   const saleData = dailyReportData.sale_summary;
@@ -68,8 +64,6 @@ function TotalReportPage() {
   const moveToMenusAnalysis = () => {
     navigate("/select-menu");
   };
-
-  console.log("menuList", menuList);
 
   return (
     <div>
@@ -205,7 +199,6 @@ function TotalReportPage() {
               👀사용자의 시선이 포함된 기준들: 체류시간, 집중도
             </p>
           </div>
-
           <div className={TR.menuChartBody}>
             <div className={TR.menuChartUpDiv}>
               <TheMenuChart data={dailyReportData} menus={menuList} />

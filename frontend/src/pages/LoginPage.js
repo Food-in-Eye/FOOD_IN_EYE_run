@@ -3,7 +3,7 @@ import Button from "../css/Button.module.css";
 import { getStore, postLogin } from "../components/API.module";
 import { handleError } from "../components/JWT.module";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { startTokenRefresh } from "../components/TokenRefreshService";
 import { useAuth } from "../components/AuthContext";
 
@@ -26,6 +26,7 @@ function LoginPage() {
   const [showIdErrorMsg, setShowIdErrorMsg] = useState(false);
   const [showPasswdErrorMsg, setShowPasswdErrorMsg] = useState(false);
   const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+  const [borderStyle, setBorderStyle] = useState("");
 
   const [idInput, setIdInput] = useState("");
   const [passwordInput, setPasswdInput] = useState("");
@@ -58,34 +59,27 @@ function LoginPage() {
 
         startTokenRefresh();
         login();
-
-        if (request.data.s_id) {
-          getStoreNum(localStorage.getItem("s_id"));
-          navigate("/main");
-        } else {
-          navigate("/store-setting");
-        }
+      } else {
+        setShowLoginSuccess(false);
       }
     } catch (error) {
       if (error.response.status === 400) {
         if (error.response.data.detail === "Incorrect PW") {
           setShowPasswdErrorMsg(true);
-          setShowLoginSuccess(false);
         } else if (error.response.data.detail === "Nonexistent ID") {
           setShowIdErrorMsg(true);
-          setShowLoginSuccess(false);
         }
       } else if (error.response.status === 401) {
         console.log(error.response.data.detail);
-        setShowLoginSuccess(false);
-        // alert("로그인에 실패했습니다. 다시 로그인해주세요.");
 
         setIdInput("");
         setPasswdInput("");
+        setBorderStyle("");
       } else {
         handleError(error);
       }
 
+      setBorderStyle("2px solid #B9062F");
       setIsButtonClicked(false);
     }
   };
@@ -98,15 +92,28 @@ function LoginPage() {
   const handleIdChange = (e) => {
     setIdInput(e.target.value);
     setShowIdErrorMsg(false);
-    // isButtonClicked && setIsButtonClicked(false);
+    setBorderStyle("");
   };
 
   const handlePasswdChange = (e) => {
     setPasswdInput(e.target.value);
     setShowIdErrorMsg(false);
     setShowPasswdErrorMsg(false);
+    setBorderStyle("");
     // isButtonClicked && setIsButtonClicked(false);
   };
+
+  useEffect(() => {
+    if (showLoginSuccess) {
+      setBorderStyle("2px solid #52BF8B");
+      if (localStorage.getItem("s_id")) {
+        getStoreNum(localStorage.getItem("s_id"));
+        navigate("/main");
+      } else {
+        navigate("/store-setting");
+      }
+    }
+  }, [showLoginSuccess]);
 
   return (
     <div className={Login.container}>
@@ -175,13 +182,19 @@ function LoginPage() {
                   placeholder="아이디"
                   value={idInput}
                   onChange={handleIdChange}
+                  // className={
+                  //   isButtonClicked
+                  //     ? showLoginSuccess
+                  //       ? Login.loginSuccess
+                  //       : Login.loginFail
+                  //     : ""
+                  // }
                   style={{
-                    border:
-                      isButtonClicked && idInput && showLoginSuccess
-                        ? "2px solid #52BF8B"
-                        : isButtonClicked && idInput && !showLoginSuccess
-                        ? "2px solid #B9062F"
-                        : "",
+                    border: borderStyle,
+                    // isButtonClicked &&
+                    // (showLoginSuccess
+                    //   ? "2px solid #52BF8B"
+                    //   : "2px solid #B9062F"),
                   }}
                 />
               </label>
@@ -199,13 +212,19 @@ function LoginPage() {
                   placeholder="비밀번호"
                   value={passwordInput}
                   onChange={handlePasswdChange}
+                  // className={
+                  //   isButtonClicked
+                  //     ? showLoginSuccess
+                  //       ? Login.loginSuccess
+                  //       : Login.loginFail
+                  //     : ""
+                  // }
                   style={{
-                    border:
-                      isButtonClicked && passwordInput && showLoginSuccess
-                        ? "2px solid #52BF8B"
-                        : isButtonClicked && passwordInput && !showLoginSuccess
-                        ? "2px solid #B9062F"
-                        : "",
+                    border: borderStyle,
+                    // isButtonClicked &&
+                    // (showLoginSuccess
+                    //   ? "2px solid #52BF8B"
+                    //   : "2px solid #B9062F"),
                   }}
                 />
               </label>

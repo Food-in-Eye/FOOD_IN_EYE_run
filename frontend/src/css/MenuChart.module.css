@@ -5,7 +5,7 @@
   align-items: center;
   width: 50vw;
   height: 35vw;
-  margin-top: 5vw;
+  margin-top: 2vw;
   margin-left: 0;
   margin-right: auto;
 }
@@ -19,17 +19,24 @@
   margin-right: auto;
 }
 
-td {
+/* td {
   width: 20px;
   height: 15px;
   padding: 10px;
   border: 1px solid #393939;
-}
+} */
 
 .menuItem {
-  margin: 5px;
+  width: 15vw;
+  height: 10vw;
+  padding: 10px;
   text-align: center;
   vertical-align: top;
+  border: 1px solid #393939;
+}
+
+.menuItemDetails {
+  min-width: 11vw;
 }
 
 .menuItemName {
@@ -70,25 +77,3 @@ td {
   color: #5a5a5a;
   white-space: nowrap;
 }
-
-/* .radarCharts {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  width: 100vw;
-  height: 50vw;
-  margin-left: 0px;
-  margin-right: auto;
-  
-}
-
-.radarCharts .radarChart {
-  width: 15vw;
-  margin: 5px 10vw;
-}
-
-.radarCharts .radarChartGroup {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 5px;
-} */

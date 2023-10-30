@@ -95,7 +95,7 @@
 .menuPageStatistics .menuPageScore,
 /* .menuDetailPageStatistics .menuDetailPageVisitCount, */
 /* .menuDetailPageStatistics .menuDetailPageDwellTime, */
-.GtoFRatioSection .GtoFRatioValue,
+/* .GtoFRatioSection .GtoFRatioValue, */
 .GtoFRatioSection .GtoFRatioPercent {
   display: flex;
   flex-direction: column;
@@ -105,6 +105,29 @@
   flex: 1 0 0;
   border-radius: 6px;
   border: 1px solid #444444;
+}
+
+.GtoFRatioSection .GtoFRatioValue {
+  display: flex;
+  flex-direction: column;
+  width: 25vw;
+  padding: 20px;
+  gap: 4px;
+  flex: 1 0 0;
+  border-radius: 6px;
+  border: 1px solid #444444;
+}
+
+.GtoFRatioBodyWithNoValue {
+  display: flex;
+  flex-direction: column;
+  width: 50vw;
+  padding: 20px;
+  gap: 4px;
+  flex: 1 0 0;
+  border-radius: 6px;
+  border: 1px solid #444444;
+  background-color: #d2d2d2;
 }
 
 .menuPageStatistics .menuPageDwellTime,
@@ -163,8 +186,8 @@
   justify-content: center;
   align-items: center;
   margin-top: 10px;
-  width: 13vw;
-  height: 8vw;
+  width: 15vw;
+  height: 10vw;
 }
 
 .GtoFRatioValue span {
@@ -251,9 +274,11 @@
 
 .menuDetailPageGazeBody {
   display: flex;
+  /* margin: 0 auto; */
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
+  position: relative;
   width: 30vw;
   margin-top: 10px;
 }
@@ -261,6 +286,7 @@
 .menuDetailPageGazeBody img {
   width: 20vw;
   height: auto;
+  border: 1px solid #474747;
 }
 
 .detailDiv {
@@ -268,13 +294,44 @@
   flex-direction: column;
   align-items: center;
   margin-left: 30px;
+  position: absolute;
+  /* top: 30px;
+  left: 30px; */
+  background: none;
+  padding: 10px;
+  z-index: 1;
 }
 
 .detailDiv p {
   font-size: 20px;
   font-weight: 700;
-  margin: 20px 0px;
   padding: 20px 0;
   white-space: nowrap;
-  background-color: #fff;
+  margin: 30px 0;
+  background: none;
+}
+
+.detailDiv p:nth-child(1) {
+  /* margin-top: 100px; */
+  margin-top: 250px;
+  margin-bottom: 2vw;
+}
+
+.detailDiv p:nth-child(2) {
+  margin-top: 3vw;
+  margin-bottom: 5vw;
+}
+
+.detailDiv p:nth-child(3) {
+  margin-top: 5vw;
+  margin-bottom: 3vw;
+}
+
+.detailDiv p:nth-child(4) {
+  /* margin-top: 20px; */
+  margin-bottom: 3vw;
+}
+
+.detailDiv p:nth-child(5) {
+  margin-bottom: 2vw;
 }

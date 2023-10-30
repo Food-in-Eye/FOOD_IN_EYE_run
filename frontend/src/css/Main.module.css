@@ -29,8 +29,12 @@
   font-weight: 600;
 }
 
-.cal .calender {
+.cal .calendar {
   margin-top: 10px;
+}
+
+.cal .today {
+  background-color: #3c68ba;
 }
 
 .rest .shortcut {

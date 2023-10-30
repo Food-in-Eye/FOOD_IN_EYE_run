@@ -2,7 +2,7 @@ import MenuBar from "../components/MenuBar";
 import MAnalysis from "../css/MenuAnalysis.module.css";
 import PieChartWithNeedle from "../charts/PieChartWithNeedle";
 import VerticalBarChart from "../charts/VerticalBarChart";
-import menuDetailPage from "../images/menu-detail-ex.jpeg";
+import menuDetailPage from "../images/menu_detail.jpg";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import PieChartForFixation from "../charts/PieChartForFixation";
@@ -19,12 +19,7 @@ function MenuReportPage() {
 
   const location = useLocation();
 
-  const { reportDate, dailyReportData, index, name, menuList } =
-    location?.state || {};
-
-  console.log("name", name);
-  console.log("menuList", menuList);
-  console.log("dailyReportData", dailyReportData);
+  const { dailyReportData, index, name, menuList } = location?.state || {};
 
   const aoiData = dailyReportData.aoi_summary;
   const saleData = dailyReportData.sale_summary;
@@ -46,10 +41,6 @@ function MenuReportPage() {
   const [menuPageDwellTime, setMenuPageDwellTime] = useState([]);
   const [menuDetailDwellTime, setMenuDetailDwellTime] = useState([]);
 
-  console.log("aoiData", aoiData);
-  console.log("saleData", saleData);
-  console.log("fNum", fNum);
-
   const setSaleData = () => {
     let maxCount = -1;
     let maxHour = -1;
@@ -70,8 +61,6 @@ function MenuReportPage() {
     setMaxHour(maxHour);
     setMenuSalesCount(foodDetail?.total_count);
     setSaleRatio(parseInt(((menuTotalSales / totalSales) * 100).toFixed(0)));
-
-    console.log("menuTotalSales, totalSales", menuTotalSales, totalSales);
   };
 
   const setAoiData = () => {
@@ -113,19 +102,12 @@ function MenuReportPage() {
           duration: detailDuration,
         };
 
-        console.log(
-          "foodNameFromMenuList, duration",
-          foodNameFromMenuList,
-          duration
-        );
-
         menuPageDurations.push(foodDuration);
         menuDetailDurations.push(foodDetailDuration);
       }
     }
 
     for (let i = 0; i < menuList.length; i++) {
-      console.log("menuList", menuList);
       if (!menuPageDurations.some((item) => item.name === menuList[i].name)) {
         menuPageDurations.push({
           index: i,
@@ -150,9 +132,6 @@ function MenuReportPage() {
 
     menuPageDurations.sort((a, b) => a.index - b.index);
     menuDetailDurations.sort((a, b) => a.index - b.index);
-
-    console.log("menuPageDurations", menuPageDurations);
-    console.log("menuDetailDurations", menuDetailDurations);
 
     setMenuPageDwellTime(menuPageDurations);
     setMenuDetailDwellTime(menuDetailDurations);
@@ -294,7 +273,6 @@ function MenuReportPage() {
 
     // 'Food 6' 메뉴의 정규화된 값을 찾아 상위 몇 퍼센트에 속하는지 계산
     const findPercentile = (data, targetName) => {
-      console.log("data, targetName", data, targetName);
       const targetItem = data.find((item) => item.name === targetName);
 
       setFixCount(targetItem?.fixation_count || 0);
@@ -333,7 +311,7 @@ function MenuReportPage() {
 
     // 정규화된 데이터 반환
     const normalizedData = normalizeData(data, minValue, maxValue);
-    console.log("normalizedData", normalizedData);
+
     // const sortedData = normalizedData
     //   .slice()
     //   .sort((a, b) => b.normalized_ratio - a.normalized_ratio);
@@ -342,7 +320,7 @@ function MenuReportPage() {
     // setFoodRankOfGtoF(rank);
 
     const percentileFood = findPercentile(normalizedData, fNum);
-    console.log("percentile", percentileFood);
+
     setFoodsPercentage(percentileFood.toFixed(0));
 
     return percentileFood;
@@ -366,9 +344,6 @@ function MenuReportPage() {
 
     setFixDataInDetail(fixPercentageObject);
   };
-
-  console.log("fixCount, gazeCount", fixCount, gazeCount);
-  console.log("fixDataInDetail", fixDataInDetail);
 
   return (
     <div>
@@ -440,8 +415,8 @@ function MenuReportPage() {
                 생기는 시선들의 집합
               </p>
             </div>
-            <div className={MAnalysis.GtoFRatioBody}>
-              {gazeCount ? (
+            {gazeCount ? (
+              <div className={MAnalysis.GtoFRatioBody}>
                 <div className={MAnalysis.GtoFRatioValue}>
                   <p>
                     시선 수 대비 Fixation 수 비율:{" "}
@@ -451,28 +426,26 @@ function MenuReportPage() {
                     <PieChartWithNeedle fc={fixCount} gc={gazeCount} />
                   </div>
                 </div>
-              ) : (
-                <div
-                  className={MAnalysis.GtoFRatioValue}
-                  style={{ backgroundColor: "#d2d2d2" }}
-                >
-                  <p>
-                    해당 메뉴에는 시선 데이터가 없으므로 그래프가 제공되지
-                    않습니다.
-                  </p>
-                </div>
-              )}
 
-              <div className={MAnalysis.GtoFRatioPercent}>
-                <p>
-                  전 메뉴 중 <strong style={{ fontSize: "20px" }}>상위 </strong>
-                </p>
-                <p>
-                  <span>{foodsPercentage} % </span>이내
-                </p>
-                {/* <span>{foodRankOfGtoF} 등</span> */}
+                <div className={MAnalysis.GtoFRatioPercent}>
+                  <p>
+                    전 메뉴 중{" "}
+                    <strong style={{ fontSize: "20px" }}>상위 </strong>
+                  </p>
+                  <p>
+                    <span>{foodsPercentage} % </span>이내
+                  </p>
+                  {/* <span>{foodRankOfGtoF} 등</span> */}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className={MAnalysis.GtoFRatioBodyWithNoValue}>
+                <p>
+                  해당 메뉴에는 시선 데이터가 없으므로 리포트가 제공되지
+                  않습니다.
+                </p>
+              </div>
+            )}
             {/* <div className={MAnalysis.GtoFRatioGraphDesc}></div> */}
           </section>
         </div>

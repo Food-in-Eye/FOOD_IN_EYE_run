@@ -48,8 +48,8 @@
   flex-direction: column;
   align-items: center;
   width: 20vw;
-  height: 25vw;
-  overflow: hidden;
+  height: 28vw;
+  overflow-y: scroll;
   margin: 30px auto 0px auto;
   background-color: #fff;
 }

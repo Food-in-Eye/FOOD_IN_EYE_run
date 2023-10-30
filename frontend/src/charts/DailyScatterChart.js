@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import dailyReport from "../data/daily_report.json";
 import SChart from "../css/ScatterChart.module.css";
 import { getFoods } from "../components/API.module";
 import {
@@ -13,26 +12,64 @@ import {
   Label,
 } from "recharts";
 
-// const data = [
-//   { x: 100, y: 200, z: 200 },
-//   { x: 120, y: 100, z: 260 },
-//   { x: 170, y: 300, z: 400 },
-//   { x: 140, y: 250, z: 280 },
-//   { x: 150, y: 400, z: 500 },
-//   { x: 110, y: 280, z: 200 },
-// ];
+function CustomTooltip({ active, payload }) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div
+        className="custom-tooltip"
+        style={{
+          width: "auto",
+          backgroundColor: "#fff",
+          padding: "2px 0px",
+          textAlign: "left",
+          border: "1px solid #d2d2d2",
+        }}
+      >
+        <p
+          style={{
+            width: "auto",
+            backgroundColor: "#fff",
+            padding: "2px",
+            fontSize: "15px",
+            fontFamily: "NotoSansKR-SemiBold",
+          }}
+        >{`메뉴명: ${data.name}`}</p>
+        <p
+          style={{
+            width: "auto",
+            backgroundColor: "#fff",
+            padding: "2px",
+            fontSize: "13px",
+            fontFamily: "NotoSansKR-SemiBold",
+          }}
+        >{`체류 시간(단위: 초): ${data.x}`}</p>
+        <p
+          style={{
+            width: "auto",
+            backgroundColor: "#fff",
+            padding: "2px",
+            fontSize: "13px",
+            fontFamily: "NotoSansKR-SemiBold",
+          }}
+        >{`주문량(단위: 건): ${data.y}`}</p>
+      </div>
+    );
+  }
 
-function DailyScatterChart(data) {
-  const sID = "64a2d45c1fe80e3e4db82af9";
+  return null;
+}
 
+function DailyScatterChart({ data }) {
+  const sID = localStorage.getItem("s_id");
   console.log("data", data);
 
-  const aoiData = data.data.aoi_summary.total_food_report;
-  const saleData = data.data.sale_summary.food_detail;
+  const aoiData = data.aoi_summary.total_food_report;
+  const saleData = data.sale_summary.food_detail;
   const [fNameList, setFNameList] = useState([]);
 
-  const [xAxisType, setXAxisType] = useState("duration");
-  const [xAxisLabel, setXAxisLabel] = useState("체류 시간");
+  const xAxisType = "duration";
+  const xAxisLabel = "체류 시간";
 
   // const handleXAxisChange = (e) => {
   //   const newXAxisType = e.target.value;
@@ -59,28 +96,28 @@ function DailyScatterChart(data) {
         foodName !== "ETC" &&
         foodName !== "Store INFO"
       ) {
+        console.log("foodName", foodName);
         const foodData = aoiData[foodName];
-        const fixCount = foodData.fix_count;
+        const foodIndex = parseInt(foodName.replace("Food ", "")) - 1;
+        console.log("fNameList", fNameList);
+        const foodNameFromFNameList = fNameList[foodIndex];
+        console.log("foodNameFromFNameList", foodNameFromFNameList);
+
         const duration = (foodData.duration / 1000).toFixed(2);
 
         let totalCount = 0;
-        let totalSales = 0;
 
         for (const fieldName in saleData) {
           if (fieldName === foodName) {
             totalCount = saleData[fieldName].total_count;
-            totalSales = saleData[fieldName].total_sales;
-
             break;
           }
         }
 
         foodDataArray.push({
-          // name: fNameList[foodDataArray.length],
-          // totalSales: totalSales,
+          name: foodNameFromFNameList,
           x: duration,
           y: totalCount,
-          // fillColor: "#1e2f4d",
         });
       }
     }
@@ -92,26 +129,6 @@ function DailyScatterChart(data) {
 
   return (
     <div className={SChart.total}>
-      {/* <div className={SChart.radioButtons}>
-        <label>
-          <input
-            type="radio"
-            value="fixCount"
-            checked={xAxisType === "fixCount"}
-            onChange={handleXAxisChange}
-          />
-          시선 수
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="duration"
-            checked={xAxisType === "duration"}
-            onChange={handleXAxisChange}
-          />
-          체류 시간
-        </label>
-      </div> */}
       <ResponsiveContainer width="100%" height={400}>
         <ScatterChart
           margin={{
@@ -122,12 +139,7 @@ function DailyScatterChart(data) {
           }}
         >
           <CartesianGrid />
-          <XAxis
-            type="number"
-            dataKey="x"
-            name={xAxisLabel}
-            // unit={xAxisType === "fixCount" ? "" : "초"}
-          >
+          <XAxis type="number" dataKey="x" name={xAxisLabel}>
             <Label
               value="체류시간(단위: 초)"
               offset={-15}
@@ -142,8 +154,11 @@ function DailyScatterChart(data) {
               angle={-90}
             />
           </YAxis>
-          <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-          <Scatter name="A school" data={graphData} fill="#8884d8" />
+          <Tooltip
+            cursor={{ strokeDasharray: "3 3" }}
+            content={CustomTooltip}
+          />
+          <Scatter name="Report" data={graphData} fill="#8884d8" />
         </ScatterChart>
       </ResponsiveContainer>
     </div>

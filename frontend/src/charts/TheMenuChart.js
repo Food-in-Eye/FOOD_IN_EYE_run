@@ -12,8 +12,6 @@ function TheMenuChart({ data, menus }) {
   const aoiData = data.aoi_summary.total_food_report;
   const saleData = data.sale_summary.food_detail;
 
-  console.log("menus", menus);
-
   const handleMenuItemValueChange = (e) => {
     setMenuItemValue(e.target.value);
   };
@@ -100,7 +98,6 @@ function TheMenuChart({ data, menus }) {
 
     dataArray.sort((a, b) => a.index - b.index);
 
-    console.log("dataArray", dataArray);
     setFoodDataArray(dataArray);
   }, [aoiData, saleData, menuItems, menus]);
 
@@ -160,8 +157,6 @@ function TheMenuChart({ data, menus }) {
   };
 
   const menu = generateMenu();
-
-  console.log("foodDataArray", foodDataArray);
 
   return (
     <div className={MChart.total}>

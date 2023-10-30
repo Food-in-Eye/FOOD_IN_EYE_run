@@ -21,6 +21,7 @@ function OrderHistoryTable({ data }) {
       {
         Header: "메뉴 총 가격",
         accessor: "menuPrices",
+        Cell: ({ value }) => <div style={{ textAlign: "right" }}>{value}</div>,
       },
     ],
     []

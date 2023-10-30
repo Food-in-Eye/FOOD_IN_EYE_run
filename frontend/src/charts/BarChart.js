@@ -1,4 +1,3 @@
-import dailyReport from "../data/daily_report.json";
 import {
   ComposedChart,
   Line,
@@ -69,8 +68,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 function BarChart({ data }) {
   const hourlySaleInfo = data.sale_summary.hourly_sale_info;
   const hourlyDwellTime = data.aoi_summary.hourly_dwell_time;
-
-  console.log("hourlySaleInfo", hourlySaleInfo);
 
   const chartData = hourlySaleInfo.map((hourData, index) => ({
     name: `${index}시`,
