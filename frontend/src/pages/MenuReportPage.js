@@ -22,6 +22,8 @@ function MenuReportPage() {
   const { dailyReportData, index, name, menuList } = location?.state || {};
 
   const aoiData = dailyReportData.aoi_summary;
+  console.log(aoiData);
+
   const saleData = dailyReportData.sale_summary;
   const fNum = `Food ${index + 1}`;
   const [maxHour, setMaxHour] = useState(-1);
@@ -80,12 +82,24 @@ function MenuReportPage() {
   const setDwellTimes = () => {
     const menuPageDurations = [];
     const menuDetailDurations = [];
+    let duration = 0;
+    let detailDuration = 0;
 
     for (const foodName in aoiData.total_food_report) {
       if (foodName !== "ETC" && foodName !== "Store INFO") {
         const foodData = aoiData.total_food_report[foodName];
-        const duration = (foodData.duration / 10000).toFixed(2);
-        const detailDuration = (foodData.in_detail.duration / 10000).toFixed(2);
+        if (foodData.duration !== null) {
+          duration = (foodData.duration / 10000).toFixed(2);
+        }
+        if (foodData.in_detail !== null) {
+          detailDuration = (foodData.in_detail.duration / 10000).toFixed(2);
+        }
+        // const duration = (
+        //   foodData.duration ? foodData.duration : 0 / 10000
+        // ).toFixed(2);
+        // const detailDuration = (
+        //   foodData.in_detail.duration ? foodData.in_detail.duration : 0 / 10000
+        // ).toFixed(2);
 
         const foodIndex = parseInt(foodName.replace("Food ", "")) - 1;
         const foodNameFromMenuList = menuList[foodIndex]?.name;
@@ -179,20 +193,20 @@ function MenuReportPage() {
     for (const foodName in aoiData.total_food_report) {
       if (foodName !== "ETC" && foodName !== "Store INFO") {
         const foodData = aoiData.total_food_report[foodName];
-        const detailData = foodData.in_detail;
+        const detailData = foodData.in_detail ? foodData.in_detail : null;
 
         const detailFixCount =
-          detailData.fix_count.name +
-          detailData.fix_count.image +
-          detailData.fix_count.info +
-          detailData.fix_count.price +
-          detailData.fix_count.etc;
+          detailData?.fix_count.name +
+          detailData?.fix_count.image +
+          detailData?.fix_count.info +
+          detailData?.fix_count.price +
+          detailData?.fix_count.etc;
         const detailGazeCount =
-          detailData.gaze_count.name +
-          detailData.gaze_count.image +
-          detailData.gaze_count.info +
-          detailData.gaze_count.price +
-          detailData.gaze_count.etc;
+          detailData?.gaze_count.name +
+          detailData?.gaze_count.image +
+          detailData?.gaze_count.info +
+          detailData?.gaze_count.price +
+          detailData?.gaze_count.etc;
         const fixCount = foodData.fix_count || 0 + detailFixCount;
 
         const gazeCount = foodData.gaze_count || 0 + detailGazeCount;
